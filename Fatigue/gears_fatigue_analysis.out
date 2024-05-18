@@ -1,0 +1,25 @@
+input file: ./Fatigue/input_gears.dat
+key:           RL value:         0.99
+key:          ntp value:        19.00
+key:          ntg value:        62.00
+key:           SU value:      1200.00
+key:            P value:       100.00
+key:        speed value:      1600.00
+key:          phi value:        20.00
+key:           dp value:       152.00
+key:           dg value:       496.00
+key:            F value:       120.00
+key:           KV value:         1.52
+key:          KOL value:         1.50
+key:           KM value:         1.70
+key:           HB value:       353.00
+key:           CE value:       189.00
+CE:       189.00
+CG:        0.123
+Torque:       445.24
+Tangential force, kN:         5.86
+Hertz stress, MPa:       601.27
+SFHZ, MPa:       905.28
+KN:         0.66
+N, cycles:     1.49E+10
+hours:    155240.67 days:      6468.36 years:        17.72

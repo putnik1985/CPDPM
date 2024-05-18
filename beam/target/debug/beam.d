@@ -1,0 +1,1 @@
+/usr/home/nikita/programming/CPDPM/beam/target/debug/beam: /usr/home/nikita/programming/CPDPM/beam/src/krylov.rs /usr/home/nikita/programming/CPDPM/beam/src/lib.rs /usr/home/nikita/programming/CPDPM/beam/src/main.rs
