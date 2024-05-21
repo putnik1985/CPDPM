@@ -39,9 +39,9 @@ END {
      print "set grid"
 
      plots = 1
-     print "plot" " \"< awk ' NR>=2 {print $$" x[plots] "," "$$" y[plots] "}'" " " file[plots] "\"" " title " "\"" name[plots] "\"" " with lines,\\"
+     print "plot" " \"<awk 'NR>=2 {print $$" x[plots] "," "$$" y[plots] "}'" " " file[plots]"\"" " title " "\"" name[plots] "\"" " with lines,\\"
      for(plots = 2; plots < current - 1; plots++){
-         print "     \"< awk ' NR>=2 {print $$" x[plots] "," "$$" y[plots] "}'" " " file[plots] "\"" " title " "\"" name[plots] "\"" " with lines,\\"
+         print "     \"<awk 'NR>=2 {print $$" x[plots] "," "$$" y[plots] "}'" " " file[plots]"\"" " title " "\"" name[plots] "\"" " with lines,\\"
      }
-         print "     \"< awk ' NR>=2 {print $$" x[plots] "," "$$" y[plots] "}'" " " file[plots] "\"" " title " "\"" name[plots] "\"" " with lines"
+         print "     \"<awk 'NR>=2 {print $$" x[plots] "," "$$" y[plots] "}'" " " file[plots]"\"" " title " "\"" name[plots] "\"" " with lines"
 }

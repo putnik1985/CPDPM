@@ -1,0 +1,2 @@
+awk -f graph.awk inputfile.dat > plot.out
+gnuplot -persist -e "call 'plot.out'"
