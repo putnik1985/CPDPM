@@ -1,0 +1,26 @@
+geometry description
+
+_element,0.,250.,60.,mm,
+_element,250.,590.,60.,mm,
+_element,590.,750.,45.,mm,
+_fillet,590.,4.5,mm,
+_hole,250.,4.5,mm,
+
+loads application
+
+_force,250.,660.,1540.,N,
+_force,590.,2640.,3520.,N,
+_moment,750.,2500.,4000.,N,
+
+
+shaft material properties
+
+_E,200.,GPa,
+_Nu,0.3,
+_Su,250.,MPa,
+_Sy,340.,MPa,
+
+boundary conditions
+
+_u,0.,
+_u,750.,
