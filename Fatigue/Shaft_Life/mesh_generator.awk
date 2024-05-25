@@ -89,18 +89,17 @@ END {
        printf("%12d%12.2f%12.2f\n", n, moment_mean[i], moment_ampl[i]) >> "Moments.dat"
       }
 
-      print current_u > "Displacements.dat"
+      print current_u > "Restraints.dat"
       for(i=1; i<=current_u; i++){
          x = u_x[i];
          n = find_node(x);
-         printf("%12d\n",n) >> "Displacements.dat";
+         printf("%12d\n",2 * n - 1) >> "Restraints.dat";
       }
 
-      print current_angle > "Angles.dat"
       for(i=1; i<=current_angle; i++){
          x = angle_x[i];
          n = find_node(x);
-         printf("%12d\n",n) >> "Angles.dat";
+         printf("%12d\n",2 * n) >> "Restraints.dat";
       }
 
       print current_fillet > "Fillets.dat"

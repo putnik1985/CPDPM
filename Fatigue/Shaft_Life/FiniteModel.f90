@@ -1,11 +1,11 @@
-       SUBROUTINE FORM_LOCAL_KE_BEAM(EJ,L,K)
+       SUBROUTINE form_ke(EJ,L,KE)
 
        implicit none
        real*8 EJ, L 
-       real*8 K(4,4)
+       real*8 KE(4,4)
        INTEGER I,J
 
-       call Matrix_Zero(4,K)
+       call mzero(4,KE)
 
        KE(1,1) = 12 * EJ / L**3
        KE(1,2) = 6 * EJ / L**2 
@@ -21,13 +21,13 @@
        
        DO I=1,4
           DO J=I,4
-             K(J,I)=K(I,J)
+             KE(J,I)=KE(I,J)
           ENDDO ! DO J
        ENDDO !DO I
 							 
-       END SUBROUTINE FORM_LOCAL_KE_BEAM
+       END SUBROUTINE form_ke 
 
-       subroutine Matrix_Zero(n,m)
+       subroutine mzero(n,m)
         implicit none
         integer n, i, j
         real*8 m(n,n)
@@ -36,22 +36,23 @@
            m(i,j)=0.0
           enddo
           enddo
-       end subroutine Matrix_Zero
+       end subroutine mzero
 
-       subroutine Vector_Zero(n,m)
+       subroutine vzero(n,m)
         implicit none
         integer n, i
         real*8 m(n)
            do i=1,n
            m(i)=0.0
           enddo
-       end subroutine Vector_Zero
+       end subroutine vzero
 
-       subroutine Add_Global(i,j,KE,K,N)
+       subroutine append(i,j,KE,K,N)
         implicit none
         real*8 KE(4,4)
         real*8 K(N,N)
-        integer r, c, N
+        integer r, c, N, i, j
+
         do r = 1,2 
          do c = 1,2 
          K(2*i-2+r,2*i-2+c) = K(2*i-2+r,2*i-2+c) + KE(r,c)
@@ -60,4 +61,96 @@
          K(2*j-2+r,2*j-2+c) = K(2*j-2+r,2*j-2+c) + KE(r+2,c+2)
          enddo
         enddo 
-      end subroutine Add_Global
+
+      end subroutine append
+
+      subroutine apply_restraints(n, K, new_dimension)
+        implicit none
+        integer n, new_dimension
+        double precision K(n,n)
+        integer dof, i, j, constraints
+        integer, allocatable :: var_to_remove(:)
+        integer, allocatable :: transform(:)
+
+        open(unit = 12, file = "Restraints.dat")
+        read(12,*) constraints
+           allocate(var_to_remove(constraints))
+            do i=1, constraints
+               read(12,*) dof
+               var_to_remove(i) = dof
+            enddo
+        close(12)
+
+        allocate(transform(n)) 
+        do i=1, n
+           transform(i) = i
+        enddo
+
+        call sort(constraints, var_to_remove)
+        do i=1, constraints
+           dof = transform(var_to_remove(i))
+           call mshift(n, K, dof)
+           transform(dof) = 0
+           do j=dof + 1, n
+              transform(j) = transform(j) - 1
+           enddo
+         enddo
+        deallocate(var_to_remove)
+        deallocate(transform)
+        new_dimension = n - constraints
+
+     end subroutine apply_restraints
+
+     subroutine sort(n, a)
+       implicit none
+       integer n
+       integer a(n)
+       integer temp, i, j
+ 
+       do i = 1, n-1
+          do j = i + 1, n
+             if (a(i) >  a(j)) then
+                 temp = a(i)
+                 a(i) = a(j)
+                 a(j) = temp
+              endif
+          enddo
+       enddo
+     end subroutine sort
+
+     subroutine mshift(n, K, dof)
+      implicit none
+      double precision K(n,n)
+      integer n, i, j, dof
+
+          do i = dof, n - 1
+             K(i,:) = K(i+1,:)
+             K(:,i) = K(:,i+1)
+          enddo
+     end subroutine mshift
+
+     subroutine vshift(n, v, dof)
+      implicit none
+      double precision v(n)
+      integer n, i, j, dof
+          do i = dof, n - 1
+             v(i) = v(i+1)
+          enddo
+     end subroutine vshift
+
+     subroutine mprint(n, K)
+      implicit none
+      integer n
+      double precision K(n,n)
+      integer i, j
+       do i = 1, n
+          write(*,*) K(i,:)
+       enddo
+     end subroutine mprint
+
+     subroutine vprint(n, a)
+      implicit none
+      integer n
+      double precision a(n)
+      write(*,*) a
+     end subroutine vprint 
