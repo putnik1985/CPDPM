@@ -75,21 +75,20 @@ END {
       for(i=1; i<=current_elem+1; i++)
        printf("%12d%12.4f\n", i, node[i]) >> "Nodes.dat"
 
-      print current_force > "Forces.dat"
+      print current_force + current_moment > "Loads.dat"
       for(i=1; i<=current_force; i++){
        x = force_x[i];
        n = find_node(x);
-       printf("%12d%12.2f%12.2f\n", n, force_mean[i], force_ampl[i]) >> "Forces.dat"
+       printf("%12d%12.2f%12.2f\n", 2 * n - 1, force_mean[i], force_ampl[i]) >> "Loads.dat"
       }
 
-      print current_moment > "Moments.dat"
       for(i=1; i<=current_moment; i++){
        x = moment_x[i];
        n = find_node(x);
-       printf("%12d%12.2f%12.2f\n", n, moment_mean[i], moment_ampl[i]) >> "Moments.dat"
+       printf("%12d%12.2f%12.2f\n", 2 * n, moment_mean[i], moment_ampl[i]) >> "Loads.dat"
       }
 
-      print current_u > "Restraints.dat"
+      print current_u  + current_angle > "Restraints.dat"
       for(i=1; i<=current_u; i++){
          x = u_x[i];
          n = find_node(x);
