@@ -1,12 +1,12 @@
        SUBROUTINE form_ke(EJ,L,KE)
 
        implicit none
-       real*8 EJ, L 
-       real*8 KE(4,4)
+       double precision EJ, L 
+       double precision KE(4,4)
        INTEGER I,J
 
        call mzero(4,KE)
-
+       
        KE(1,1) = 12 * EJ / L**3
        KE(1,2) = 6 * EJ / L**2 
        KE(1,3) = -12 * EJ / L**3 
@@ -18,6 +18,8 @@
 
        KE(3,3) = 12 * EJ /L**3
        KE(3,4) = -6 * EJ / L**2
+
+       KE(4,4) = 4 * EJ / L
        
        DO I=1,4
           DO J=I,4
@@ -49,10 +51,9 @@
 
        subroutine append(i,j,KE,K,N)
         implicit none
-        real*8 KE(4,4)
-        real*8 K(N,N)
+        double precision KE(4,4)
+        double precision K(N,N)
         integer r, c, N, i, j
-
         do r = 1,2 
          do c = 1,2 
          K(2*i-2+r,2*i-2+c) = K(2*i-2+r,2*i-2+c) + KE(r,c)
@@ -154,3 +155,35 @@
       double precision a(n)
       write(*,*) a
      end subroutine vprint 
+
+     subroutine create_K(n, K, funit, en)
+       implicit none
+       integer funit
+       integer en, n, i, j
+       double precision K(n,n)
+       double precision ke(4,4)
+       integer node
+       double precision L,EJ
+
+       call mzero(n, K)
+       do i=1, en
+        read(funit,*) node, L, EJ
+        call form_ke(EJ, L, ke)
+        call append(node, node + 1, ke, K, n)
+       enddo
+
+     end subroutine create_K
+
+     subroutine create_P(n, P_mean, P_ampl)
+       integer n, i, j 
+       double precision P_mean(n), P_ampl(n)
+       double precision mean, ampl
+       integer records, dof
+       open(unit = 12, file = "Loads.dat")
+       read(12,*) records
+       do i=1, records
+        read(12,*) dof, mean, ampl
+        P_mean(dof) = mean
+        P_ampl(dof) = ampl
+       enddo
+    end subroutine create_P
