@@ -1,0 +1,2 @@
+########gfortran test.f90 -L./ -llapack -lrefblas -ltmglib
+gfortran test.f90 -L/home/putins/Downloads/lapack-3.12.0 -llapack -lrefblas -ltmglib
