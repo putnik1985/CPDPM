@@ -69,7 +69,7 @@
         implicit none
         integer n, new_dimension
         double precision K(n,n)
-        integer dof, i, j, constraints
+        integer dof, i, j, constraints, global_dof
         integer, allocatable :: var_to_remove(:)
         integer, allocatable :: transform(:)
 
@@ -89,10 +89,11 @@
         call sort(constraints, var_to_remove)
 
         do i=1, constraints
-           dof = transform(var_to_remove(i))
+           global_dof = var_to_remove(i)
+           dof = transform(global_dof)
+           transform(global_dof) = 0
            call mshift(n, K, dof)
-           transform(dof) = 0
-           do j=dof + 1, n
+           do j=global_dof + 1, n
               transform(j) = transform(j) - 1
            enddo
         enddo
@@ -193,7 +194,7 @@
         implicit none
         integer n, new_dimension
         double precision P(n)
-        integer dof, i, j, constraints
+        integer dof, i, j, constraints, global_dof
         integer, allocatable :: var_to_remove(:)
         integer, allocatable :: transform(:)
 
@@ -213,10 +214,11 @@
         call sort(constraints, var_to_remove)
 
         do i=1, constraints
-           dof = transform(var_to_remove(i))
+           global_dof = var_to_remove(i)
+           dof = transform(global_dof)
+           transform(global_dof) = 0
            call vshift(n, P, dof)
-           transform(dof) = 0
-           do j=dof + 1, n
+           do j=global_dof + 1, n
               transform(j) = transform(j) - 1
            enddo
         enddo
@@ -258,3 +260,22 @@
 
         deallocate(var_to_remove)
      end subroutine create_transform 
+
+subroutine write_solution(n, u)
+ implicit none
+ integer nodes, node
+ double precision u(n)
+ integer n
+ double precision x
+ integer i, j
+
+ open(unit = 12, file = "Nodes.dat")
+ read(12,*) nodes
+
+ do i=1, nodes
+  read(12,*) node, x
+  write(*,'(3F12.4)') x, u(2 * node - 1), u(2 * node)
+ enddo
+ close(12)
+
+end subroutine write_solution
