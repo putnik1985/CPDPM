@@ -86,8 +86,8 @@
         do i=1, n
            transform(i) = i
         enddo
-
         call sort(constraints, var_to_remove)
+
         do i=1, constraints
            dof = transform(var_to_remove(i))
            call mshift(n, K, dof)
@@ -95,11 +95,11 @@
            do j=dof + 1, n
               transform(j) = transform(j) - 1
            enddo
-         enddo
+        enddo
+
         deallocate(var_to_remove)
         deallocate(transform)
         new_dimension = n - constraints
-
      end subroutine apply_restraints
 
      subroutine sort(n, a)
@@ -125,9 +125,10 @@
       integer n, i, j, dof
 
           do i = dof, n - 1
-             K(i,:) = K(i+1,:)
-             K(:,i) = K(:,i+1)
+                K(i,:) = K(i+1,:)
+                K(:,i) = K(:,i+1)
           enddo
+
      end subroutine mshift
 
      subroutine vshift(n, v, dof)
@@ -153,7 +154,7 @@
       implicit none
       integer n
       double precision a(n)
-      write(*,*) a
+      write(*,*) a(:)
      end subroutine vprint 
 
      subroutine create_K(n, K, funit, en)
@@ -187,3 +188,73 @@
         P_ampl(dof) = ampl
        enddo
     end subroutine create_P
+
+      subroutine remove_dofs(n, P, new_dimension)
+        implicit none
+        integer n, new_dimension
+        double precision P(n)
+        integer dof, i, j, constraints
+        integer, allocatable :: var_to_remove(:)
+        integer, allocatable :: transform(:)
+
+        open(unit = 12, file = "Restraints.dat")
+        read(12,*) constraints
+           allocate(var_to_remove(constraints))
+            do i=1, constraints
+               read(12,*) dof
+               var_to_remove(i) = dof
+            enddo
+        close(12)
+
+        allocate(transform(n)) 
+        do i=1, n
+           transform(i) = i
+        enddo
+        call sort(constraints, var_to_remove)
+
+        do i=1, constraints
+           dof = transform(var_to_remove(i))
+           call vshift(n, P, dof)
+           transform(dof) = 0
+           do j=dof + 1, n
+              transform(j) = transform(j) - 1
+           enddo
+        enddo
+
+        deallocate(var_to_remove)
+        deallocate(transform)
+        new_dimension = n - constraints
+     end subroutine remove_dofs
+
+      subroutine create_transform(n, transform)
+        implicit none
+        integer n, constraints, dof, i, j, global_dof
+        integer transform(n)
+        integer, allocatable :: var_to_remove(:)
+
+        open(unit = 12, file = "Restraints.dat")
+        read(12,*) constraints
+           allocate(var_to_remove(constraints))
+            do i=1, constraints
+               read(12,*) dof
+               var_to_remove(i) = dof
+            enddo
+        close(12)
+
+        do i=1, n
+           transform(i) = i
+        enddo
+
+        call sort(constraints, var_to_remove)
+
+        do i=1, constraints
+           global_dof = var_to_remove(i)
+           dof = transform(global_dof)
+           transform(global_dof) = 0
+           do j = global_dof + 1, n
+              transform(j) = transform(j) - 1
+           enddo
+        enddo
+
+        deallocate(var_to_remove)
+     end subroutine create_transform 
