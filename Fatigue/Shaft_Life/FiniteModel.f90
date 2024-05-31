@@ -268,13 +268,14 @@ subroutine write_solution(n, u)
  integer n
  double precision x
  integer i, j
+ double precision, parameter :: conv_to_mm = 1000.
 
  open(unit = 12, file = "Nodes.dat")
  read(12,*) nodes
 
  do i=1, nodes
   read(12,*) node, x
-  write(*,'(3F12.4)') x, u(2 * node - 1), u(2 * node)
+  write(*,'(3F12.4)') x, conv_to_mm * u(2 * node - 1), conv_to_mm * u(2 * node)
  enddo
  close(12)
 

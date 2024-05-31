@@ -1,11 +1,11 @@
-BEGIN { FS=","; pi = 3.14159;}
+BEGIN { FS=","; pi = 3.14159; conv_to_m = 0.001; conv_to_Pa = 1000000000.;}
 
 $1 ~ "_element" { 
                   current_elem += 1;
                   x1 = $2;
                   x2 = $3;
-                   D = $4;
-                   L = abs(x2-x1);
+                   D = conv_to_m * $4;
+                   L = conv_to_m * abs(x2-x1);
                    J = pi * D * D * D * D / 64.;
                    elem_length[current_elem] = L;
                    elem_J[current_elem] = J;
@@ -13,7 +13,7 @@ $1 ~ "_element" {
                    node[current_elem+1] = x2;
                  }
 
-$1 ~ "_E" { E = $2 ; }
+$1 ~ "_E" { E = conv_to_Pa * $2 ; }
 $1 ~ "_Nu" { Nu = $2; }
 $1 ~ "_Su" { SU = $2; }
 $1 ~ "_Sy" { SY = $2; }
