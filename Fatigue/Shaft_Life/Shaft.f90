@@ -58,11 +58,10 @@ program shaft
           u_ampl(j) = v
        enddo
 
- write(*,*) "Mean:"
- call write_solution(n, u_mean)
- write(*,*)
- write(*,*) "Amplitudes:"
- call write_solution(n, u_ampl)
+ call write_solution(n, u_mean, 1, 6)
+ call write_solution(n, u_ampl, 2, 7)
+ call write_shaft_loads(n, u_mean, 1, 8)
+ call write_shaft_loads(n, u_ampl, 2, 9)
 
  deallocate(K, P_mean, P_ampl)
  deallocate(K_reduced)

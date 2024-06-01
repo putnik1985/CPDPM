@@ -261,22 +261,81 @@
         deallocate(var_to_remove)
      end subroutine create_transform 
 
-subroutine write_solution(n, u)
+subroutine write_solution(n, u, filename, unit_num)
  implicit none
- integer nodes, node
+ integer nodes, node, unit_num
  double precision u(n)
  integer n
  double precision x
  integer i, j
  double precision, parameter :: conv_to_mm = 1000.
+ integer filename
+
+ if (filename .eq. 1) then
+     open(unit = unit_num, file = "displacement_mean.out")
+ else
+     open(unit = unit_num, file = "displacement_ampl.out")
+ endif
 
  open(unit = 12, file = "Nodes.dat")
  read(12,*) nodes
 
  do i=1, nodes
   read(12,*) node, x
-  write(*,'(3F12.4)') x, conv_to_mm * u(2 * node - 1), conv_to_mm * u(2 * node)
+  write(unit_num,'(3F12.4)') x, conv_to_mm * u(2 * node - 1), u(2 * node)
  enddo
  close(12)
-
+ close(unit_num)
 end subroutine write_solution
+
+subroutine write_shaft_loads(n, u, filename, unit_num)
+ implicit none
+ integer n, i, j, k, element, nodes1, node, unit_num
+ double precision ke(4,4), u(n), v(4), loads(4)
+ double precision L, EJ, x
+ double precision, allocatable ::  nodes(:)
+ integer ne
+ integer filename
+
+ open(unit = 10, file = "Nodes.dat")
+ read(10,*) nodes1
+ allocate(nodes(nodes1))
+ do i=1, nodes1
+  read(10,*) node, x
+  nodes(i) = x
+ enddo
+ close(10)
+
+ open(unit = 12, file = "Elements.dat")
+ read(12,*) ne
+
+ if (filename .eq. 1) then
+     open(unit = unit_num, file = "shaft_loads_mean.out")
+ else
+     open(unit = unit_num, file = "shaft_loads_ampl.out")
+ endif
+  
+ do i=1, ne
+  read(12,*) element, L, EJ
+  call form_ke(EJ, L, ke)
+   do j = 1, 2
+    v(2*j-1) = u( 2 * (element + j - 1) - 1)
+    v(2*j) = u( 2 * (element + j - 1) )
+   enddo
+
+   do j=1,4
+    loads(j) = 0.
+    do k=1, 4
+     loads(j) = loads(j) + ke(j,k) * v(k)
+    enddo
+   enddo
+  x = nodes(i)
+  write(unit_num,'(3F12.2)') x, loads(1), loads(2)
+ enddo
+  x = nodes(ne+1)
+  write(unit_num,'(3F12.2)') x, -loads(3), -loads(4)
+  
+ close(12)
+ close(unit_num)
+ deallocate(nodes)
+end subroutine write_shaft_loads
