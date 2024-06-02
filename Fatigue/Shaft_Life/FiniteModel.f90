@@ -1,3 +1,4 @@
+
        SUBROUTINE form_ke(EJ,L,KE)
 
        implicit none
@@ -339,3 +340,147 @@ subroutine write_shaft_loads(n, u, filename, unit_num)
  close(unit_num)
  deallocate(nodes)
 end subroutine write_shaft_loads
+
+subroutine create_moments(n, u, Moments)
+ implicit none
+ integer n, i, j, k, element, nodes1, node, unit_num
+ double precision ke(4,4), u(n), v(4), loads(4), Moments(n/2)
+ double precision L, EJ, x
+ integer ne
+
+ open(unit = 12, file = "Elements.dat")
+ read(12,*) ne
+
+ do i=1, ne
+  read(12,*) element, L, EJ
+  call form_ke(EJ, L, ke)
+   do j = 1, 2
+    v(2*j-1) = u( 2 * (element + j - 1) - 1)
+    v(2*j) = u( 2 * (element + j - 1) )
+   enddo
+
+   do j=1,4
+    loads(j) = 0.
+    do k=1, 4
+     loads(j) = loads(j) + ke(j,k) * v(k)
+    enddo
+   enddo
+  Moments(i) = loads(2)
+ enddo
+
+ Moments(ne+1) = -loads(4)
+ close(12)
+end subroutine create_moments
+
+subroutine create_stress(nodes, M, stress)
+  implicit none
+  integer nodes, i, j, ne, element
+  double precision M(nodes)
+  double precision stress(nodes)
+  double precision R, Jz
+  open(unit=12, file = "Geometry.dat")
+  read(12,*) ne
+
+  do i=1, ne
+   read(12,*) element, R, Jz
+   stress(i) = abs(M(i) * R / (2 * Jz))
+  enddo
+   stress(ne+1) = abs(M(ne+1) * R / (2 * Jz))
+  close(12)
+end subroutine create_stress
+
+subroutine create_fillets_Kf(nodes, fillets, geometry)
+ implicit none
+ integer i, j, nodes, records, node
+ double precision fillets(nodes)
+ double precision geometry(nodes)
+
+ double precision Kf, Kt, q, rad, R
+
+ open(unit=12, file = "Fillets.dat")
+ read(12,*) records
+
+ do i=1, nodes
+  fillets(i) = 1.
+ enddo
+
+ do i=1, records
+  read(12,*) node, rad
+  R = geometry(node)
+  Kt = fillet_Kt(R, rad)
+   q = notch_sensitivity(rad)
+  Kf = 1. + q * (Kt - 1.)
+  fillets(node) = Kf
+ enddo
+
+ close(12)
+end subroutine create_fillets_Kf
+
+subroutine create_holes(nodes, holes, geometry)
+  implicit none
+  double precision R, rad
+  integer i, j, nodes, records, node
+  double precision holes(nodes), geometry(nodes)
+  double precision Kt, Kf, q
+ 
+  open(unit=12, file="Holes.dat")
+   read(12,*) records
+
+  do i=1, nodes
+   holes(i) = 1.
+  enddo
+
+  do i=1, records
+   read(12,*) node, rad
+   R = geometry(node)
+   Kt = holes_Kt(R, rad)
+    q = notch_sensitivity(rad)
+   Kf = 1. + q * (Kt - 1.)
+
+  enddo
+  close(12)
+end subroutine create_holes
+
+subroutine include_Kt(nodes, stress, fillets, holes)
+ implicit none
+ integer i, j, nodes
+ double precision stress(nodes), fillets(nodes), holes(nodes)
+
+ do i=1, nodes
+  stress(i) = stress(i) * holes(i) * fillets(i)
+ enddo
+end subroutine include_Kt
+
+function max_stress_node(nodes, stress)
+ implicit none
+ integer i, j, nodes
+ double precision stress(nodes)
+ double precision max_stress
+ integer max_stress_node
+
+ max_stress = 0.
+ do i=1, nodes
+  if (stress(i) > max_stress ) then
+      max_stress = stress(i)
+      max_stress_node = i
+  endif
+ enddo
+ return
+end function max_stress_node
+
+function equiv(s_mean, s_ampl, SU)
+ implicit none
+ double precision equiv, s_mean, s_ampl, SU
+
+ equiv = s_ampl / (1. - (s_mean/SU)**2)
+ return
+end function equiv
+
+function cycles(equiv, B, C)
+ implicit none
+ double precision equiv, B, C 
+ double precision cycles
+
+ cycles = C * equiv**(-B)
+ return
+end function cycles

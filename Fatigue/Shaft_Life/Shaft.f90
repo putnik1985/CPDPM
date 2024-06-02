@@ -63,6 +63,27 @@ program shaft
  call write_shaft_loads(n, u_mean, 1, 8)
  call write_shaft_loads(n, u_ampl, 2, 9)
 
+
+ call create_geometry(nodes, geometry)
+ allocate(M_mean(nodes), M_ampl(nodes))
+ allocate(stress_mean(nodes), stress_ampl(nodes))
+
+ call create_stress(nodes, M_mean, stress_mean)
+ call create_stress(node, M_ampl, stress_ampl)
+ call create_fillets(nodes, fillets, geometry)
+ call creat_holes(nodes, holes, geometry)
+ call include_Kt(nodes, stress_ampl, fillets, holes)
+ 
+ node = max_stress_node(nodes,stress_ampl)
+ write(*,*) "Max stress amplitude at node: ", node, stress_ampl(node)
+ s_mean = stress_mean(node)
+ s_ampl = stress_ampl(node)
+
+ equiv_stress = equiv(s_mean, s_ampl, SU)
+ call read_fatigue(B, C)
+
+ write(*,*) "cycles: ", cycles(equiv_stress, B, C)
+
  deallocate(K, P_mean, P_ampl)
  deallocate(K_reduced)
  deallocate(P_mean_reduced, P_ampl_reduced)
