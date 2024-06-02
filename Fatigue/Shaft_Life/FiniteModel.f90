@@ -484,3 +484,30 @@ function cycles(equiv, B, C)
  cycles = C * equiv**(-B)
  return
 end function cycles
+
+subroutine create_geometry(nodes, geometry)
+ implicit none 
+ integer nodes, i, j, node, ne
+ double precision geometry(nodes), rad, J
+ open(unit = 12, file = "Geometry.dat")
+ read(12,*) ne
+
+ do i=1, ne
+  read(12,*) node, rad, J
+  geometry(i) = rad
+ enddo
+  geometry(nodes) = rad
+ close(12)
+end subroutine create_geometry
+
+subroutine read_fatigue(B, C)
+ implicit none
+ double precision B, C
+ open(unit = 12, file = "Wheller_B.dat")
+ read(12,*) B
+ close(12)
+
+ open(unit = 12, file = "Wheller_C.dat")
+ read(12,*) C 
+ close(12)
+end subroutine read_fatigue

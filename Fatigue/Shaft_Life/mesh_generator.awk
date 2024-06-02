@@ -1,4 +1,4 @@
-BEGIN { FS=","; pi = 3.14159; conv_to_m = 0.001; conv_to_Pa = 1000000000.;}
+BEGIN { FS=","; pi = 3.14159; conv_to_m = 0.001; conv_to_Pa = 1000000000.; MPa_to_Pa = 1000000.;}
 
 $1 ~ "_element" { 
                   current_elem += 1;
@@ -9,25 +9,28 @@ $1 ~ "_element" {
                    J = pi * D * D * D * D / 64.;
                    elem_length[current_elem] = L;
                    elem_J[current_elem] = J;
+                   elem_rad[current_elem] = D / 2
                    node[current_elem] = x1;
                    node[current_elem+1] = x2;
                  }
 
 $1 ~ "_E" { E = conv_to_Pa * $2 ; }
 $1 ~ "_Nu" { Nu = $2; }
-$1 ~ "_Su" { SU = $2; }
-$1 ~ "_Sy" { SY = $2; }
+$1 ~ "_Su" { SU = $2 * MPa_to_Pa; print SU >> "Ultimate.dat" }
+$1 ~ "_Sy" { SY = $2 * MPa_to_Pa; print SY >> "Yield.dat"}
+$1 ~ "_C"  {C = $2; print C >> "Wheller_C.dat" }
+$1 ~ "_B"  {B = $2; print B >> "Wheller_B.dat" }
 
 $1 ~ "_fillet" {
                current_fillet += 1;
                fillet_x[current_fillet] = $2;
-               fillet_rad[current_fillet] = $3;
+               fillet_rad[current_fillet] = conv_to_m * $3;
                }
 
 $1 ~ "_hole" {
               current_hole += 1;
               hole_x[current_hole] = $2;
-              hole_d[current_hole] = $3;
+              hole_d[current_hole] = conv_to_m * $3;
              }
 
 $1 ~ "_force" {
@@ -68,8 +71,12 @@ $1 ~ "_Ka" {
 
 END {
       print current_elem > "Elements.dat"
-      for(i=1; i<=current_elem; i++)
+      print current_elem > "Geometry.dat"
+      
+      for(i=1; i<=current_elem; i++){
        printf("%12d%12.4f%12.2E\n", i, elem_length[i], E * elem_J[i]) >> "Elements.dat"
+       printf("%12d%12.4f%12.2E\n", i, elem_rad[i], elem_J[i]) >> "Geometry.dat"
+      }
 
       print current_elem + 1 > "Nodes.dat"
       for(i=1; i<=current_elem+1; i++)
@@ -105,14 +112,14 @@ END {
       for(i=1; i<=current_fillet; i++){
          x = fillet_x[i];
          n = find_node(x);
-         printf("%12d%12.2f\n",n, fillet_rad[i]) >> "Fillets.dat";
+         printf("%12d%12.4f\n",n, fillet_rad[i]) >> "Fillets.dat";
       }
 
       print current_hole > "Holes.dat"
       for(i=1; i<=current_hole; i++){
          x = hole_x[i];
          n = find_node(x);
-         printf("%12d%12.2f\n",n, hole_d[i]) >> "Holes.dat";
+         printf("%12d%12.4f\n",n, hole_d[i]) >> "Holes.dat";
       }
 }
 

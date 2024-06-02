@@ -19,6 +19,8 @@ _E,200.,GPa,
 _Nu,0.3,
 _Su,250.,MPa,
 _Sy,340.,MPa,
+_B,4.,
+_C,1.E+15,
 
 boundary conditions
 
