@@ -16,8 +16,8 @@ $1 ~ "_element" {
 
 $1 ~ "_E" { E = conv_to_Pa * $2 ; }
 $1 ~ "_Nu" { Nu = $2; }
-$1 ~ "_Su" { SU = $2 * MPa_to_Pa; print SU >> "Ultimate.dat" }
-$1 ~ "_Sy" { SY = $2 * MPa_to_Pa; print SY >> "Yield.dat"}
+$1 ~ "_Su" { SU = $2 ; print SU > "Ultimate.dat" }
+$1 ~ "_Sy" { SY = $2 ; print SY > "Yield.dat"}
 $1 ~ "_C"  {C = $2; print C >> "Wheller_C.dat" }
 $1 ~ "_B"  {B = $2; print B >> "Wheller_B.dat" }
 

@@ -394,6 +394,8 @@ subroutine create_fillets_Kf(nodes, fillets, geometry)
  integer i, j, nodes, records, node
  double precision fillets(nodes)
  double precision geometry(nodes)
+ double precision fillet_Kt
+ double precision notch_sensitivity
 
  double precision Kf, Kt, q, rad, R
 
@@ -416,12 +418,14 @@ subroutine create_fillets_Kf(nodes, fillets, geometry)
  close(12)
 end subroutine create_fillets_Kf
 
-subroutine create_holes(nodes, holes, geometry)
+subroutine create_holes_Kf(nodes, holes, geometry)
   implicit none
   double precision R, rad
   integer i, j, nodes, records, node
   double precision holes(nodes), geometry(nodes)
   double precision Kt, Kf, q
+  double precision hole_Kt
+  double precision notch_sensitivity
  
   open(unit=12, file="Holes.dat")
    read(12,*) records
@@ -433,13 +437,13 @@ subroutine create_holes(nodes, holes, geometry)
   do i=1, records
    read(12,*) node, rad
    R = geometry(node)
-   Kt = holes_Kt(R, rad)
+   Kt = hole_Kt(R, rad)
     q = notch_sensitivity(rad)
    Kf = 1. + q * (Kt - 1.)
-
+   holes(node) = Kf
   enddo
   close(12)
-end subroutine create_holes
+end subroutine create_holes_Kf
 
 subroutine include_Kt(nodes, stress, fillets, holes)
  implicit none
@@ -488,12 +492,12 @@ end function cycles
 subroutine create_geometry(nodes, geometry)
  implicit none 
  integer nodes, i, j, node, ne
- double precision geometry(nodes), rad, J
+ double precision geometry(nodes), rad, J1
  open(unit = 12, file = "Geometry.dat")
  read(12,*) ne
 
  do i=1, ne
-  read(12,*) node, rad, J
+  read(12,*) node, rad, J1
   geometry(i) = rad
  enddo
   geometry(nodes) = rad
@@ -511,3 +515,63 @@ subroutine read_fatigue(B, C)
  read(12,*) C 
  close(12)
 end subroutine read_fatigue
+
+function fillet_Kt(R, rad)
+ implicit none 
+ double precision R, rad, h
+ double precision D
+ double precision fillet_Kt
+ h = R-rad
+ D = 2*R
+ if ( h/r > 0.25 .and. h/r <=2.0) then
+    fillet_Kt = 0.927 + 1.149 * (h/rad)**0.5 - 0.086*(h/rad)+ &
+               (0.015 - 3.281*(h/rad)**0.5 + 0.837*(h/rad))*(2*h/D)+ &
+               (0.847 + 1.716*(h/rad)**0.5 - 0.506*h/rad)*(2*h/D)**2+ &
+               (-0.790 + 0.417*(h/rad)**0.5+0.246*h/rad)*(2*h/D)**3 
+ else
+    fillet_Kt = 1.225 + 0.831*(h/rad)**0.5 - 0.01*h/rad+ &
+                (-3.790 + 0.958*(h/rad)**0.5 - 0.257*h/ rad)*(2*h/D)+ &
+                (7.374 - 4.834*(h/rad)**0.5 + 0.862*h /rad)*(2*h/D)**2+ &
+                (-3.809 + 3.046*(h/rad)**0.5-0.595*h/rad)*(2*h/D)**3
+ endif
+ return
+end function fillet_Kt
+
+function hole_Kt(R, rad)
+ implicit none
+ double precision hole_Kt
+ double precision R, rad, D, h
+ D = 2*R 
+ hole_Kt = 3. - 3.13*(2*rad/D) + 3.66 * (2*rad/D)**2 - 1.53 * (2*rad/D)**3
+ return
+end function hole_Kt
+
+function notch_sensitivity(rad)
+ implicit none
+ double precision notch_sensitivity
+ double precision rad
+ double precision a 
+ double precision SU, SY
+ common /material/ SU, SY
+
+!! assume SU < 700. MPa 
+     a = 0.185 * (700. / SU)
+!!!!!!!!     a = 0.025 * (2000. / SU)**1.9
+
+ notch_sensitivity = (1. + a / rad)**(-1.)
+ return
+end function notch_sensitivity
+
+subroutine read_su(SU)
+ double precision SU
+ open(unit = 12, file = "Ultimate.dat")
+ read(12,*) SU
+ close(12)
+end subroutine read_su
+
+subroutine read_sy(SY)
+ double precision SY
+ open(unit = 12, file = "Yield.dat")
+ read(12,*) SY
+ close(12)
+end subroutine read_sy
