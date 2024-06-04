@@ -46,7 +46,7 @@ int run_shaft_fatigue_analysis();
 int run_rainflow_algorithm();
 int run_damage_analysis();
 int run_effective_analysis();
-
+int run_shaft_lifecycle();
 
 
 private:
@@ -101,7 +101,8 @@ QAction *laplas_transform_action;
  QAction *rainflow_action;
  QAction *damage_action;
  QAction *effective_modules_action;
- 
+ QAction *shaft_lifecycle_action;
+
 int create_menu();
 int create_actions();
 

@@ -123,6 +123,12 @@ connect(
          this,
          SLOT(run_effective_analysis())
        );
+
+connect(
+        shaft_lifecycle_action, SIGNAL(triggered()),
+        this,
+        SLOT(run_shaft_lifecycle())
+        );
 }
 
 //------------------------------------------------------------------------
@@ -196,6 +202,7 @@ int Plotter::create_menu(){ // think if there can be any exception throw
   fatigue_menu->addAction(shaft_action);
   fatigue_menu->addAction(rainflow_action);
   fatigue_menu->addAction(damage_action);
+  fatigue_menu->addAction(shaft_lifecycle_action);
 
   composite_menu->addAction(effective_modules_action);
   
@@ -233,13 +240,14 @@ int Plotter::create_actions(){
    furie_transform_action = new QAction(tr("Fourie"), this);
    laplas_transform_action = new QAction(tr("Laplas"), this);
    
-   truck_action = new QAction( tr("&Truck Displacement"));
-   uniform_beam_action = new QAction(tr("&Natural Modes"));
-   gears_action = new QAction(tr("&Gears Fatigue Analysis"));
-   shaft_action = new QAction(tr("&Aluminium Alloy Circular Shaft Fatigue Analysis"));
-   rainflow_action = new QAction(tr("&Rainflow Algorithm"));
-   damage_action = new QAction(tr("&Damage Analysis"));
-   effective_modules_action = new QAction(tr("&Effective Parameters"));
+   truck_action = new QAction( tr("&Truck Displacement"),this);
+   uniform_beam_action = new QAction(tr("&Natural Modes"),this);
+   gears_action = new QAction(tr("&Gears Fatigue Analysis"),this);
+   shaft_action = new QAction(tr("&Aluminium Alloy Circular Shaft Fatigue Analysis"),this);
+   rainflow_action = new QAction(tr("&Rainflow Algorithm"),this);
+   damage_action = new QAction(tr("&Damage Analysis"),this);
+   shaft_lifecycle_action = new QAction(tr("&Shaft Life Cycle Analysis"), this);
+   effective_modules_action = new QAction(tr("&Effective Parameters"),this);
    
    return 0;
 }
@@ -540,5 +548,13 @@ int Plotter::run_damage_analysis(){
       system("perl ./Fatigue/extract_rainflow.pl ./Fatigue/rainflow_algorithm.out > ./Fatigue/rain.dat"); 
       system("./Fatigue/damage ./Fatigue/rain.dat ./Fatigue/input_damage.dat > ./Fatigue/damage_analysis.out"); 
       system("echo Damage Analysis Completed"); 
+      return 0;
+}
+
+//-------------------------------------------------------------------------------------
+int Plotter::run_shaft_lifecycle(){
+      system("awl -f ../Fatigue/Shaft_Life/mesh_generator.awk  shaft_commands.dat"); 
+      system("../Fatigue/Shaft_Life/shaft"); 
+      system("echo Shaft Lifecycle Analysis Completed"); 
       return 0;
 }

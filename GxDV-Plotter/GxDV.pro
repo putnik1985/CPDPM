@@ -11,4 +11,4 @@ INCLUDEPATH += .
 HEADERS += Curve.h Qt_lib.h std_lib_facilities.h Chart.h Axes.h Note.h Plotter.h Axes_editor.h Axes_range.h Table_Widget.h Plot_name.h file_threads.h
 SOURCES += Curve.cpp main.cpp Chart.cpp Axes.cpp Note.cpp Plotter.cpp Axes_editor.cpp Axes_range.cpp Table_Widget.cpp Plot_name.cpp file_threads.cpp
 QMAKE_CXXFLAGS = -std=c++14
-QT += widgets
+####QT += widgets
