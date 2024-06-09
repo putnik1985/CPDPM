@@ -10,6 +10,7 @@
 #include <utility>
 
 using namespace std;
+using step = pair<double, double>;
 
 class signal {
  public:
@@ -17,14 +18,13 @@ class signal {
  friend ostream& operator<<(ostream&, const signal&);
 
  private:
- vector< pair<double, double> > thistory;
+ vector<step> thistory;
 };
 
-inline istream& operator>>(istream& is, pair<double, double>& p){
+inline istream& operator>>(istream& is, step& p){
  double time, speed, value;
  char c;
-
- is >> time >> speed >> value;
+ is >> time >> c >> speed >> c >> value >> c;
  p.first = time;
  p.second = value;
  ///cout << time << "  " << speed << " " << value << endl;

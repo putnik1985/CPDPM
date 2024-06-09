@@ -7,10 +7,10 @@ signal::signal(string filename){
  if (!is) 
     cerr << "can not open file: " << filename << '\n';
 
- pair<double, double> p;
- while (is >> p){ 
+ step p;
+ while (is >> p) 
   thistory.push_back(p);
- }
+ 
 
 }
 
