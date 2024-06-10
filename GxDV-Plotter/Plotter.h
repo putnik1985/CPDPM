@@ -39,6 +39,8 @@ int allow_legend_action();
 int read_line_from_table();
 int rename_plot();
 
+int run_fourier_analysis();
+
 int run_truck_random_vibrations();
 int run_natural_modes_beam();
 int run_gears_fatigue_analysis();
@@ -91,7 +93,7 @@ QAction *probe_action;
 QAction *legend_move_action;
 
 
-QAction *furie_transform_action;
+QAction *furier_transform_action;
 QAction *laplas_transform_action;
  
  QAction *truck_action;

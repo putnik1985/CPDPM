@@ -22,7 +22,7 @@ static const uint qt_meta_data_Plotter[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      21,   14, // methods
+      22,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -44,13 +44,14 @@ static const uint qt_meta_data_Plotter[] = {
      209,    8,    9,    8, 0x08,
      232,    8,    9,    8, 0x08,
      246,    8,    9,    8, 0x08,
-     276,    8,    9,    8, 0x08,
-     301,    8,    9,    8, 0x08,
-     330,    8,    9,    8, 0x08,
-     359,    8,    9,    8, 0x08,
-     384,    8,    9,    8, 0x08,
-     406,    8,    9,    8, 0x08,
-     431,    8,    9,    8, 0x08,
+     269,    8,    9,    8, 0x08,
+     299,    8,    9,    8, 0x08,
+     324,    8,    9,    8, 0x08,
+     353,    8,    9,    8, 0x08,
+     382,    8,    9,    8, 0x08,
+     407,    8,    9,    8, 0x08,
+     429,    8,    9,    8, 0x08,
+     454,    8,    9,    8, 0x08,
 
        0        // eod
 };
@@ -63,6 +64,7 @@ static const char qt_meta_stringdata_Plotter[] = {
     "create_y_title()\0create_x_range()\0"
     "create_y_range()\0allow_legend_action()\0"
     "read_line_from_table()\0rename_plot()\0"
+    "run_fourier_analysis()\0"
     "run_truck_random_vibrations()\0"
     "run_natural_modes_beam()\0"
     "run_gears_fatigue_analysis()\0"
@@ -103,21 +105,23 @@ void Plotter::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         case 12: { int _r = _t->rename_plot();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 13: { int _r = _t->run_truck_random_vibrations();
+        case 13: { int _r = _t->run_fourier_analysis();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 14: { int _r = _t->run_natural_modes_beam();
+        case 14: { int _r = _t->run_truck_random_vibrations();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 15: { int _r = _t->run_gears_fatigue_analysis();
+        case 15: { int _r = _t->run_natural_modes_beam();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 16: { int _r = _t->run_shaft_fatigue_analysis();
+        case 16: { int _r = _t->run_gears_fatigue_analysis();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 17: { int _r = _t->run_rainflow_algorithm();
+        case 17: { int _r = _t->run_shaft_fatigue_analysis();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 18: { int _r = _t->run_damage_analysis();
+        case 18: { int _r = _t->run_rainflow_algorithm();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 19: { int _r = _t->run_effective_analysis();
+        case 19: { int _r = _t->run_damage_analysis();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 20: { int _r = _t->run_shaft_lifecycle();
+        case 20: { int _r = _t->run_effective_analysis();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
+        case 21: { int _r = _t->run_shaft_lifecycle();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         default: ;
         }
@@ -156,9 +160,9 @@ int Plotter::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 21)
+        if (_id < 22)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 21;
+        _id -= 22;
     }
     return _id;
 }

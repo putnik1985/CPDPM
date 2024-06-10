@@ -129,6 +129,12 @@ connect(
         this,
         SLOT(run_shaft_lifecycle())
         );
+
+connect(
+        furier_transform_action, SIGNAL(triggered()),
+        this,
+        SLOT(run_fourier_analysis())
+        );
 }
 
 //------------------------------------------------------------------------
@@ -155,7 +161,7 @@ int Plotter::create_menu(){ // think if there can be any exception throw
 
   mode_menu = new QMenu( tr("&Mode"));
 
-  transformation_menu = new QMenu( tr("&Transformations"));
+  transformation_menu = new QMenu( tr("&Experimental Frequency Analysis"));
   random_vibrations_menu = new QMenu(tr("&Random Vibrations"));
   uniform_beam_menu = new QMenu(tr("&Beam Vibrations"));
   fatigue_menu = new QMenu(tr("&Fatigue"));
@@ -193,7 +199,7 @@ int Plotter::create_menu(){ // think if there can be any exception throw
   mode_menu->addAction(legend_move_action);
   
 
-  transformation_menu->addAction(furie_transform_action);
+  transformation_menu->addAction(furier_transform_action);
   transformation_menu->addAction(laplas_transform_action);  
 
   random_vibrations_menu->addAction(truck_action);
@@ -237,7 +243,7 @@ int Plotter::create_actions(){
    legend_move_action->setCheckable(true);
 
 
-   furie_transform_action = new QAction(tr("Fourie"), this);
+   furier_transform_action = new QAction(tr("Furie Analysis"), this);
    laplas_transform_action = new QAction(tr("Laplas"), this);
    
    truck_action = new QAction( tr("&Truck Displacement"),this);
@@ -557,4 +563,11 @@ int Plotter::run_shaft_lifecycle(){
       system("../Fatigue/Shaft_Life/shaft"); 
       system("echo Shaft Lifecycle Analysis Completed"); 
       return 0;
+}
+
+//-------------------------------------------------------------------------------------
+int Plotter::run_fourier_analysis(){
+    system("../Frequency-Analysis/signal ../Frequency-Analysis/input.dat > ../Frequency-Analysis/spectrum.out");
+    system("echo Fourier Analysis Completed"); 
+    return 0;
 }
