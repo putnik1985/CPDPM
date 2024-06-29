@@ -49,6 +49,7 @@ int run_rainflow_algorithm();
 int run_damage_analysis();
 int run_effective_analysis();
 int run_shaft_lifecycle();
+int run_bolt_joint();
 
 
 private:
@@ -71,6 +72,7 @@ QMenu *random_vibrations_menu;
 QMenu *uniform_beam_menu;
 QMenu *fatigue_menu;
 QMenu *composite_menu;
+QMenu *bolt_menu;
 
 QAction *create_project_action;
 QAction *open_project_action;
@@ -104,7 +106,8 @@ QAction *laplas_transform_action;
  QAction *damage_action;
  QAction *effective_modules_action;
  QAction *shaft_lifecycle_action;
-
+ QAction *bolt_joint_action;
+ 
 int create_menu();
 int create_actions();
 

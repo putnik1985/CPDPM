@@ -22,7 +22,7 @@ static const uint qt_meta_data_Plotter[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      22,   14, // methods
+      23,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -52,6 +52,7 @@ static const uint qt_meta_data_Plotter[] = {
      407,    8,    9,    8, 0x08,
      429,    8,    9,    8, 0x08,
      454,    8,    9,    8, 0x08,
+     476,    8,    9,    8, 0x08,
 
        0        // eod
 };
@@ -71,6 +72,7 @@ static const char qt_meta_stringdata_Plotter[] = {
     "run_shaft_fatigue_analysis()\0"
     "run_rainflow_algorithm()\0run_damage_analysis()\0"
     "run_effective_analysis()\0run_shaft_lifecycle()\0"
+    "run_bolt_joint()\0"
 };
 
 void Plotter::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -123,6 +125,8 @@ void Plotter::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         case 21: { int _r = _t->run_shaft_lifecycle();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
+        case 22: { int _r = _t->run_bolt_joint();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         default: ;
         }
     }
@@ -160,9 +164,9 @@ int Plotter::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 22)
+        if (_id < 23)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 22;
+        _id -= 23;
     }
     return _id;
 }

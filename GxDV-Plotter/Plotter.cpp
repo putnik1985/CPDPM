@@ -135,6 +135,11 @@ connect(
         this,
         SLOT(run_fourier_analysis())
         );
+connect(
+        bolt_joint_action, SIGNAL(triggered()),
+        this,
+        SLOT(run_bolt_joint())
+        );
 }
 
 //------------------------------------------------------------------------
@@ -166,6 +171,8 @@ int Plotter::create_menu(){ // think if there can be any exception throw
   uniform_beam_menu = new QMenu(tr("&Beam Vibrations"));
   fatigue_menu = new QMenu(tr("&Fatigue"));
   composite_menu = new QMenu(tr("&Composites"));
+  bolt_menu = new QMenu(tr("&Bolts"));
+
    
   menu_bar->addMenu(project_menu);
   menu_bar->addMenu(plots_menu);
@@ -176,6 +183,7 @@ int Plotter::create_menu(){ // think if there can be any exception throw
   menu_bar->addMenu(uniform_beam_menu);
   menu_bar->addMenu(fatigue_menu);
   menu_bar->addMenu(composite_menu);
+  menu_bar->addMenu(bolt_menu);
   
   create_actions(); // create actions
 
@@ -212,6 +220,8 @@ int Plotter::create_menu(){ // think if there can be any exception throw
 
   composite_menu->addAction(effective_modules_action);
   
+  bolt_menu->addAction(bolt_joint_action);
+
   return 0;
 }
 
@@ -254,6 +264,8 @@ int Plotter::create_actions(){
    damage_action = new QAction(tr("&Damage Analysis"),this);
    shaft_lifecycle_action = new QAction(tr("&Shaft Life Cycle Analysis"), this);
    effective_modules_action = new QAction(tr("&Effective Parameters"),this);
+
+   bolt_joint_action = new QAction(tr("&Bolt Joint Stiffness"), this);
    
    return 0;
 }
@@ -569,5 +581,12 @@ int Plotter::run_shaft_lifecycle(){
 int Plotter::run_fourier_analysis(){
     system("../Frequency-Analysis/signal ../Frequency-Analysis/input.dat > ../Frequency-Analysis/spectrum.out");
     system("echo Fourier Analysis Completed"); 
+    return 0;
+}
+
+//-------------------------------------------------------------------------------------
+int Plotter::run_bolt_joint(){
+    system("../bolts/bolt_joint/target/debug/bolt_joint ../bolts/bolt_joint/bolt_joint_input.txt > ../bolts/bolt_joint/bolt_joint.out");
+    system("echo Bolt Joint Analysis completed");
     return 0;
 }
