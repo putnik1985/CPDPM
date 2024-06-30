@@ -1,0 +1,1 @@
+gfortran -o  beam *.f90 -L/home/putins/Downloads/lapack-3.12.0 -llapack -lrefblas -ltmglib
