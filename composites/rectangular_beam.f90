@@ -4,10 +4,21 @@ program rectangular_beam
   double precision E1, E2, E3
   double precision G12, G23, G13
   double precision Nu12, Nu13, Nu23
-  integer layers, i, j
+  integer layers
   integer file_unit
   double precision params(9)
   double precision, allocatable::A(:,:)
+
+  double precision, allocatable::K(:,:), K_reduced(:,:)
+  double precision, allocatable::P(:)
+  double precision, allocatable::P_reduced(:)
+  integer n, ne, new_dim, i, j
+  double precision, allocatable::u(:)
+  double precision u1
+  integer lda, ldb, info, nrhs
+  integer, allocatable :: transform(:)
+  integer nodes, node
+
 
          file_unit = 8
 
@@ -33,7 +44,54 @@ program rectangular_beam
              call create_layers(layers, A, params, i)
           enddo
 
-  deallocate(A)
+
+         open(unit = 12, file = "Elements.dat")
+         read(12,*) ne
+         n = 2 * (ne+1)
+         allocate(K(n,n), P(n), u(n))
+         call create_composite_K(n, K, 12, layers, A, ne)
+         close(12)
+
+         call create_P_composite(n, P)
+         allocate(transform(n))
+         call create_transform(n, transform)
+
+         call apply_restraints(n, K, new_dim)
+         call remove_dofs(n, P, new_dim)
+
+         allocate(K_reduced(new_dim, new_dim))
+         allocate(P_reduced(new_dim))
+
+  do i=1, new_dim
+   do j=1, new_dim
+    K_reduced(i,j) = K(i,j)
+   enddo
+    P_reduced(i) = P(i)
+  enddo 
+       call print_matrix(new_dim, K_reduced)
+       nrhs = 1
+       lda  = new_dim
+       ldb  = new_dim
+       call dposv('U', new_dim, nrhs, K_reduced, lda, P_reduced, ldb, info) 
+       call vzero(n, u)
+
+       do i = 1, new_dim
+        u1 = P_reduced(i)
+          j = 1
+          do while (transform(j) .ne. i)
+            j = j + 1
+          enddo
+          u(j) = u1 
+       enddo
+      call write_solution_composite(n, u, 6)
+      call write_shaft_loads_composite(n, u, 8, layers, A)
+
+ deallocate(K, P)
+ deallocate(K_reduced)
+ deallocate(P_reduced)
+ deallocate(transform)
+ deallocate(A)
+
 end program rectangular_beam
 
 subroutine create_layers(n, A, params, layer)
@@ -60,6 +118,7 @@ subroutine create_layers(n, A, params, layer)
   double precision l1211, l1222, l1233, l1212, l1223, l1231
   double precision l2311, l2322, l2333, l2312, l2323, l2331
   double precision l3111, l3122, l3133, l3112, l3123, l3131
+
 
           E1 = params(1)
           E2 = params(2)
@@ -103,7 +162,6 @@ subroutine create_layers(n, A, params, layer)
           lwork = block_size 
           call dgetri(dim, C, dim, IPIV, work, lwork, info)
 
-          call  print_matrix(6,C)
 
           l1111 = C(1,1)
           l1122 = C(1,2)
@@ -161,6 +219,7 @@ subroutine create_layers(n, A, params, layer)
           A(layer,3) = A51
           A(layer,4) = A55
           A(layer,5) = A66
+
 
 end subroutine create_layers
 
