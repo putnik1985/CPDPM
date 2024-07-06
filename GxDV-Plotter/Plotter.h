@@ -48,6 +48,7 @@ int run_shaft_fatigue_analysis();
 int run_rainflow_algorithm();
 int run_damage_analysis();
 int run_effective_analysis();
+int run_rectangular_beam_analysis();
 int run_shaft_lifecycle();
 int run_bolt_joint();
 
@@ -105,6 +106,7 @@ QAction *laplas_transform_action;
  QAction *rainflow_action;
  QAction *damage_action;
  QAction *effective_modules_action;
+ QAction *rectangular_beam_action;
  QAction *shaft_lifecycle_action;
  QAction *bolt_joint_action;
  

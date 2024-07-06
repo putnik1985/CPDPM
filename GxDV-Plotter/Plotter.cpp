@@ -140,6 +140,12 @@ connect(
         this,
         SLOT(run_bolt_joint())
         );
+connect(
+        rectangular_beam_action, SIGNAL(triggered()),
+        this,
+        SLOT(run_rectangular_beam_analysis())
+        );
+
 }
 
 //------------------------------------------------------------------------
@@ -219,6 +225,7 @@ int Plotter::create_menu(){ // think if there can be any exception throw
   fatigue_menu->addAction(shaft_lifecycle_action);
 
   composite_menu->addAction(effective_modules_action);
+  composite_menu->addAction(rectangular_beam_action);
   
   bolt_menu->addAction(bolt_joint_action);
 
@@ -264,6 +271,7 @@ int Plotter::create_actions(){
    damage_action = new QAction(tr("&Damage Analysis"),this);
    shaft_lifecycle_action = new QAction(tr("&Shaft Life Cycle Analysis"), this);
    effective_modules_action = new QAction(tr("&Effective Parameters"),this);
+   rectangular_beam_action = new QAction(tr("&Rectangular Beam"), this);
 
    bolt_joint_action = new QAction(tr("&Bolt Joint Stiffness"), this);
    
@@ -590,3 +598,10 @@ int Plotter::run_bolt_joint(){
     system("echo Bolt Joint Analysis completed");
     return 0;
 }
+//-------------------------------------------------------------------------------------
+int Plotter::run_rectangular_beam_analysis(){
+      system("cd ../composites; echo beam_input.dat | ./beam"); 
+      system("echo Rectangular Composite Beam Analysis Completed"); 
+      return 0;
+}
+
