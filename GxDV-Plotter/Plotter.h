@@ -51,6 +51,9 @@ int run_effective_analysis();
 int run_rectangular_beam_analysis();
 int run_shaft_lifecycle();
 int run_bolt_joint();
+int run_joint_analysis();
+int run_msc_nastran_sol101();
+
 
 
 private:
@@ -74,6 +77,9 @@ QMenu *uniform_beam_menu;
 QMenu *fatigue_menu;
 QMenu *composite_menu;
 QMenu *bolt_menu;
+QMenu *joint_analysis_menu;
+
+QMenu *msc_nastran_menu;
 
 QAction *create_project_action;
 QAction *open_project_action;
@@ -109,6 +115,10 @@ QAction *laplas_transform_action;
  QAction *rectangular_beam_action;
  QAction *shaft_lifecycle_action;
  QAction *bolt_joint_action;
+ QAction *joint_analysis_action;
+
+ QAction *msc_nastran_sol101_action;
+
  
 int create_menu();
 int create_actions();

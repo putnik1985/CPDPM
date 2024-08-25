@@ -140,10 +140,23 @@ connect(
         this,
         SLOT(run_bolt_joint())
         );
+
 connect(
         rectangular_beam_action, SIGNAL(triggered()),
         this,
         SLOT(run_rectangular_beam_analysis())
+        );
+
+connect(
+        joint_analysis_action, SIGNAL(triggered()),
+        this,
+        SLOT(run_joint_analysis())
+        );
+
+connect(
+        msc_nastran_sol101_action, SIGNAL(triggered()),
+        this,
+        SLOT(run_msc_nastran_sol101())
         );
 
 }
@@ -179,6 +192,10 @@ int Plotter::create_menu(){ // think if there can be any exception throw
   composite_menu = new QMenu(tr("&Composites"));
   bolt_menu = new QMenu(tr("&Bolts"));
 
+  joint_analysis_menu = new QMenu(tr("&Joint Analysis"));
+
+  msc_nastran_menu = new QMenu(tr("&MSC Nastran"));
+
    
   menu_bar->addMenu(project_menu);
   menu_bar->addMenu(plots_menu);
@@ -190,6 +207,8 @@ int Plotter::create_menu(){ // think if there can be any exception throw
   menu_bar->addMenu(fatigue_menu);
   menu_bar->addMenu(composite_menu);
   menu_bar->addMenu(bolt_menu);
+  menu_bar->addMenu(joint_analysis_menu);
+  menu_bar->addMenu(msc_nastran_menu);
   
   create_actions(); // create actions
 
@@ -229,11 +248,13 @@ int Plotter::create_menu(){ // think if there can be any exception throw
   
   bolt_menu->addAction(bolt_joint_action);
 
+  joint_analysis_menu->addAction(joint_analysis_action);
+  
+  msc_nastran_menu->addAction(msc_nastran_sol101_action); 
   return 0;
 }
 
 //------------------------------------------------------------------------
-
 int Plotter::create_actions(){
   
    create_project_action = new QAction( tr("&Create Project"), this);
@@ -274,7 +295,10 @@ int Plotter::create_actions(){
    rectangular_beam_action = new QAction(tr("&Rectangular Beam"), this);
 
    bolt_joint_action = new QAction(tr("&Bolt Joint Stiffness"), this);
+
+   joint_analysis_action = new QAction(tr("&Bolts Joint Analysis"), this);
    
+   msc_nastran_sol101_action = new QAction(tr("&SOL101 Nastran File"), this);
    return 0;
 }
 
@@ -579,7 +603,7 @@ int Plotter::run_damage_analysis(){
 
 //-------------------------------------------------------------------------------------
 int Plotter::run_shaft_lifecycle(){
-      system("awl -f ../Fatigue/Shaft_Life/mesh_generator.awk  shaft_commands.dat"); 
+      system("awk -f ../Fatigue/Shaft_Life/mesh_generator.awk  shaft_commands.dat"); 
       system("../Fatigue/Shaft_Life/shaft"); 
       system("echo Shaft Lifecycle Analysis Completed"); 
       return 0;
@@ -602,6 +626,20 @@ int Plotter::run_bolt_joint(){
 int Plotter::run_rectangular_beam_analysis(){
       system("cd ../composites; echo beam_input.dat | ./beam"); 
       system("echo Rectangular Composite Beam Analysis Completed"); 
+      return 0;
+}
+
+//-------------------------------------------------------------------------------------
+int Plotter::run_joint_analysis(){
+      system("awk -f ../joint-analysis/joint_analysis.awk  ../joint-analysis/joint#1.dat > ../joint-analysis/joint#1.out"); 
+      system("echo Joint Analysis Completed"); 
+      return 0;
+}
+
+//-------------------------------------------------------------------------------------
+int Plotter::run_msc_nastran_sol101(){
+      system("perl ../mscnastran/msc-nastran-beam-linear-static-model-generator.pl  ../mscnastran/utsr-ball-joint.txt > ../mscnastran/utsr-sol101-ball.nas"); 
+      system("echo MSC Nastran SOL101 Input File Written"); 
       return 0;
 }
 
