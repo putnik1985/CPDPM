@@ -53,7 +53,7 @@ int run_shaft_lifecycle();
 int run_bolt_joint();
 int run_joint_analysis();
 int run_msc_nastran_sol101();
-
+int run_cylindrical_shell();
 
 
 private:
@@ -80,6 +80,8 @@ QMenu *bolt_menu;
 QMenu *joint_analysis_menu;
 
 QMenu *msc_nastran_menu;
+QMenu *plate_shell_menu;
+
 
 QAction *create_project_action;
 QAction *open_project_action;
@@ -118,7 +120,7 @@ QAction *laplas_transform_action;
  QAction *joint_analysis_action;
 
  QAction *msc_nastran_sol101_action;
-
+ QAction *cylindrical_shell_action;
  
 int create_menu();
 int create_actions();
