@@ -22,7 +22,7 @@ static const uint qt_meta_data_Plotter[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      27,   14, // methods
+      28,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -57,6 +57,7 @@ static const uint qt_meta_data_Plotter[] = {
      525,    8,    9,    8, 0x08,
      546,    8,    9,    8, 0x08,
      571,    8,    9,    8, 0x08,
+     595,    8,    9,    8, 0x08,
 
        0        // eod
 };
@@ -80,6 +81,7 @@ static const char qt_meta_stringdata_Plotter[] = {
     "run_shaft_lifecycle()\0run_bolt_joint()\0"
     "run_joint_analysis()\0run_msc_nastran_sol101()\0"
     "run_cylindrical_shell()\0"
+    "run_msc_nastran_mesher()\0"
 };
 
 void Plotter::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -142,6 +144,8 @@ void Plotter::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         case 26: { int _r = _t->run_cylindrical_shell();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
+        case 27: { int _r = _t->run_msc_nastran_mesher();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         default: ;
         }
     }
@@ -179,9 +183,9 @@ int Plotter::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 27)
+        if (_id < 28)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 27;
+        _id -= 28;
     }
     return _id;
 }

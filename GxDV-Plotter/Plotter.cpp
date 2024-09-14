@@ -165,6 +165,12 @@ connect(
        SLOT(run_cylindrical_shell())
        );
 
+connect(
+       msc_nastran_mesher_action, SIGNAL(triggered()),
+       this,
+       SLOT(run_msc_nastran_mesher())
+       );
+
 }
 
 //------------------------------------------------------------------------
@@ -258,6 +264,7 @@ int Plotter::create_menu(){ // think if there can be any exception throw
   joint_analysis_menu->addAction(joint_analysis_action);
   
   msc_nastran_menu->addAction(msc_nastran_sol101_action);
+  msc_nastran_menu->addAction(msc_nastran_mesher_action);
 
   plate_shell_menu->addAction(cylindrical_shell_action); 
   return 0;
@@ -308,6 +315,7 @@ int Plotter::create_actions(){
    joint_analysis_action = new QAction(tr("&Bolts Joint Analysis"), this);
    
    msc_nastran_sol101_action = new QAction(tr("&SOL101 Nastran File"), this);
+   msc_nastran_mesher_action = new QAction(tr("&MSC Nastran Mesher"), this);
 
    cylindrical_shell_action = new QAction(tr("&Cylindrical Shell(Axisymmetric Static Linear Analysis)"), this);
    return 0;
@@ -651,6 +659,13 @@ int Plotter::run_joint_analysis(){
 int Plotter::run_msc_nastran_sol101(){
       system("perl ../mscnastran/msc-nastran-beam-linear-static-model-generator.pl  ../mscnastran/utsr-ball-joint.txt > ../mscnastran/utsr-sol101-ball.nas"); 
       system("echo MSC Nastran SOL101 Input File Written"); 
+      return 0;
+}
+
+//-------------------------------------------------------------------------------------
+int Plotter::run_msc_nastran_mesher(){
+      system("perl ../nastran-mesher/nastran-free-mesh-modifier.pl  ../nastran-mesher/mesh.txt ../nastran-mesher/free-mesh-commands.txt"); 
+      system("echo MSC Nastran Mesher Updated Mesh"); 
       return 0;
 }
 

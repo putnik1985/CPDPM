@@ -54,6 +54,8 @@ int run_bolt_joint();
 int run_joint_analysis();
 int run_msc_nastran_sol101();
 int run_cylindrical_shell();
+int run_msc_nastran_mesher();
+
 
 
 private:
@@ -120,6 +122,7 @@ QAction *laplas_transform_action;
  QAction *joint_analysis_action;
 
  QAction *msc_nastran_sol101_action;
+ QAction *msc_nastran_mesher_action;
  QAction *cylindrical_shell_action;
  
 int create_menu();
