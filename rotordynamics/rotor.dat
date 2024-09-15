@@ -1,0 +1,5 @@
+_linear_bearing,10000.,
+_uniform_shaft,200.,2.e+11,100.,150.,
+_disk,20.,120.,240.,
+_uniform_shaft,300.,2.e+11,200.,250.,
+_linear_bearing,20000.,
