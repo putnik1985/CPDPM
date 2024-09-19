@@ -255,7 +255,7 @@ ENDDATA";
 	     my $fullname = getcwd."/".$mesh_file;
 		 chomp($nastran_path);
 		 
-	     printf newfh "$nastran_path $fullname old=no news=no";
+	     printf newfh "$nastran_path $filename old=no news=no";
 	close newfh;
 	
 }

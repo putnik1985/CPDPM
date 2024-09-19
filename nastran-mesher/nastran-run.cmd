@@ -1,1 +1,1 @@
-C:\plmapps\NX2000\NXNASTRAN\bin\nastranw C:/Users/ni097270/Analysis/Calculations/GERI-LPGF-Structural-Test-Rig-FEM-CONSTRAINED.dat old=no news=no
+C:\plmapps\NX2000\NXNASTRAN\bin\nastranw mesh-sol103.nas old=no news=no
