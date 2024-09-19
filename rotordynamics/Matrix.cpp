@@ -28,15 +28,6 @@
              v = new_v;
          }
 
-    void Matrix::print() const
-      {
-           for(int i=1;i<=dimension;++i){
-             for(int j=1;j<=dimension;++j)   
-               cout << fixed << setprecision(WRITE_PRECISION) << this->operator()(i,j) << ";";
-             cout << '\n';
-           }
-      } 
-
      Matrix& Matrix::operator=(const Matrix& m)
      {
                 if(m.size()!=dimension) 
@@ -190,11 +181,11 @@ Matrix operator*(const double& b, const Matrix& A){
 ostream& operator<<(ostream& os, const Matrix& M){
       int dimension = M.size();
       for(int i=1;i<=dimension;++i){
-      for(int j=1;j<=dimension;++j)   
-      os << M(i,j) << ";";
-      os << '\n';
+          for(int j=1;j<=dimension;++j)   
+              os << M(i,j) << ";";
+          os << '\n';
       }
-return os;
+return os; 
 }
 
 

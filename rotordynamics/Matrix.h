@@ -21,7 +21,6 @@ public:
 	double& operator()(const int& i, const int& j); 
         int size() const;
         void set_dimension(const int& n); 
-        void print() const;
         Matrix& operator=(const Matrix& m);
         double& get(const int& i, const int& j);
         const double& get(const int& i, const int& j) const;
@@ -35,4 +34,5 @@ public:
         void transpose();
 };
 
+ ostream& operator<<(ostream&, const Matrix&);
 #endif

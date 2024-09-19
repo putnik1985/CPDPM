@@ -3,8 +3,7 @@
 
 #include "linear_bearing.h"
 #include "disk.h"
-
-#include "functions.h"
+#include "uniform_shaft.h"
 
 int main(int argc, char** argv){
     string line;
@@ -23,16 +22,15 @@ int main(int argc, char** argv){
 
     Csv csv(ifs);
     while (csv.getline(line) != 0) {
-        cout << "line = '" << line << "'\n";
-        for (int i = 0; i < csv.getnfield(); i++)
-            cout << "field[" << i << "] = "
-                 << csv.getfield(i) << "\n";
-
+/*
+*        cout << "line = '" << line << "'\n";
+*        for (int i = 0; i < csv.getnfield(); i++)
+*            cout << "field[" << i << "] = "
+*                 << csv.getfield(i) << "\n";
+*/
         if ( csv.getfield(0).compare("_linear_bearing") == 0 ){
              double k = stod(csv.getfield(1)); 
              linear_bearing lbr(k);
-             Matrix mat = lbr.K();
-             cout << mat;
         }
 
         if ( csv.getfield(0).compare("_disk") == 0 ){
@@ -40,6 +38,15 @@ int main(int argc, char** argv){
              double Jp = stod(csv.getfield(2)); 
              double Jd = stod(csv.getfield(3)); 
              disk d(m, Jp, Jd); 
+        }
+
+        if ( csv.getfield(0).compare("_uniform_shaft") == 0 ){
+             auto L = stod(csv.getfield(1)); 
+             auto E = stod(csv.getfield(2)); 
+             auto Ri = stod(csv.getfield(3)); 
+             auto Ro = stod(csv.getfield(4)); 
+             auto  n = stod(csv.getfield(5)); // number of the elements
+             uniform_shaft us = uniform_shaft(L, E, Ri, Ro);
         }
     }
     return 0;

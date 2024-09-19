@@ -1,0 +1,2 @@
+g++  -c -std=c++14 main.cpp csv.cpp functions.cpp Matrix.cpp linear_bearing.cpp disk.cpp 
+makefile:10: recipe for target 'objects' failed

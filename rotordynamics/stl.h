@@ -14,6 +14,8 @@
 #include <iomanip>
 #include<stdexcept>
 
+#include <map>
+
 using namespace std;
 
 #endif
