@@ -2,7 +2,7 @@ use strict;
 use autodie;
 
 use Math::Trig;
-
+use Cwd qw(getcwd);
 
     print "\n";
 
@@ -15,6 +15,7 @@ use Math::Trig;
 	my $spc_id = 100;
 	my $mpc_id = 100;
 	my $unreal_number = 1.e+38;
+	my $total_dofs = 6;
 	
 ##	printf "command file: %12s\n",$command_file;
 ##	printf "  input file: %12s\n", $mesh_file;
@@ -129,9 +130,135 @@ use Math::Trig;
            print "_grid_copy_rotate completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_rbe3_plane$/) {
+		   ####print $_;
+	       grid_rbe3_plane($_); 
+           print "_grid_rbe3_plane completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_inf_rivet$/) {
+		   ####print $_;
+	       grid_inf_rivet($_); 
+           print "_grid_inf_rivet completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_rbe2_plane$/) {
+		   ####print $_;
+	       grid_rbe2_plane($_); 
+           print "_grid_rbe2_plane completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_rbe2_radius$/) {
+		   ####print $_;
+	       grid_rbe2_radius($_); 
+           print "_grid_rbe2_radius completed\n";		   
+       }		   
+
+
+	   if ($words[0] =~ /^_grid_rbe2_contact_cylinder_rotate$/) {
+		   ####print $_;
+	       grid_rbe2_contact_cylinder_rotate($_); 
+           print "_grid_rbe2_contact_cylinder_rotate completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_bolt$/) {
+		   ####print $_;
+	       grid_bolt($_); 
+           print "_grid_bolt completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_bolt_rotate$/) {
+		   ####print $_;
+	       grid_bolt_rotate($_); 
+           print "_grid_bolt_rotate completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_msc_nastran_solution$/) {
+		   ####print $_;
+	       msc_nastran_solution($_); 
+           print "_msc_nastran_solution completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
+sub msc_nastran_solution{
+    my @words = split /,/,@_[0];
+	(my $file, my $ext) = split/\./,$mesh_file;
+	my $nastran_path = $words[2];
+	my $filename;
+	
+	if($words[1] =~ /static/){
+	   $filename = $file."-sol101.nas";
+	   open(newfh,">",$filename) or die $!;
+	   printf newfh "
+SOL 101
+CEND
+
+echo = none
+DISPLACEMENT(PLOT,REAL) = ALL
+load = $load_id
+spc = $spc_id
+mpc = $mpc_id
+
+BEGIN BULK
+
+\$* PARAM CARDS
+PARAM     OIBULK     YES
+PARAM    OMACHPR     YES
+PARAM       POST      -2
+PARAM    POSTEXT     YES
+param,autospc,yes
+
+\$---------------------------
+\$ Solver
+\$---------------------------
+grav,$load_id,0,386.1,1.,1.,1.
+include '$mesh_file'
+
+ENDDATA";
+	   close newfh;	   
+	}
+	
+	if($words[1] =~ /modal/){
+	   $filename = $file."-sol103.nas";
+	   open(newfh,">",$filename) or die $!;
+	   printf newfh "
+SOL 103
+CEND
+
+echo = none
+DISPLACEMENT(PLOT,REAL) = ALL
+method = 100
+spc = $spc_id
+
+BEGIN BULK
+
+\$* PARAM CARDS
+PARAM     OIBULK     YES
+PARAM    OMACHPR     YES
+PARAM       POST      -2
+PARAM    POSTEXT     YES
+param,autospc,yes
+
+\$---------------------------
+\$ Solver
+\$---------------------------
+EIGRL,100,,,12
+include '$mesh_file'
+
+ENDDATA";
+	   close newfh;
+	}
+	
+	open(newfh,">","nastran-run.cmd") or die $!;
+	     my $fullname = getcwd."/".$mesh_file;
+		 chomp($nastran_path);
+		 
+	     printf newfh "$nastran_path $fullname old=no news=no";
+	close newfh;
+	
+}
 
 sub grid_translate_box {
 	       my @words = split /,/,@_[0];
@@ -565,7 +692,7 @@ sub grid_spc_plane {
 	my $nz = $words[7];
 
 	my @grids;
-	
+	####print "$x0,$y0,$z0,$nx,$ny,$nz\n";
 	open(fh1, '<', $mesh_file) or die $!;
 	
 	 while (<fh1>) {
@@ -944,7 +1071,6 @@ sub grid_rbe2_contact {
 	##print "minimum distance: " . $min_distance . "\n";
 
 	open(fh1, ">>", $mesh_file) or die $!;
-
 	print fh1 "\n\$_grid_rbe2_contact output:\n";
     my $current_field = 5;
 	my $current = 0;
@@ -989,12 +1115,27 @@ sub mesh_stat {
 	my $min_elem = $unreal_number;
 	my $max_elem;
 	my $elems;
+	my $max_material = 1;
+	my $max_property = 1;
 
 	
 	 while (<fh1>) {
 		###print $_;
 		my @words = split /,/,$_;
 		####print $words[1]."\n"; 
+
+        if ($words[0] =~ /PSOLID|PBUSH|PSHELL|PBEAML|PBAR/){
+		    if ($max_property < $words[1]) {
+				$max_property = $words[1];
+			}				
+		}
+
+        if ($words[0] =~ /MAT1/){
+		    if ($max_material < $words[1]) {
+				$max_material = $words[1];
+			}				
+		}
+
 
         if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
 
@@ -1035,25 +1176,25 @@ sub mesh_stat {
 	##print "closest grid: " . $closest_grid . "\n";
 	##print "minimum distance: " . $min_distance . "\n";
 
-	open(fh1, ">>", $mesh_file) or die $!;
-	print fh1 "\n\$_mesh_stat output:\n";
-	print fh1 "\$grids: $grids\n";
-	print fh1 "\$lower grid: $min_grid\n";
-	print fh1 "\$highest grid: $max_grid\n";
-	print fh1 "\n";
-	print fh1 "\$elements: $elems\n";
-	print fh1 "\$lower element: $min_elem\n";
-	print fh1 "\$highest element: $max_elem\n";
-	print fh1 "\n";
-	print fh1 "\$RBE2 element: $rbe2_eid\n";
-	print fh1 "\$RBE3 element: $rbe3_eid\n";
-	print fh1 "\$CTETRA element: $ctetra_eid\n";
-	print fh1 "\$CHEXA element: $chexa_eid\n";
-	print fh1 "\$CQUAD element: $cquad_eid\n";
-	print fh1 "\$CELAS element: $celas_eid\n";
-	print fh1 "\$CBUSH element: $cbush_eid\n";
-	print fh1 "\$GAP element: $gap_eid\n";
-    close(fh1);			
+	print STDOUT "\n\$_mesh_stat output:\n";
+	print STDOUT "\$grids: $grids\n";
+	print STDOUT "\$lower grid: $min_grid\n";
+	print STDOUT "\$highest grid: $max_grid\n";
+	print STDOUT "\n";
+	print STDOUT "\$elements: $elems\n";
+	print STDOUT "\$lower element: $min_elem\n";
+	print STDOUT "\$highest element: $max_elem\n";
+	print STDOUT "\n";
+	print STDOUT "\$RBE2 element: $rbe2_eid\n";
+	print STDOUT "\$RBE3 element: $rbe3_eid\n";
+	print STDOUT "\$CTETRA element: $ctetra_eid\n";
+	print STDOUT "\$CHEXA element: $chexa_eid\n";
+	print STDOUT "\$CQUAD element: $cquad_eid\n";
+	print STDOUT "\$CELAS element: $celas_eid\n";
+	print STDOUT "\$CBUSH element: $cbush_eid\n";
+	print STDOUT "\$GAP element: $gap_eid\n";
+	
+    ($max_grid,$max_elem,$max_property,$max_material);	
 }
 
 
@@ -1195,6 +1336,483 @@ sub new_grid{
 	++$new_grid;
 }
 
+
+sub grid_rbe2_plane {
+	
+	       my @words = split /,/,@_[0];
+		   my $x0 = $words[1];
+		   my $y0 = $words[2];
+		   my $z0 = $words[3];
+		   my $nx = $words[4];
+		   my $ny = $words[5];
+		   my $nz = $words[6];		   
+		   
+	my @grids;
+	
+	open(fh1, '<', $mesh_file) or die $!;
+    my $new_eid;
+	my $new_grid;
+	
+	 while (<fh1>) {
+		###print $_;
+		my @words = split /,/,$_;
+		####print $words[1]."\n"; 
+        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
+			####print $_;
+			if ($new_eid < $words[1]) {
+				$new_eid = $words[1];
+			}	
+		}
+		
+        if ($words[0] =~ /GRID/){
+			##print "$words[1] -->> $new_grid\n";
+			if ($new_grid < $words[1]) {
+				$new_grid = $words[1];
+			}	
+		}	
+		
+        if ($words[0] =~ /GRID/){
+			my $x = $words[3];
+			my $y = $words[4];
+			my $z = $words[5];
+		
+			my $point = "$x,$y,$z,";
+            my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,"; 			
+            if (within_plane($point, $plane)){
+                push(@grids, $words[1]);				
+            }				
+        }			
+	 }
+	close(fh1);
+	
+	##print "highest eid: " . $new_eid . "\n";
+	##print "highets grid: " . $new_grid . "\n";
+
+	open(fh1, ">>", $mesh_file) or die $!;
+	print fh1 "\n\$_grid_rbe2_plane output:\n";
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids;
+
+	printf fh1 "GRID,%d,0,%g,%g,%g,0\n",++$new_grid,$x0,$y0,$z0;
+	printf fh1 "RBE2,%d,%d,123456,",++$new_eid,$new_grid;
+	for(my $k = 0; $k < $last; $k++) {
+
+			if ($current_field <= $rbe2_fields) {
+		        printf fh1 "%d,",$grids[$k];
+				++$current_field;
+			} else {
+		        printf fh1 "+\n";
+		        printf fh1 "+,";
+		        printf fh1 "%d,",$grids[$k];				
+                $current_field = 3; 				
+            }
+
+    }	
+    close(fh1);			
+
+}
+
+sub grid_rbe3_plane {
+	
+	       my @words = split /,/,@_[0];
+		   my $x0 = $words[1];
+		   my $y0 = $words[2];
+		   my $z0 = $words[3];
+		   my $nx = $words[4];
+		   my $ny = $words[5];
+		   my $nz = $words[6];		   
+		   
+	my @grids;
+	
+	open(fh1, '<', $mesh_file) or die $!;
+    my $new_eid;
+	my $new_grid;
+	
+	 while (<fh1>) {
+		###print $_;
+		my @words = split /,/,$_;
+		####print $words[1]."\n"; 
+        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
+			####print $_;
+			if ($new_eid < $words[1]) {
+				$new_eid = $words[1];
+			}	
+		}
+		
+        if ($words[0] =~ /GRID/){
+			##print "$words[1] -->> $new_grid\n";
+			if ($new_grid < $words[1]) {
+				$new_grid = $words[1];
+			}	
+		}	
+		
+        if ($words[0] =~ /GRID/){
+			my $x = $words[3];
+			my $y = $words[4];
+			my $z = $words[5];
+		
+			my $point = "$x,$y,$z,";
+            my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,"; 			
+            if (within_plane($point, $plane)){
+                push(@grids, $words[1]);				
+            }				
+        }			
+	 }
+	close(fh1);
+	
+	##print "highest eid: " . $new_eid . "\n";
+	##print "highets grid: " . $new_grid . "\n";
+
+	open(fh1, ">>", $mesh_file) or die $!;
+	print fh1 "\n\$_grid_rbe3_plane output:\n";
+    my $current_field = 8;
+	my $current = 0;
+	my $last = @grids;
+
+	printf fh1 "GRID,%d,0,%g,%g,%g,0\n",++$new_grid,$x0,$y0,$z0;
+	printf fh1 "RBE3,%d,,%d,123456,1.0,123,",++$new_eid,$new_grid;
+	for(my $k = 0; $k < $last; $k++) {
+
+			if ($current_field <= $rbe3_fields) {
+		        printf fh1 "%d,",$grids[$k];
+				++$current_field;
+			} else {
+		        printf fh1 "+\n";
+		        printf fh1 "+,";
+		        printf fh1 "%d,",$grids[$k];				
+                $current_field = 3; 				
+            }
+    }	
+    close(fh1);		
+}
+
+sub grid_rbe2_radius {
+	
+	       my @words = split /,/,@_[0];
+		   my $x0 = $words[1];
+		   my $y0 = $words[2];
+		   my $z0 = $words[3];
+		   my $nx = $words[4];
+		   my $ny = $words[5];
+		   my $nz = $words[6];
+           my $radius = $words[7];		   
+		   
+	my @grids;
+	
+	open(fh1, '<', $mesh_file) or die $!;
+    my $new_eid;
+	my $new_grid;
+	
+	 while (<fh1>) {
+		###print $_;
+		my @words = split /,/,$_;
+		####print $words[1]."\n"; 
+        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP|CBEAM/){
+			####print $_;
+			if ($new_eid < $words[1]) {
+				$new_eid = $words[1];
+			}	
+		}
+		
+        if ($words[0] =~ /GRID/){
+			##print "$words[1] -->> $new_grid\n";
+			if ($new_grid < $words[1]) {
+				$new_grid = $words[1];
+			}	
+		}	
+		
+        if ($words[0] =~ /GRID/){
+			my $x = $words[3];
+			my $y = $words[4];
+			my $z = $words[5];
+		
+			my $point = "$x,$y,$z,";
+            my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,"; 
+            my $dist = sqrt(($x-$x0)**2+($y-$y0)**2+($z-$z0)**2);			
+            if (within_plane($point, $plane) && $dist <= $radius){
+                push(@grids, $words[1]);				
+            }				
+        }			
+	 }
+	close(fh1);
+	
+	##print "highest eid: " . $new_eid . "\n";
+	##print "highets grid: " . $new_grid . "\n";
+
+	open(fh1, ">>", $mesh_file) or die $!;
+	print fh1 "\n\$_grid_rbe2_radius output:\n";
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids;
+
+	printf fh1 "GRID,%d,0,%g,%g,%g,0\n",++$new_grid,$x0,$y0,$z0;
+	printf fh1 "RBE2,%d,%d,123456,",++$new_eid,$new_grid;
+	for(my $k = 0; $k < $last; $k++) {
+
+			if ($current_field <= $rbe2_fields) {
+		        printf fh1 "%d,",$grids[$k];
+				++$current_field;
+			} else {
+		        printf fh1 "+\n";
+		        printf fh1 "+,";
+		        printf fh1 "%d,",$grids[$k];				
+                $current_field = 3; 				
+            }
+    }	
+    close(fh1);			
+}
+
+sub grid_bolt {
+	
+	       my @words = split /,/,@_[0];
+		   my $x0 = $words[1];
+		   my $y0 = $words[2];
+		   my $z0 = $words[3];
+
+		   my $x1 = $words[4];
+		   my $y1 = $words[5];
+		   my $z1 = $words[6];
+
+		   my $nx = $words[7];
+		   my $ny = $words[8];
+		   my $nz = $words[9];
+
+           my $h = $words[10];
+           my $thread_radius = $words[11];
+	   
+	       my $head_radius = $words[12];
+	       my $bolt_radius = $words[13];
+     
+    &grid_rbe2_radius("_grid_rbe2_radius,$x0,$y0,$z0,$nx,$ny,$nz,$head_radius,");	 
+	&grid_rbe2_cylinder("_grid_rbe2_cylinder,$x1,$y1,$z1,$h,$thread_radius,$nx,$ny,$nz,");
+
+    my $materials;
+	my $property;
+	my $element;
+	my $grid;
+	
+	($grid,$element,$property,$materials) = &mesh_stat();
+	
+	my $first_grid = $grid - 1;
+    my $second_grid = $grid;
+
+	open(fh1, ">>", $mesh_file) or die $!;
+	printf fh1 "\n\$_grid_bolt output:\n";
+    printf fh1 "CBEAM,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",++$element,++$property,$first_grid,$second_grid,-$ny,$nx,0.0;	
+	printf fh1 "PBEAML,%d,%d,MSCBML0,ROD,,,,,+\n",$property,++$materials;
+	printf fh1 "+,%.4f,0.0,YES,1.0,%.4f,0.0,\n",$bolt_radius,$bolt_radius;
+
+	my   $E = 2.8e+7;
+	my  $nu = 0.296;
+	my $rho = 0.283;
+	printf fh1 "MAT1,%d,%.2E,,%.4f,%.4g,\n",$materials,$E,$nu,$rho / 386.1;
+	close fh1;
+}
+
+sub grid_bolt_rotate {
+	
+	       my @words = split /,/,@_[0];
+		   my $x0 = $words[1];
+		   my $y0 = $words[2];
+		   my $z0 = $words[3];
+
+		   my $x1 = $words[4];
+		   my $y1 = $words[5];
+		   my $z1 = $words[6];
+
+		   my $nx = $words[7];
+		   my $ny = $words[8];
+		   my $nz = $words[9];
+
+           my $h = $words[10];
+           my $thread_radius = $words[11];
+	   
+	       my $head_radius = $words[12];
+	       my $bolt_radius = $words[13];
+		   
+		   my $rot_x = $words[14];
+		   my $rot_y = $words[15];
+		   my $rot_z = $words[16];
+		   
+		   my $copies = $words[17];
+     
+	open(fh1, ">>", $mesh_file) or die $!;
+	print fh1 "\n\$_grid_bolt_rotate output:\n";
+	my $alpha = 2. * pi / $copies;
+    close(fh1);    
+	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
+	
+	for(my $k = 0; $k < $copies; $k++) {
+		my $angle = $alpha * $k;
+		(my $new_x0, my $new_y0, my $new_z0) = &rotate_rodrig_formula("$x0,$y0,$z0,$rot_x,$rot_y,$rot_z,$nx,$ny,$nz,$angle");
+		(my $new_x1, my $new_y1, my $new_z1) = &rotate_rodrig_formula("$x1,$y1,$z1,$rot_x,$rot_y,$rot_z,$nx,$ny,$nz,$angle");		
+		my $command="_grid_bolt,$new_x0,$new_y0,$new_z0,$new_x1,$new_y1,$new_z1,$nx,$ny,$nz,$h,$thread_radius,$head_radius,$bolt_radius,";
+		&grid_bolt($command);
+    }
+	
+}
+
+sub grid_inf_rivet {
+	
+	       my @words = split /,/,@_[0];
+		   my $x0 = $words[1];
+		   my $y0 = $words[2];
+		   my $z0 = $words[3];
+
+		   my $x1 = $words[4];
+		   my $y1 = $words[5];
+		   my $z1 = $words[6];
+
+		   my $nx = $words[7];
+		   my $ny = $words[8];
+		   my $nz = $words[9];		   
+		   
+	my @grids0;
+	my @grids1;	
+	
+	open(fh1, '<', $mesh_file) or die $!;
+    my $new_eid;
+	my $new_grid;
+	
+	 while (<fh1>) {
+		###print $_;
+		my @words = split /,/,$_;
+		####print $words[1]."\n"; 
+        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
+			####print $_;
+			if ($new_eid < $words[1]) {
+				$new_eid = $words[1];
+			}	
+		}
+		
+        if ($words[0] =~ /GRID/){
+			##print "$words[1] -->> $new_grid\n";
+			if ($new_grid < $words[1]) {
+				$new_grid = $words[1];
+			}	
+		}	
+		
+        if ($words[0] =~ /GRID/){
+			my $x = $words[3];
+			my $y = $words[4];
+			my $z = $words[5];
+		
+			my $point = "$x,$y,$z,";
+            my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,"; 			
+            if (within_plane($point, $plane)){
+                push(@grids0, $words[1]);				
+            }				
+
+			$point = "$x,$y,$z,";
+            $plane = "$x1,$y1,$z1,$nx,$ny,$nz,"; 			
+            if (within_plane($point, $plane)){
+                push(@grids1, $words[1]);				
+            }				
+
+        }			
+	 }
+	close(fh1);
+	
+	##print "highest eid: " . $new_eid . "\n";
+	##print "highets grid: " . $new_grid . "\n";
+
+	open(fh1, ">>", $mesh_file) or die $!;
+	print fh1 "\n\$_grid_rbe3_plane output:\n";
+
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids0;
+
+
+	printf fh1 "GRID,%d,0,%g,%g,%g,0\n",++$new_grid,$x0,$y0,$z0;
+	printf fh1 "RBE2,%d,%d,123456,",++$new_eid,$new_grid;
+	my $first_grid = $new_grid;	
+	for(my $k = 0; $k < $last; $k++) {
+
+			if ($current_field <= $rbe2_fields) {
+		        printf fh1 "%d,",$grids0[$k];
+				++$current_field;
+			} else {
+		        printf fh1 "+\n";
+		        printf fh1 "+,";
+		        printf fh1 "%d,",$grids0[$k];				
+                $current_field = 3; 				
+            }
+
+    }	
+    close(fh1);			
+
+
+	open(fh1, ">>", $mesh_file) or die $!;
+	print fh1 "\n\$_grid_rbe3_plane output:\n";
+
+    $current_field = 5;
+	$current = 0;
+	$last = @grids1;
+
+	printf fh1 "GRID,%d,0,%g,%g,%g,0\n",++$new_grid,$x1,$y1,$z1;
+	printf fh1 "RBE2,%d,%d,123456,",++$new_eid,$new_grid;
+	my $second_grid = $new_grid;	
+	for(my $k = 0; $k < $last; $k++) {
+
+			if ($current_field <= $rbe2_fields) {
+		        printf fh1 "%d,",$grids1[$k];
+				++$current_field;
+			} else {
+		        printf fh1 "+\n";
+		        printf fh1 "+,";
+		        printf fh1 "%d,",$grids1[$k];				
+                $current_field = 3; 				
+            }
+
+    }	
+    close(fh1);	
+	
+	open(fh1, ">>", $mesh_file) or die $!;
+	print fh1 "\n\$_grid_rivet output:\n";	
+	for(my $i=1; $i<=$total_dofs;++$i){
+		++$new_eid;
+		print fh1 "CELAS2,$new_eid,1.E+9,$first_grid,$i,$second_grid,$i,\n";
+    }
+	close fh1;
+}
+
+
+sub grid_rbe2_contact_cylinder_rotate {
+	
+	       my @words = split /,/,@_[0];
+    	  (my $x, my $y, my $z) = ($words[1], $words[2], $words[3]);
+		  (my $x0, my $y0, my $z0) = ($words[4], $words[5], $words[6]);
+		  (my $nx, my $ny, my $nz) = ($words[7], $words[8], $words[9]);
+		   my $copies = $words[10];
+		   my $h = $words[11];
+		   my $radius = $words[12];
+
+	open(fh1, ">>", $mesh_file) or die $!;
+	print fh1 "\n\$_grid_rbe2_contact_cylinder_rotate output:\n";
+	my $alpha = 2. * pi / $copies;
+    close(fh1);    
+	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
+	
+	for(my $k = 0; $k < $copies; $k++) {
+		my $angle = $alpha * $k;
+		(my $new_x, my $new_y, my $new_z) = &rotate_rodrig_formula("$x,$y,$z,$x0,$y0,$z0,$nx,$ny,$nz,$angle");
+		my $command="_grid_rbe2_cylinder,$new_x,$new_y,$new_z,$h,$radius,$nx,$ny,$nz,";
+		&grid_rbe2_cylinder($command);
+    }	
+	
+}
+
+
 sub within{
     ((@_[1] <= @_[0]) && (@_[0] <= @_[2]))
  }
@@ -1260,5 +1878,7 @@ sub within_plane{
 ##  my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,"; 			
 	(my $x, my $y, my $z) = split /,/,@_[0];
 	(my $x0, my $y0, my $z0, my $nx, my $ny, my $nz) = split /,/,@_[1];
+	my $d = abs( ($x-$x0) * $nx + ($y-$y0) * $ny +($z-$z0) * $nz );
+	##print "$x,$y,$z,$x0,$y0,$z0,$nx,$ny,$nz,$d\n";
 	abs( ($x-$x0) * $nx + ($y-$y0) * $ny +($z-$z0) * $nz ) < $error;
 }

@@ -31,6 +31,8 @@ int main(int argc, char** argv){
         if ( csv.getfield(0).compare("_linear_bearing") == 0 ){
              double k = stod(csv.getfield(1)); 
              linear_bearing lbr(k);
+             Matrix mat = lbr.K();
+             cout << mat;
         }
 
         if ( csv.getfield(0).compare("_disk") == 0 ){
