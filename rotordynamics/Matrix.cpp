@@ -115,7 +115,12 @@
               for(int j=i+1;j<=dimension;++j)
                   swap(get(i,j), get(j,i));
      }       
-
+ 
+    Matrix Matrix::operator*=(double a){
+           for(int i = 0; i < v.size(); ++i)
+               v[i]*=a;
+           return *this;
+    }
 
 Matrix operator+(const Matrix& A, const Matrix& B){
 
@@ -205,4 +210,4 @@ vector<double> operator*(const Matrix& A, const vector<double>& v){
      return c;
 }
 
-
+       

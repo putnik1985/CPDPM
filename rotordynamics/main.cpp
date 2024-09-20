@@ -47,6 +47,7 @@ int main(int argc, char** argv){
              auto Ro = stod(csv.getfield(4)); 
              auto  n = stod(csv.getfield(5)); // number of the elements
              uniform_shaft us = uniform_shaft(L, E, Ri, Ro);
+             ////cout << us.K();
         }
     }
     return 0;

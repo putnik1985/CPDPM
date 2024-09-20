@@ -32,7 +32,9 @@ public:
         void unit();
         bool symmetric() const;
         void transpose();
+        Matrix operator*=(double);
 };
 
  ostream& operator<<(ostream&, const Matrix&);
+
 #endif
