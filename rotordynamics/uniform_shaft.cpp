@@ -39,9 +39,36 @@ Matrix uniform_shaft::K()
        return k;
 }
 
+
 Matrix uniform_shaft::M()
 {
        Matrix m(8);
 
+       auto J = M_PI * (pow(Ro, 4) - pow(Ri, 4))/4.;
+       auto A = M_PI * (pow(Ro, 2) - pow(Ri, 2));
+       auto m1 = rho * A * L / 2.0; 
+       auto Id = (rho * J * L + rho * A * pow(L, 3) / 12.) / 2.;
+
+       m(1,1) = m1; m(2,2) = m1; m(3,3) = Id; m(4,4) = Id;
+
+       for(int i = 1; i<=4; ++i)
+           m(i + 4,i + 4) = m(i,i); 
+
        return m;
+}
+
+
+Matrix uniform_shaft::G()
+{
+       Matrix g(8);
+       auto J = M_PI * (pow(Ro, 4) - pow(Ri, 4))/4.;
+       auto Jp = rho * J * L; 
+
+       g(3,4) = Jp;
+       g(4,3) = -Jp;
+
+       g(7,8) = Jp;
+       g(8,7) = -Jp;
+
+       return g;
 }

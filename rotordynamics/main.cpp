@@ -42,12 +42,15 @@ int main(int argc, char** argv){
 
         if ( csv.getfield(0).compare("_uniform_shaft") == 0 ){
              auto L = stod(csv.getfield(1)); 
-             auto E = stod(csv.getfield(2)); 
-             auto Ri = stod(csv.getfield(3)); 
-             auto Ro = stod(csv.getfield(4)); 
-             auto  n = stod(csv.getfield(5)); // number of the elements
-             uniform_shaft us = uniform_shaft(L, E, Ri, Ro);
-             ////cout << us.K();
+             auto rho = stod(csv.getfield(2));
+             auto E = stod(csv.getfield(3)); 
+             auto Ri = stod(csv.getfield(4)); 
+             auto Ro = stod(csv.getfield(5)); 
+             auto  n = stod(csv.getfield(6)); // number of the elements
+             uniform_shaft us = uniform_shaft(L, rho, E, Ri, Ro);
+
+             cout << "gyro:\n";
+             cout << us.G(); 
         }
     }
     return 0;

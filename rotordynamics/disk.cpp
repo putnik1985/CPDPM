@@ -15,3 +15,11 @@ Matrix disk::K()
  Matrix k(4);
  return k;
 }
+
+Matrix disk::G()
+{
+ Matrix g(4);
+ g(3,4) = Jp;
+ g(4,3) = -Jp;
+ return g;
+}
