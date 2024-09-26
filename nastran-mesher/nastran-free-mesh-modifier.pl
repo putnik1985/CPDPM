@@ -10,7 +10,7 @@ use Cwd qw(getcwd);
     my $command_file = $ARGV[1];
 	my $rbe2_fields = 9;
 	my $rbe3_fields = 9;
-    my $error = 0.0001;	
+    my $error = 0.001;	
 	my $load_id = 100;
 	my $spc_id = 100;
 	my $mpc_id = 100;
@@ -63,7 +63,6 @@ use Cwd qw(getcwd);
            print "_grid_rbe2_cone completed\n";		   
        }		   
 
-
 	   if ($words[0] =~ /^_grid_spc_plane$/) {
 		   ####print $_;
 	       grid_spc_plane($_); 
@@ -93,7 +92,6 @@ use Cwd qw(getcwd);
 	       grid_rbe3_cylinder($_); 
            print "_grid_rbe3_cylinder completed\n";		   
        }		   
-
 
 	   if ($words[0] =~ /^_grid_rbe2_sphere_copy_translate$/) {
 		   ####print $_;
@@ -154,7 +152,6 @@ use Cwd qw(getcwd);
            print "_grid_rbe2_radius completed\n";		   
        }		   
 
-
 	   if ($words[0] =~ /^_grid_rbe2_contact_cylinder_rotate$/) {
 		   ####print $_;
 	       grid_rbe2_contact_cylinder_rotate($_); 
@@ -179,8 +176,256 @@ use Cwd qw(getcwd);
            print "_msc_nastran_solution completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_translate$/) {
+		   ####print $_;
+	       grid_translate($_); 
+           print "_grid_translate completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_mesh_combine$/) {
+		   ####print $_;
+	       mesh_combine($_); 
+           print "_mesh_combine completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_rotate$/) {
+		   ####print $_;
+	       grid_rotate($_); 
+           print "_grid_rotate completed\n";		   
+       }		   
+
+
 	}
 	close(fh);
+
+
+sub grid_rotate {
+
+	       my @words = split /,/,@_[0];
+		   my $rot_x = $words[1];
+		   my $rot_y = $words[2];
+		   my $rot_z = $words[3];
+		   my $nx = $words[4];
+		   my $ny = $words[5];
+		   my $nz = $words[6];
+		   my $angle = $words[7];
+		   
+		   $angle *= pi / 180.;
+		   my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+		   $nx /= $mag;
+		   $ny /= $mag;
+		   $nz /= $mag;
+	(my $file, my $ext) = split /\./,$mesh_file;
+	
+	open(outh, '>', "$file-ROTATED.dat") or die $!;
+	open(fh1, '<', $mesh_file) or die $!;
+	 while (<fh1>) {
+		my @words = split /,/,$_;
+        if ($words[0] =~ /GRID/){
+                ####print $_;
+				my $x0 = $words[3] ;
+				my $y0 = $words[4] ;
+				my $z0 = $words[5] ;
+			   (my $new_x, my $new_y, my $new_z) = &rotate_rodrig_formula("$x0,$y0,$z0,$rot_x,$rot_y,$rot_z,$nx,$ny,$nz,$angle");
+
+                $words[3] = $new_x;
+                $words[4] = $new_y;
+                $words[5] = $new_z;	
+				
+				my $str = join(",",@words);
+				printf outh "%s",$str;
+            } else {
+                printf outh "%s",$_;
+            }				
+		}	
+	close(fh1);
+    close(outh);
+}
+
+sub file_mesh_stat {
+	
+	my $filename = @_[0];
+	open(fh1, '<', $filename) or die $!;
+	
+    my $rbe2_eid;
+    my $rbe3_eid;
+    my $ctetra_eid;
+    my $chexa_eid;
+    my $cbush_eid;
+	my $gap_eid;
+	my $celas_eid;
+	my $cquad_eid;
+	
+	my $min_grid = $unreal_number;
+	my $max_grid;
+	my $grids;
+
+	my $min_elem = $unreal_number;
+	my $max_elem;
+	my $elems;
+	my $max_material = 1;
+	my $min_material = $unreal_number;
+	my $max_property = 1;
+	my $min_property = $unreal_number;
+
+	
+	 while (<fh1>) {
+		###print $_;
+		my @words = split /,/,$_;
+		####print $words[1]."\n"; 
+
+        if ($words[0] =~ /PSOLID|PBUSH|PSHELL|PBEAML|PBAR/){
+		    if ($max_property < $words[1]) {
+				$max_property = $words[1];
+			}				
+
+		    if ($min_property > $words[1]) {
+				$min_property = $words[1];
+			}				
+
+		}
+
+        if ($words[0] =~ /MAT1/){
+		    if ($max_material < $words[1]) {
+				$max_material = $words[1];
+			}				
+
+		    if ($min_material > $words[1]) {
+				$min_material = $words[1];
+			}				
+
+		}
+
+
+        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
+
+            ++$elems;
+			
+			if ($max_elem < $words[1]) {
+				$max_elem = $words[1];
+			}
+			
+			if ($min_elem > $words[1]) {
+				$min_elem = $words[1];
+			}
+			
+            if ($words[0] =~ /^RBE2/) { ++$rbe2_eid; }
+			if ($words[0] =~ /^RBE3/) { ++$rbe3_eid; }
+			if ($words[0] =~ /^CTETRA/) { ++$ctetra_eid; }
+			if ($words[0] =~ /^CHEXA/) { ++$chexa_eid; }
+			if ($words[0] =~ /^CQUAD/) { ++$cquad_eid; }
+			if ($words[0] =~ /^CELAS/) { ++$celas_eid; }
+			if ($words[0] =~ /^CBUSH/) { ++$cbush_eid; }
+			if ($words[0] =~ /^GAP/) { ++$gap_eid; }			
+		}
+		
+        if ($words[0] =~ /^GRID/){
+			if ($max_grid < $words[1]) {
+				$max_grid = $words[1];
+			}	
+			
+			if ($min_grid > $words[1]) {
+				$min_grid = $words[1];
+			}	
+            ++$grids;
+		}	
+	 }
+	close(fh1);
+	
+	##print "highest eid: " . $new_eid . "\n";
+	##print "closest grid: " . $closest_grid . "\n";
+	##print "minimum distance: " . $min_distance . "\n";
+
+	print STDOUT "\n\$_mesh_stat $filename output:\n";
+	print STDOUT "\$grids: $grids\n";
+	print STDOUT "\$lower grid: $min_grid\n";
+	print STDOUT "\$highest grid: $max_grid\n";
+	print STDOUT "\n";
+	print STDOUT "\$elements: $elems\n";
+	print STDOUT "\$lower element: $min_elem\n";
+	print STDOUT "\$highest element: $max_elem\n";
+	print STDOUT "\n";
+	print STDOUT "\$RBE2 element: $rbe2_eid\n";
+	print STDOUT "\$RBE3 element: $rbe3_eid\n";
+	print STDOUT "\$CTETRA element: $ctetra_eid\n";
+	print STDOUT "\$CHEXA element: $chexa_eid\n";
+	print STDOUT "\$CQUAD element: $cquad_eid\n";
+	print STDOUT "\$CELAS element: $celas_eid\n";
+	print STDOUT "\$CBUSH element: $cbush_eid\n";
+	print STDOUT "\$GAP element: $gap_eid\n";
+	
+    ($min_grid,$max_grid,$min_elem,$max_elem,$min_property,$max_property,$min_material,$max_material);	
+}
+
+sub mesh_combine {
+
+	       my @words = split /,/,@_[0];
+		   my $add_file = $words[1];
+
+           print "combine $mesh_file and $add_file\n";
+		   (my $min_grid,my $max_grid, my $min_elem, my $max_elem, my $min_property, my $max_property, my $min_material, my $max_material) = &file_mesh_stat($mesh_file);
+		   (my $min_grid1,my $max_grid1, my $min_elem1, my $max_elem1, my $min_property1, my $max_property1, my $min_material1, my $max_material1) = &file_mesh_stat($add_file);
+		   
+		   my $grid_offset = 0;
+		   my $elem_offset = 0;
+		   my $mat_offset = 0;
+		   my $prop_offset = 0;
+
+		   if ( $max_grid + 1 > $min_grid1) {
+			    $grid_offset = $max_grid + 1 - $min_grid1;
+		   }
+
+		   if ( $max_elem + 1 > $min_elem1) {
+			    $elem_offset = $max_elem + 1 - $min_elem1;
+		   }
+
+		   if ( $max_material + 1 > $min_material1) {
+			    $mat_offset = $max_material + 1 - $min_material1;
+		   }
+
+		   if ( $max_property + 1 > $min_property1) {
+			    $prop_offset = $max_property + 1 - $min_property1;
+		   }
+		   
+		   (my $file1, my $ext1) = split /\./,$mesh_file;
+		   (my $file2, my $ext2) = split /\./,$add_file;
+		   
+		   open(infile, '>', $mesh_file) or die $!;
+		   open(addfile, '>', $add_file) or die $!;
+		   open(combine, '>', "$file1+$file2.dat") or die $!;
+		   
+		        printf combine "\$file: $mesh_file\n";
+				
+		        while (<infile>){
+					printf combine $_;
+				}
+
+		        printf combine "\$file: $add_file\n";
+				
+		        while (<addfile>){
+		          my @words = split /,/,$_;
+
+                     if ($words[0] =~ /PSOLID|PBUSH|PSHELL|PBEAML|PBAR/){
+			         }				
+
+                     if ($words[0] =~ /MAT1/){
+
+               		}
+
+                     if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
+             		}
+
+                     if ($words[0] =~ /^GRID/){
+		            }	
+
+				}
+
+		   
+		   close(infile);
+		   close(addfile);
+		   close(combine);
+		   
+}
 
 sub msc_nastran_solution{
     my @words = split /,/,@_[0];
@@ -252,12 +497,42 @@ ENDDATA";
 	}
 	
 	open(newfh,">","nastran-run.cmd") or die $!;
-	     my $fullname = getcwd."/".$mesh_file;
+	     my $fullname = getcwd."/".$filename;
 		 chomp($nastran_path);
 		 
-	     printf newfh "$nastran_path $filename old=no news=no";
+	     printf newfh "$nastran_path $fullname old=no news=no";
 	close newfh;
 	
+}
+
+sub grid_translate {
+
+	       my @words = split /,/,@_[0];
+		   my $x0 = $words[1];
+		   my $y0 = $words[2];
+		   my $z0 = $words[3];
+		   my $x1 = $words[4];
+		   my $y1 = $words[5];
+		   my $z1 = $words[6];
+	      (my $dx, my $dy, my $dz) = ($x1-$x0, $y1-$y0, $z1-$z0);
+		  (my $file, my $ext) = split/\./,$mesh_file;
+	open(outh, '>', "$file-TRANSLATED.dat") or die $!;
+	open(fh1, '<', $mesh_file) or die $!;
+	 while (<fh1>) {
+		my @words = split /,/,$_;
+        if ($words[0] =~ /GRID/){
+                ####print $_;
+				$words[3] += $dx;
+				$words[4] += $dy;
+				$words[5] += $dz;
+				my $str = join(",",@words);
+				printf outh "%s",$str;
+            } else {
+                printf outh "%s",$_;
+            }				
+		}	
+	close(fh1);
+    close(outh);
 }
 
 sub grid_translate_box {
@@ -714,7 +989,7 @@ sub grid_spc_plane {
 	open(fh1, ">>", $mesh_file) or die $!;
 	print fh1 "\n\$_grid_spc_plane output:\n";	
 	for (@grids) {
-		printf fh1 "spc,$spc_id,$_,$dofs,\n";
+		printf fh1 "SPC,$spc_id,$_,$dofs,\n";
 	}
 	close(fh1);
 }
@@ -1175,24 +1450,6 @@ sub mesh_stat {
 	##print "highest eid: " . $new_eid . "\n";
 	##print "closest grid: " . $closest_grid . "\n";
 	##print "minimum distance: " . $min_distance . "\n";
-
-	print STDOUT "\n\$_mesh_stat output:\n";
-	print STDOUT "\$grids: $grids\n";
-	print STDOUT "\$lower grid: $min_grid\n";
-	print STDOUT "\$highest grid: $max_grid\n";
-	print STDOUT "\n";
-	print STDOUT "\$elements: $elems\n";
-	print STDOUT "\$lower element: $min_elem\n";
-	print STDOUT "\$highest element: $max_elem\n";
-	print STDOUT "\n";
-	print STDOUT "\$RBE2 element: $rbe2_eid\n";
-	print STDOUT "\$RBE3 element: $rbe3_eid\n";
-	print STDOUT "\$CTETRA element: $ctetra_eid\n";
-	print STDOUT "\$CHEXA element: $chexa_eid\n";
-	print STDOUT "\$CQUAD element: $cquad_eid\n";
-	print STDOUT "\$CELAS element: $celas_eid\n";
-	print STDOUT "\$CBUSH element: $cbush_eid\n";
-	print STDOUT "\$GAP element: $gap_eid\n";
 	
     ($max_grid,$max_elem,$max_property,$max_material);	
 }

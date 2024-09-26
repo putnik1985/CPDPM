@@ -32,10 +32,11 @@ _msc_nastran_solution,modal,C:\plmapps\NX2000\NXNASTRAN\bin\nastranw
 #_grid_rbe2_contact_cylinder_rotate,-94.212,-200.4298,90.1909,-115.924,-198.2053,84.8204,1.,0.,0.,4,0.4,0.9,
 #_grid_bolt,
 #_grid_bolt_rotate,-88.0133,-198.205,90.6329,-86.334,-198.2053,90.6333,1.,0.,0.,0.4,0.3,0.4,0.6,-115.924,-198.2053,84.8204,4,
-
+#_grid_translate,dx,dy,dz,
+#_mesh_combine,GERI-LPGF-Structural-Test-Rig-UPDATED.dat,
 
 TO DO
-
+#_grid_rotate,nx,ny,nz,teta_in_degrees,
 ###_grid_mpc,
 ###_grid_gap,-0.0010,0.0134,0.0000,0.60,0.2,0.,0.,1.,
 ###_grid_spring,-0.0010,0.0134,0.0000,0.60,0.2,0.,0.,1.,

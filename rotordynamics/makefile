@@ -8,7 +8,7 @@ target:= rotor
 
 
 $(target): $(objects)
-	$(link) $(flags) -o $(target) $(objects)
+	$(link) $(flags) -o $(target) $(objects) 
 
 $(objects): $(libs) $(headers)
 	$(link) $(compile) $(flags) $(libs)
