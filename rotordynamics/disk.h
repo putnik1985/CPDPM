@@ -4,15 +4,10 @@
 #include "structure.h"
 #include "gyro.h"
 
-class disk: public structure, gyro {
+class disk: public structure, public gyro {
  
  public:
-   disk(double m, double Jp, double Jd):
-   m(m), Jp(Jp), Jd(Jd) {}
-
-   Matrix M();
-   Matrix K();
-   Matrix G();
+   disk(double m, double Jp, double Jd);
 
  private:
    double m;

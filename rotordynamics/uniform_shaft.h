@@ -4,14 +4,9 @@
 #include "structure.h"   
 #include "gyro.h"
 
-class uniform_shaft: public structure, gyro {
+class uniform_shaft: public structure, public gyro {
  public:
- explicit uniform_shaft(double L, double rho, double E, double Ri, double Ro):
- L(L), rho(rho), E(E), Ri(Ri), Ro(Ro) {}
-
- Matrix M();
- Matrix K();
- Matrix G();
+ explicit uniform_shaft(double L, double rho, double E, double Ri, double Ro);
 
  private:
  double L;

@@ -37,7 +37,8 @@ int main(int argc, char** argv){
              double m = stod(csv.getfield(1)); 
              double Jp = stod(csv.getfield(2)); 
              double Jd = stod(csv.getfield(3)); 
-             disk d(m, Jp, Jd); 
+             disk d(m, Jp, Jd);
+             cout << d.G;			 
         }
 
         if ( csv.getfield(0).compare("_uniform_shaft") == 0 ){
@@ -49,8 +50,8 @@ int main(int argc, char** argv){
              auto  n = stod(csv.getfield(6)); // number of the elements
              uniform_shaft us = uniform_shaft(L, rho, E, Ri, Ro);
 
-             cout << "gyro:\n";
-             cout << us.G(); 
+             //cout << "gyro:\n";
+             //cout << us.G; 
         }
     }
     return 0;

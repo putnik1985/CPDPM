@@ -3,11 +3,9 @@
 
 #include "Matrix.h"
 
-class structure {
- 
- public:
- virtual Matrix M() = 0;
- virtual Matrix K() = 0;
+struct structure {
+ Matrix M;
+ Matrix K;
 };
 
 #endif

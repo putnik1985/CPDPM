@@ -3,9 +3,8 @@
 
 #include "Matrix.h"
 
-class gyro{
-public:
-virtual Matrix G() = 0;    
+struct gyro{
+Matrix G;    
 };
 
 #endif

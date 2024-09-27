@@ -1,17 +1,11 @@
 #include "linear_bearing.h"
 
-Matrix linear_bearing::M()
+linear_bearing::linear_bearing(double k):
+k{k}
 {
-       Matrix m(4);
-       return m;
-}
-        
-Matrix linear_bearing::K()
-{
-       Matrix k1(4);
-              k1(1,1) = k;  k1(1,3) = -k;
-              k1(3,1) = -k; k1(3,3) = k;
-              k1(2,2) = k;  k1(1,4) = -k;
-              k1(4,1) = -k; k1(4,4) = k;
-       return k1;
+       unsigned int dofs = 2; // vertical and latteral deflection for the grounded bearing
+	   M = Matrix(dofs);
+	   K = Matrix(dofs);
+	   K(1,1) = k;
+	   K(2,2) = k;
 }

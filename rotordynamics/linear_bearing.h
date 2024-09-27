@@ -5,11 +5,7 @@
 
 class linear_bearing: public structure {
  public:
- linear_bearing(double k):
- k(k) {}
-
- Matrix M();
- Matrix K();
+ linear_bearing(double k);
 
  private:
  double k;
