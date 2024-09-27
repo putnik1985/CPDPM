@@ -194,10 +194,65 @@ use Cwd qw(getcwd);
            print "_grid_rotate completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_create_rbe2_from_list$/) {
+		   ####print $_;
+	       grid_create_rbe2_from_list($_); 
+           print "_grid_create_rbe2_from_list completed\n";		   
+       }		   
+
 
 	}
 	close(fh);
 
+sub grid_create_rbe2_from_list {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $x0 = $words[2];
+		   my $y0 = $words[3];
+		   my $z0 = $words[4];
+  
+           my @grids;
+           open(gridsh, "<", $list) or die $!;
+	       while (<gridsh>) {
+			 my @words = split / /,$_;
+			 if ($words[0] =~ /Label|label/){
+                 push(@grids,$words[1]);
+			 }
+		    }
+	       close(gridsh);
+    ############print @grids;
+	open(h1, ">>", $mesh_file) or die $!;
+
+	printf h1 "\n\$_grid_create_rbe2_from_list:\n";
+
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids;
+    
+   (my $max_grid, my $max_elem, my $max_property, my $max_material) = &mesh_stat();
+	my $new_grid = $max_grid + 1;
+	my $new_eid = $max_elem + 1;
+	
+	
+	printf h1 "GRID,%d,0,%g,%g,%g,0\n",$new_grid,$x0,$y0,$z0;
+	printf h1 "RBE2,%d,%d,123456,",$new_eid,$new_grid;
+	for(my $k = 0; $k < $last; $k++) {
+
+			if ($current_field <= $rbe2_fields) {
+		        printf h1 "%d,",$grids[$k];
+				++$current_field;
+			} else {
+		        printf h1 "+\n";
+		        printf h1 "+,";
+		        printf h1 "%d,",$grids[$k];				
+                $current_field = 3; 				
+            }
+
+    }
+	
+    close(h1);
+}
 
 sub grid_rotate {
 
