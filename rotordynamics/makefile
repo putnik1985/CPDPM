@@ -7,7 +7,7 @@ objects:= main.o csv.o Matrix.o linear_bearing.o disk.o uniform_shaft.o rotor.o
 target:= rotor
 
 
-$(target): $(objects)
+$(target): $(objects) 
 	$(link) $(flags) -o $(target) $(objects) 
 
 $(objects): $(libs) $(headers)

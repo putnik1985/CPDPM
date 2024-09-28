@@ -5,14 +5,12 @@
 #include "disk.h"
 #include "uniform_shaft.h"
 
-class rotor: public structure, public gyro {
- public:
-   rotor(){};
-   int append(const linear_bearing&) const; 
-   int append(const disk&) const;
-   int append(const uniform_shaft&) const;
+struct rotor: public structure, public gyro {
 
- private:
+   rotor(): nodes{0}{};
+   int append(const linear_bearing&); 
+   int append(const disk&);
+   int append(const uniform_shaft&);
    int nodes;
 
 };
