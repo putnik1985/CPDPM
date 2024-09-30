@@ -4,6 +4,7 @@
 #include "linear_bearing.h"
 #include "disk.h"
 #include "uniform_shaft.h"
+#include "rotor.h"
 
 int main(int argc, char** argv){
     string line;
@@ -13,13 +14,13 @@ int main(int argc, char** argv){
     for( int i = 0; i < argc; ++i)
      if (strcmp(argv[i], "-f") == 0) filename = argv[i+1]; // need to check if it exists will crash otherwise
 
-    cout << filename << "\n";
     ifstream ifs(filename.c_str());
     if (!ifs){
        cerr << "can not open file: " << filename << "\n";
        return -1;
     }
 
+    rotor R;
     Csv csv(ifs);
     while (csv.getline(line) != 0) {
 /*
@@ -31,6 +32,7 @@ int main(int argc, char** argv){
         if ( csv.getfield(0).compare("_linear_bearing") == 0 ){
              double k = stod(csv.getfield(1)); 
              linear_bearing lbr(k);
+             R.append(lbr);
         }
 
         if ( csv.getfield(0).compare("_disk") == 0 ){
@@ -38,7 +40,7 @@ int main(int argc, char** argv){
              double Jp = stod(csv.getfield(2)); 
              double Jd = stod(csv.getfield(3)); 
              disk d(m, Jp, Jd);
-             cout << d.G;			 
+             R.append(d);
         }
 
         if ( csv.getfield(0).compare("_uniform_shaft") == 0 ){
@@ -48,11 +50,15 @@ int main(int argc, char** argv){
              auto Ri = stod(csv.getfield(4)); 
              auto Ro = stod(csv.getfield(5)); 
              auto  n = stod(csv.getfield(6)); // number of the elements
-             uniform_shaft us = uniform_shaft(L, rho, E, Ri, Ro);
 
-             //cout << "gyro:\n";
-             //cout << us.G; 
+             double elem_L = L / n;
+             for(int i = 0; i < n; ++i){
+                 uniform_shaft us = uniform_shaft(elem_L, rho, E, Ri, Ro);
+                 R.append(us);
+             }
         }
-    }
+    } // end of the cycle over the commands
+
+    // lets start to solve the equations 
     return 0;
 }
