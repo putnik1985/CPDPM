@@ -16,10 +16,22 @@ use Cwd qw(getcwd);
 	my $mpc_id = 100;
 	my $unreal_number = 1.e+38;
 	my $total_dofs = 6;
+	my $grids_modified = 0;
 	
 ##	printf "command file: %12s\n",$command_file;
 ##	printf "  input file: %12s\n", $mesh_file;
 ##	printf "\n";
+
+	my %file_grids;
+	open(gridh,'<',$mesh_file);
+	     while (<gridh>){
+			 if ($_ =~ /^GRID/){
+				 my @words = split/,/,$_;
+                 $file_grids{$words[1]} = $_;				 
+			 }
+		 }
+	close(gridh);
+	##########print %file_grids;
 	
 	open(fh, '<', $command_file) or die $!;
 	my %commands;
@@ -200,9 +212,68 @@ use Cwd qw(getcwd);
            print "_grid_create_rbe2_from_list completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_modify_from_list$/) {
+		   ####print $_;
+	       grid_modify_from_list($_); 
+           print "_grid_modify_from_list completed\n";		   
+       }		   
 
 	}
 	close(fh);
+
+    if ($grids_modified){
+
+	my ( $file, $ext) = split/\./,$mesh_file;
+	open(outh, '>', "$file-MODIFIED.dat") or die $!;
+          foreach my $str (values %file_grids){
+	        printf outh "%s",$str;			
+	      }
+	      open(fh1, '<', $mesh_file) or die $!;
+	           while (<fh1>) {
+		              my @words = split /,/,$_;
+                      if ($words[0] =~ /[^GRID]/){
+                          printf outh "%s",$_;
+                      }				
+		        }	
+	      close(fh1);
+    close(outh);
+    }
+	
+sub grid_modify_from_list {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $x0 = $words[2];
+		   my $y0 = $words[3];
+		   my $z0 = $words[4];
+
+           my @grids;
+           open(gridsh, "<", $list) or die $!;
+	       while (<gridsh>) {
+			 my @words = split / /,$_;
+			 if ($words[0] =~ /Label|label/){
+                 push(@grids,$words[1]);
+			 }
+		    }
+	       close(gridsh);
+
+
+    for (@grids){
+		    
+			my @words = split/,/,$file_grids{$_};
+			if ($x0 != '') { $words[3] = $x0;};
+			if ($y0 != '') { $words[4] = $y0;};
+			if ($z0 != '') { $words[5] = $z0;};
+			
+			my $str = join(",",@words);
+			$file_grids{$_} = $str;
+
+	}
+
+    $grids_modified = 1;
+}
+
+
 
 sub grid_create_rbe2_from_list {
 
