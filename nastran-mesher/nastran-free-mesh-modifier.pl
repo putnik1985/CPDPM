@@ -341,31 +341,24 @@ sub grid_rotate {
 		   $nx /= $mag;
 		   $ny /= $mag;
 		   $nz /= $mag;
-	(my $file, my $ext) = split /\./,$mesh_file;
 	
-	open(outh, '>', "$file-ROTATED.dat") or die $!;
-	open(fh1, '<', $mesh_file) or die $!;
-	 while (<fh1>) {
-		my @words = split /,/,$_;
-        if ($words[0] =~ /GRID/){
-                ####print $_;
-				my $x0 = $words[3] ;
-				my $y0 = $words[4] ;
-				my $z0 = $words[5] ;
-			   (my $new_x, my $new_y, my $new_z) = &rotate_rodrig_formula("$x0,$y0,$z0,$rot_x,$rot_y,$rot_z,$nx,$ny,$nz,$angle");
+		
+		while (my ($key, $value) = each %file_grids){
+		       my @words = split /,/,$value;
+		       my $x0 = $words[3];
+		       my $y0 = $words[4];
+		       my $z0 = $words[5];
+
+        	  (my $new_x, my $new_y, my $new_z) = &rotate_rodrig_formula("$x0,$y0,$z0,$rot_x,$rot_y,$rot_z,$nx,$ny,$nz,$angle");
 
                 $words[3] = $new_x;
                 $words[4] = $new_y;
                 $words[5] = $new_z;	
-				
 				my $str = join(",",@words);
-				printf outh "%s",$str;
-            } else {
-                printf outh "%s",$_;
-            }				
+
+				$file_grids{$key} = $str;
 		}	
-	close(fh1);
-    close(outh);
+    $grids_modified = 1;
 }
 
 sub file_mesh_stat {
@@ -641,24 +634,23 @@ sub grid_translate {
 		   my $y1 = $words[5];
 		   my $z1 = $words[6];
 	      (my $dx, my $dy, my $dz) = ($x1-$x0, $y1-$y0, $z1-$z0);
-		  (my $file, my $ext) = split/\./,$mesh_file;
-	open(outh, '>', "$file-TRANSLATED.dat") or die $!;
-	open(fh1, '<', $mesh_file) or die $!;
-	 while (<fh1>) {
-		my @words = split /,/,$_;
-        if ($words[0] =~ /GRID/){
-                ####print $_;
-				$words[3] += $dx;
-				$words[4] += $dy;
-				$words[5] += $dz;
+
+		while (my ($key, $value) = each %file_grids){
+		       my @words = split /,/,$value;
+		       my $x0 = $words[3];
+		       my $y0 = $words[4];
+		       my $z0 = $words[5];
+
+        	  (my $new_x, my $new_y, my $new_z) = ($x0 + $dx, $y0 + $dy, $z0 + $dz);
+
+                $words[3] = $new_x;
+                $words[4] = $new_y;
+                $words[5] = $new_z;	
 				my $str = join(",",@words);
-				printf outh "%s",$str;
-            } else {
-                printf outh "%s",$_;
-            }				
+
+				$file_grids{$key} = $str;
 		}	
-	close(fh1);
-    close(outh);
+    $grids_modified = 1;
 }
 
 sub grid_translate_box {
