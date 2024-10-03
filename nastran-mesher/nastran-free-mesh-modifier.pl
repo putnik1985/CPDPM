@@ -218,6 +218,12 @@ use Cwd qw(getcwd);
            print "_grid_modify_from_list completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_bolt_translate$/) {
+		   ####print $_;
+	       grid_bolt_translate($_); 
+           print "_grid_bolt_translate completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -238,6 +244,52 @@ use Cwd qw(getcwd);
 	      close(fh1);
     close(outh);
     }
+
+sub grid_bolt_translate {
+	
+	       my @words = split /,/,@_[0];
+		   my $x0 = $words[1];
+		   my $y0 = $words[2];
+		   my $z0 = $words[3];
+
+		   my $x1 = $words[4];
+		   my $y1 = $words[5];
+		   my $z1 = $words[6];
+
+		   my $nx = $words[7];
+		   my $ny = $words[8];
+		   my $nz = $words[9];
+
+           my $h = $words[10];
+           my $thread_radius = $words[11];
+	   
+	       my $head_radius = $words[12];
+	       my $bolt_radius = $words[13];
+		   
+		   my $dx = $words[14];
+		   my $dy = $words[15];
+		   my $dz = $words[16];
+		   
+		   my $copies = $words[17];
+     
+	open(fh1, ">>", $mesh_file) or die $!;
+	print fh1 "\n\$ @_[0] \n";	
+	print fh1 "\n\$_grid_bolt_translate output:\n";
+    close(fh1);    
+	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
+	
+	for(my $k = 0; $k < $copies; $k++) {
+		(my $new_x0, my $new_y0, my $new_z0) = ($x0 + $k * $dx, $y0 + $k * $dy, $z0 + $k * $dz);
+		(my $new_x1, my $new_y1, my $new_z1) = ($x1 + $k * $dx, $y1 + $k * $dy, $z1 + $k * $dz);		
+		my $command="_grid_bolt,$new_x0,$new_y0,$new_z0,$new_x1,$new_y1,$new_z1,$nx,$ny,$nz,$h,$thread_radius,$head_radius,$bolt_radius,";
+		&grid_bolt($command);
+    }
+	
+}
 	
 sub grid_modify_from_list {
 
@@ -2189,7 +2241,7 @@ sub grid_rbe2_contact_cylinder_rotate {
 
 
 sub within{
-    ((@_[1] <= @_[0]) && (@_[0] <= @_[2]))
+    ((@_[1] < @_[0]) && (@_[0] < @_[2]))
  }
  
 sub within_cone{
@@ -2216,7 +2268,7 @@ sub within_cone{
 	my $t = ($x - $x0) * $nx + ($y - $y0) * $ny + ($z - $z0) * $nz;
 	my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
 	
-   (abs($t) <= $h) && ( abs($t) >= $distance * cos($alpha)); 
+   (abs($t) < $h) && ( abs($t) > $distance * cos($alpha)); 
 }
 
 
@@ -2244,7 +2296,7 @@ sub within_cylinder{
 	my $t = ($x - $x0) * $nx + ($y - $y0) * $ny + ($z - $z0) * $nz;
 	my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
 	
-   ($distance**2 - $t**2 <= $R0**2) && (abs($t) <= $h) ; 
+   ($distance**2 - $t**2 < $R0**2) && (abs($t) < $h) ; 
 }
 
 
