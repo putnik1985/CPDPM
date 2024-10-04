@@ -2025,8 +2025,12 @@ sub grid_bolt {
     my $second_grid = $grid;
 
 	open(fh1, ">>", $mesh_file) or die $!;
+    ## want to find vector normal to nx, ny, nz: nx * k + ny * l + nz * m = 0.
+	
+    my ($rx, $ry, $rz) = &vector_normal($nx, $ny, $nz);	
+	
 	printf fh1 "\n\$_grid_bolt output:\n";
-    printf fh1 "CBEAM,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",++$element,++$property,$first_grid,$second_grid,-$ny,$nx,0.0;	
+    printf fh1 "CBEAM,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",++$element,++$property,$first_grid,$second_grid,$rx,$ry,$rz;	
 	printf fh1 "PBEAML,%d,%d,MSCBML0,ROD,,,,,+\n",$property,++$materials;
 	printf fh1 "+,%.4f,0.0,YES,1.0,%.4f,0.0,\n",$bolt_radius,$bolt_radius;
 
@@ -2036,6 +2040,37 @@ sub grid_bolt {
 	printf fh1 "MAT1,%d,%.2E,,%.4f,%.4g,\n",$materials,$E,$nu,$rho / 386.1;
 	close fh1;
 }
+
+sub vector_normal{
+	my $nx = @_[0];
+	my $ny = @_[1];
+	my $nz = @_[2];
+	
+	my $rx; 
+	my $ry;
+	my $rz;
+	
+	if ($nx != 0.) { 
+	    $ry = 1.0; 
+		$rz = 0.; 
+		$rx = -$ny / $nx;
+	} elsif ($ny != 0.) {
+	    $rz = 1.0; 
+		$rx = 0.; 
+		$ry = -$nz / $ny;		
+	} else {
+	    $rx = 1.0; 
+		$ry = 0.; 
+		$rz = -$nx / $nz;		
+	}
+		
+	my $mag = sqrt($rx**2 + $ry**2 + $rz**2);
+	$rx /= $mag;
+	$ry /= $mag;
+	$rz /= $mag;
+	($rx, $ry, $rz);
+}
+
 
 sub grid_bolt_rotate {
 	
