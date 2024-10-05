@@ -224,6 +224,12 @@ use Cwd qw(getcwd);
            print "_grid_bolt_translate completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_create_rbe3_from_grid_and_list$/) {
+		   ####print $_;
+	       grid_create_rbe3_from_grid_and_list($_); 
+           print "_grid_create_rbe3_from_grid_and_list completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -244,6 +250,49 @@ use Cwd qw(getcwd);
 	      close(fh1);
     close(outh);
     }
+
+
+
+sub grid_create_rbe3_from_grid_and_list {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $new_grid = $words[2];
+  
+           my @grids;
+           open(gridsh, "<", $list) or die $!;
+	       while (<gridsh>) {
+			 my @words = split / /,$_;
+			 if ($words[0] =~ /Label|label/){
+                 push(@grids,$words[1]);
+			 }
+		    }
+	       close(gridsh);
+	
+	open(h1, ">>", $mesh_file) or die $!;
+	print h1 "\n\$_grid_create_rbe3_from_grid_and_list output:\n";
+    my $current_field = 8;
+	my $current = 0;
+	my $last = @grids;
+    
+   (my $max_grid, my $max_elem, my $max_property, my $max_material) = &mesh_stat();
+	my $new_eid = $max_elem + 1;
+
+	printf h1 "RBE3,%d,,%d,123456,1.0,123,",$new_eid,$new_grid;
+	for(my $k = 0; $k < $last; $k++) {
+
+			if ($current_field <= $rbe3_fields) {
+		        printf h1 "%d,",$grids[$k];
+				++$current_field;
+			} else {
+		        printf h1 "+\n";
+		        printf h1 "+,";
+		        printf h1 "%d,",$grids[$k];				
+                $current_field = 3; 				
+            }
+    }	
+    close(h1);		
+}
 
 sub grid_bolt_translate {
 	
