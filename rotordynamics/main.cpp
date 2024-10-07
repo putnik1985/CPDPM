@@ -60,5 +60,6 @@ int main(int argc, char** argv){
     } // end of the cycle over the commands
 
     // lets start to solve the equations 
+	cout << R.K;
     return 0;
 }
