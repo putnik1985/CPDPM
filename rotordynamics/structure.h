@@ -4,8 +4,8 @@
 #include "Matrix.h"
 
 struct structure {
- Matrix M;
- Matrix K;
+ Matrix<double> M;
+ Matrix<double> K;
 };
 
 #endif

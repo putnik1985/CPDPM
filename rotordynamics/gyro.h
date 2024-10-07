@@ -4,7 +4,7 @@
 #include "Matrix.h"
 
 struct gyro{
-Matrix G;    
+Matrix<double> G;    
 };
 
 #endif

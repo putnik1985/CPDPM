@@ -113,7 +113,7 @@ template<class T> class Matrix_base {
     // Matrix_base does element-wise operations
 protected:
     T* elem;    // vector? no: we couldn't easily provide a vector for a slice
-    const Index sz;    
+    Index sz;    
     mutable bool owns;
     mutable bool xfer;
 public:

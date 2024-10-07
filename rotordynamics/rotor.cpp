@@ -5,9 +5,9 @@ int rotor::append(const linear_bearing& lbr){
 
     if (nodes == 0) {
         nodes = 1;
-        M = Matrix( 4 * nodes);
-        K = Matrix( 4 * nodes);
-        G = Matrix( 4 * nodes);
+        M = Matrix<double>( 4 * nodes);
+        K = Matrix<double>( 4 * nodes);
+        G = Matrix<double>( 4 * nodes);
     }
 
     unsigned int dofs = 2;
@@ -23,9 +23,9 @@ int rotor::append(const disk& d){
 
     if (nodes == 0) {
         nodes = 1;
-        M = Matrix( 4 * nodes);
-        K = Matrix( 4 * nodes);
-        G = Matrix( 4 * nodes);
+        M = Matrix<double>( 4 * nodes);
+        K = Matrix<double>( 4 * nodes);
+        G = Matrix<double>( 4 * nodes);
     }
 
     unsigned int dofs = 4;
@@ -42,9 +42,9 @@ int rotor::append(const uniform_shaft& us){
 
     if (nodes == 0) {
         nodes = 1;
-        M = Matrix(4 * nodes);
-        K = Matrix(4 * nodes);
-        G = Matrix(4 * nodes);
+        M = Matrix<double>(4 * nodes);
+        K = Matrix<double>(4 * nodes);
+        G = Matrix<double>(4 * nodes);
     }
 
     M.set_dimension(4 * nodes + 4); // additional nodes has 4 dofs

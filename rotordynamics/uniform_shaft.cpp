@@ -8,7 +8,7 @@ uniform_shaft::uniform_shaft(double L, double rho, double E, double Ri, double R
  L(L), rho(rho), E(E), Ri(Ri), Ro(Ro) 
  {
 	   unsigned int dofs = 8;
-	   K = Matrix(dofs);
+	   K = Matrix<double>(dofs);
 	 
        auto J = M_PI * (pow(Ro, 4) - pow(Ri, 4))/4.;
        auto A = M_PI * (pow(Ro, 2) - pow(Ri, 2));
@@ -43,7 +43,7 @@ uniform_shaft::uniform_shaft(double L, double rho, double E, double Ri, double R
 
        K *= E * J / (pow(L,3) * (1. + 12. * eps));	 
 	   
-	   M = Matrix(dofs);
+	   M = Matrix<double>(dofs);
 
        m1 = rho * A * L / 2.0; 
        auto Id = (rho * J * L + rho * A * pow(L, 3) / 12.) / 2.;
@@ -53,7 +53,7 @@ uniform_shaft::uniform_shaft(double L, double rho, double E, double Ri, double R
        for(int i = 1; i<=4; ++i)
            M(i + 4,i + 4) = M(i,i); 
 
-	   G = Matrix(dofs);
+	   G = Matrix<double>(dofs);
        auto Jp = rho * J * L; 
 
        G(3,4) = Jp;
