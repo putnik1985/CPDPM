@@ -23,8 +23,11 @@ use Cwd qw(getcwd);
 ##	printf "\n";
 
 	my %file_grids;
+	my @file_lines;
+	
 	open(gridh,'<',$mesh_file);
 	     while (<gridh>){
+	         push(@file_lines,$_);
 			 if ($_ =~ /^GRID/){
 				 my @words = split/,/,$_;
                  $file_grids{$words[1]} = $_;				 
@@ -234,7 +237,6 @@ use Cwd qw(getcwd);
 	close(fh);
 
     if ($grids_modified){
-
 	my ( $file, $ext) = split/\./,$mesh_file;
 	open(outh, '>', "$file-MODIFIED.dat") or die $!;
           foreach my $str (values %file_grids){
@@ -250,8 +252,12 @@ use Cwd qw(getcwd);
 	      close(fh1);
     close(outh);
     }
+   
 
 
+##    for (@file_lines){
+##		print $_;
+##    }
 
 sub grid_create_rbe3_from_grid_and_list {
 
