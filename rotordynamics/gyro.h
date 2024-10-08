@@ -1,7 +1,7 @@
 #ifndef GYRO_H
 #define GYRO_H
 
-#include "Matrix.cpp"
+#include "Matrix.h"
 
 struct gyro{
 Matrix<double> G;    

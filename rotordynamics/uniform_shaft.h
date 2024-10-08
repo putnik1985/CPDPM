@@ -1,7 +1,7 @@
 #ifndef UNIFORM_SHAFT_H
 #define UNIFORM_SHAFT_H
 
-#include "structure.h"   
+#include "structure.h"
 #include "gyro.h"
 
 class uniform_shaft: public structure, public gyro {

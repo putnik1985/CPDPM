@@ -1,7 +1,8 @@
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
-#include "Matrix.cpp"
+#include "Matrix.h"
+#include "Matrix.cpp"   
 
 struct structure {
  Matrix<double> M;
