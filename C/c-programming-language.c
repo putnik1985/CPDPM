@@ -196,51 +196,40 @@ int _strncmp(char* s, char* t, int n)
 	return *s - *t;
 }
 
+/* getline: get ine into s and return length */
+int getline(char* s, int lim)
+{
+	int c, i;
+	i = 0;
+	while (--lim > 0 && (c = getchar()) != EOF && c!= '\n')
+           s[i++] = c;
+
+    if (c == '\n')
+           s[i++] = c;
+    s[i] = '\0';
+    return i;	
+}
+
+/* strindex: return index of t in s, -1 if none */
+int _strindex(char* s, char* t)
+{
+	char* begin = s;
+	for( ; *s != '\0'; s++) {
+		char* sp = s;
+		char* tp = t;
+		for( ;  *tp != '\0' && *tp == *sp; tp++, sp++)
+			;    
+		printf("%c -- %c\n", *s, *tp);
+		if ((tp > t) && ( *tp == '\0'))
+			return s - begin;
+	}
+	return -1;
+}
 
 int main(){
-	/*
-    fprintf(stdout, "start printing\n");
-	float c;
-	while ( getfloat(&c)) {
-	    printf("number: %f\n",c);
-	}
-	*//*
-	char *p = alloc(4);
 
-	for(int i = 0; i < 8; ++i)
-		printf("%c,",allocbuf[i]);
-	printf("\n");
-
-    if (p == NULL) return -1;
-	
-	printf("%p\n",p);
-	
-	for(int i = 0; i < 4; ++i)
-		p[i] = i;
-
-	for(int i = 0; i < 8; ++i)
-		printf("%c,",allocbuf[i]);
-	printf("\n");
-	
-    afree(p);	
-
-	for(int i = 0; i < 8; ++i)
-		printf("%c,",allocbuf[i]);
-	printf("\n");
-    printf("%p\n",p);
-	
-	*/
 	char s1[MAXLINE];
-	char s2[MAXLINE];
-        int n;
-
-	printf("input words\n");
-	fscanf(stdin,"%s%s",s1,s2);
-	printf("input n\n");
-	fscanf(stdin,"%d",&n);
-
-	int d = _strncmp(s1, s2, n);
-        printf("strcmp: %d\n", d);
-
+    char s2[MAXLINE];     
+	
 	return 0;
 }
