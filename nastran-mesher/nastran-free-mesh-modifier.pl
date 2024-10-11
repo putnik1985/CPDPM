@@ -233,6 +233,12 @@ use Cwd qw(getcwd);
            print "_grid_create_rbe3_from_grid_and_list completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_rbe2_cylinder_master_from_list$/) {
+		   ####print $_;
+	       grid_rbe2_cylinder_master_from_list($_); 
+           print "_grid_rbe2_cylinder_master_from_list completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -258,6 +264,77 @@ use Cwd qw(getcwd);
 ##    for (@file_lines){
 ##		print $_;
 ##    }
+
+sub grid_rbe2_cylinder_master_from_list {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $radius = $words[2];
+		   my $h = $words[3];
+		   my ($nx, $ny, $nz) = ($words[4], $words[5], $words[6]);
+  
+           my @master_grids;
+           open(gridsh, "<", $list) or die $!;
+	       while (<gridsh>) {
+			 my @words = split / /,$_;
+			 if ($words[0] =~ /Label|label/){
+                 push(@master_grids,$words[1]);
+			 }
+		    }
+	       close(gridsh);
+		   
+    ############print @grids;
+	open(h1, ">>", $mesh_file) or die $!;
+
+ 	print h1 "\n\$ @_[0] \n"; 
+	printf h1 "\n\$_grid_rbe2_cylinder_master_from_list:\n";
+   
+   (my $max_grid, my $max_elem, my $max_property, my $max_material) = &mesh_stat();
+	my $new_eid = $max_elem + 1;
+	
+	for (@master_grids){
+
+		my $current_grid = $_;
+		my @words = split/,/,$file_grids{$current_grid};
+		my ($x0, $y0, $z0) = ($words[3], $words[4], $words[5]);
+		
+		my @grids;
+		while (my ($key, $value) = each %file_grids){
+			my @list = split/,/,$value;
+			my ($x, $y, $z) = ($list[3], $list[4], $list[5]);
+		    my $point = "$x,$y,$z,";
+            my $cone = "$x0,$y0,$z0,$h,$radius,$nx,$ny,$nz,"; 			
+            if (within_cylinder($point, $cone)){
+                if ($current_grid != $key) {
+				    push(@grids, $key);
+				}
+            }				
+		}
+		
+		##create RBE2
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids;
+	
+	print h1 "\n";
+	printf h1 "RBE2,%d,%d,123456,",$new_eid++,$current_grid;
+	for(my $k = 0; $k < $last; $k++) {
+			if ($current_field <= $rbe2_fields) {
+		        printf h1 "%d,",$grids[$k];
+				++$current_field;
+			} else {
+		        printf h1 "+\n";
+		        printf h1 "+,";
+		        printf h1 "%d,",$grids[$k];				
+                $current_field = 3; 				
+            }				
+	}
+	}
+	
+	close(h1);
+	
+}
+
 
 sub grid_create_rbe3_from_grid_and_list {
 
