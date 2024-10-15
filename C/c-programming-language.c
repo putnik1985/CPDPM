@@ -225,11 +225,52 @@ int _strindex(char* s, char* t)
 	}
 	return -1;
 }
+/* swap: swap the chars pointed defined by the address */
+int swap(char* p, char* t)
+{ 
+     char temp = *p;
+     *p = *t;
+     *t = temp;
+     return 0;
+}
+
+/* reverse: reverse string s in place */
+int reverse(char* s)
+{ 
+	char* end = s + strlen(s) - 1;
+	char* begin = s;
+	int c, i, j;
+	for(; begin < end; begin++, end--){
+	      swap(begin, end);
+	}
+	return 0;
+}
+
+/* atoi: convert s into integer */
+int _atoi(char* s)
+{
+	int sign, number;
+	char* begin = s;
+	for(; isspace(*begin); ++begin)
+		;
+
+	sign = (*begin == '-') ? -1 : 1;
+	if (*begin == '-' || *begin == '+' )++begin; /* skip sign */
+
+	for(number = 0; isdigit(*begin);++begin)
+            number = 10 * number + (*begin - '0');
+	return sign * number;
+}
 
 int main(){
-
-	char s1[MAXLINE];
+    char s1[MAXLINE];
     char s2[MAXLINE];     
-	
-	return 0;
+    printf("input string\n");
+    scanf("%s",s1);
+    printf("\ninput:\n");
+    printf("%s\n",s1);
+    printf("number:\n");
+    int n = _atoi(s1); 
+    printf("%d\n",n);
+    return 0;
 }
