@@ -1714,7 +1714,7 @@ sub mesh_stat {
 		}
 
 
-        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
+        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP|CBEAM/){
 
             ++$elems;
 			
