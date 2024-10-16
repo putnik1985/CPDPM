@@ -17,6 +17,8 @@ use Cwd qw(getcwd);
 	my $unreal_number = 1.e+38;
 	my $total_dofs = 6;
 	my $grids_modified = 0;
+	my $tolerance = 0.002;
+	my $file_update = 0;
 	
 ##	printf "command file: %12s\n",$command_file;
 ##	printf "  input file: %12s\n", $mesh_file;
@@ -34,13 +36,13 @@ use Cwd qw(getcwd);
 			 }
 		 }
 	close(gridh);
-	##########print %file_grids;
+	####print %file_grids;
 	
 	open(fh, '<', $command_file) or die $!;
 	my %commands;
 	
 	while (<fh>) {
-	   ####print $_;	
+	   ###print $_;	
 	   my @words = split /,/,$_;
 	   if ($words[0] =~ /^_grid_translate_box$/) {
 		   ####print $_;
@@ -239,6 +241,12 @@ use Cwd qw(getcwd);
            print "_grid_rbe2_cylinder_master_from_list completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_translate_enclosed_volume_file$/) {
+		   ###print $_;
+	       grid_translate_enclosed_volume_file($_); 
+           print "_grid_translate_enclosed_volume_file completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -260,10 +268,94 @@ use Cwd qw(getcwd);
     }
    
 
+    if ($file_update){
+        for (@file_lines){
+		     print $_;
+		}
+    }
 
-##    for (@file_lines){
-##		print $_;
-##    }
+sub grid_translate_enclosed_volume_file {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my ($dx, $dy, $dz) = ($words[2], $words[3], $words[4]);
+		   
+		   my $x_min = $unreal_number;
+		   my $x_max = -$unreal_number;
+		   
+		   my $y_min = $unreal_number;
+		   my $y_max = -$unreal_number;
+
+		   my $z_min = $unreal_number;
+		   my $z_max = -$unreal_number;
+		   
+           open(gridsh, "<", $list) or die $!;
+	       while (<gridsh>) {
+			 if ($_ =~ /Global coordinates/){
+				 $_ =~ s/^\s+|\s+$//g; ## remove leading and trailing spaces
+				 my @words = split/\s+/,$_;
+                 my $x = $words[3];
+				 my $y = $words[4];
+				 my $z = $words[5];
+				 
+				 if ($x < $x_min){
+					 $x_min = $x;
+				 }
+
+				 if ($y < $y_min){
+					 $y_min = $y;
+				 }
+
+				 if ($z < $z_min){
+					 $z_min = $z;
+				 }
+
+				 if ($x > $x_max){
+					 $x_max = $x;
+				 }
+
+				 if ($y > $y_max){
+					 $y_max = $y;
+				 }
+
+				 if ($z > $z_max){
+					 $z_max = $z;
+				 }
+
+			 }
+		    }
+		   ##print("$x_min,$y_min,$z_min\n");
+		   ##print("$x_max,$y_max,$z_max\n");
+	       close(gridsh);
+		   
+           $x_min -= $tolerance;
+		   $x_max += $tolerance;
+		   
+		   $y_min -= $tolerance;
+		   $y_max += $tolerance;
+		   
+		   $z_min -= $tolerance;
+		   $z_max += $tolerance;
+		
+        
+		for(my $NR = 0; $NR <  @file_lines; ++$NR){
+		    my @words = split /,/,$file_lines[$NR];
+			if ($words[0] =~ /GRID/){
+		        my $x = $words[3];
+		        my $y = $words[4];
+		        my $z = $words[5];
+                if (&within($x,$x_min,$x_max) && &within($y,$y_min,$y_max) && &within($z,$z_min,$z_max)){
+        	        (my $new_x, my $new_y, my $new_z) = ($x + $dx, $y + $dy, $z + $dz);
+					$words[3] = $new_x;
+					$words[4] = $new_y;
+					$words[5] = $new_z;
+					$file_lines[$NR] = join(",",@words);
+                }
+			}
+		}
+				
+    $file_update = 1;
+}
 
 sub grid_rbe2_cylinder_master_from_list {
 
