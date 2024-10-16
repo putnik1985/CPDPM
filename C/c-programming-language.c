@@ -262,15 +262,109 @@ int _atoi(char* s)
 	return sign * number;
 }
 
-int main(){
-    char s1[MAXLINE];
-    char s2[MAXLINE];     
-    printf("input string\n");
-    scanf("%s",s1);
-    printf("\ninput:\n");
-    printf("%s\n",s1);
-    printf("number:\n");
-    int n = _atoi(s1); 
-    printf("%d\n",n);
-    return 0;
+#define MAXLINES 5000
+char *lineptr[MAXLINES]; /* pointers to text lines */
+
+int readlines(char *lineptr[], int nlines);
+void writelines(char *lineptr[], int nlines);
+
+void _qsort(void *lineptr[], int left, int rigth, int (*cmp)(void*, void*));
+int numcmp(char*, char*);
+
+/* sort input lines */
+int main(int argc, char** argv){
+        int nlines; /* number of input lines */
+	int numeric = 0; /* 1 if numeric sort */
+	int reverse = 0;
+	int fold = 0;
+	int directory_order = 0;
+
+
+        for(int i = 0; i < argc; ++i){
+		if (strcmp("-n",argv[i])) numeric = 1;
+		if (strcmp("-r",argv[i])) reverse = 1;
+		if (strcmp("-f",argv[i])) fold = 1;
+		if (strcmp("-d",argv[i])) directory_order = 1;
+	}
+        
+	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
+	     _qsort((void**) lineptr, 0, nlines-1,
+	           (int (*)(void*, void*))(numeric ? numcmp : strcmp));
+	     writelines(lineptr, nlines);
+	     return 0;
+	     } else {
+	       printf("input too big to sort\n");
+	       return 1;
+	       }
+}
+
+/* qsort: sort v[left]...v[right] into increasing order */
+void _qsort(void *v[], int left, int right, int (*comp)(void*, void*))
+{
+           int i, last;
+	   void _swap(void *v[], int, int);
+
+	   if (left >= right)
+	       return;
+
+	   _swap(v, left, (left + right)/2);
+	   last = left;
+
+	   for( i = left+1; i <= right; i++)
+		   if ((*comp)(v[i], v[left]) < 0)
+			   _swap(v, ++last, i);
+	   _swap(v, left, last);
+	   _qsort(v, left, last-1, comp);
+	   _qsort(v, last+1, right, comp);
+}
+
+/* numcmp: compare s1 and s2 numerically */
+int numcmp(char *s1, char *s2)
+{
+	double v1, v2;
+	v1 = atof(s1);
+	v2 = atof(s2);
+
+	if (v1 < v2)
+		return -1;
+	else if (v1 > v2)
+		return  1;
+	else
+		return  0;
+}
+
+void _swap(void *v[], int i, int j)
+{
+	void *temp;
+
+	temp = v[i];
+	v[i] = v[j];
+	v[j] = temp;
+}
+#define MAXLEN 1000
+
+/* readlines: read input line */
+int readlines(char *lineptr[], int maxlines)
+{
+	int len, nlines;
+	char *p, line[MAXLEN];
+
+	nlines = 0;
+	while ((len = getline(line, MAXLEN)) > 0)
+		if (nlines >= maxlines || (p = alloc(len)) == NULL)
+			return -1;
+		else {
+			line[len-1] = '\0'; /* delete new line */
+			strcpy(p, line);
+			lineptr[nlines++] = p;
+		}
+	return nlines;
+}
+
+/* writelines: write output lines */
+void writelines(char *lineptr[], int nlines)
+{
+	int i;
+        while (nlines-- > 0)	
+		printf("%s\n", *lineptr++);
 }
