@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 double* gauss(int n, double a[n][n], double b[n]); 
+double* rotation(int n, double a[n][n], double b[n]); 
 
 int main()
 {
@@ -16,10 +17,17 @@ int main()
 
 	if ( x == NULL) 
 		return -1;
-
+	printf("gauss:\n");
 	for(int i = 0; i<n; ++i)
 		printf("%g,", x[i]);
+	printf("\n");
 
+	x = rotation(n,a,b);
+	if ( x == NULL) 
+		return -1;
+	printf("rotations:\n");
+	for(int i = 0; i<n; ++i)
+		printf("%g,", x[i]);
 	printf("\n");
 	return 0;
 }
