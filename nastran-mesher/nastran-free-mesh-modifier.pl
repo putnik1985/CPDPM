@@ -1480,7 +1480,7 @@ sub grid_rbe2_cylinder {
 		###print $_;
 		my @words = split /,/,$_;
 		####print $words[1]."\n"; 
-        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
+        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP|CBEAM/){
 			####print $_;
 			if ($new_eid < $words[1]) {
 				$new_eid = $words[1];
