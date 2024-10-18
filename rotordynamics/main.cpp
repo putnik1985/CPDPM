@@ -6,6 +6,7 @@
 #include "uniform_shaft.h"
 #include "rotor.h"
 
+
 int main(int argc, char** argv){
     string line;
     string filename;
@@ -61,5 +62,16 @@ int main(int argc, char** argv){
 
     // lets start to solve the equations 
 	cout << R.K;
+
+	int n = 3;
+	double a[3][3] = {{2.,-1.,-1.},
+		          {3.,4.,-2.},
+			  {3.,-2.,4.}};
+
+	double b[3] = {4.,11.,11.};
+
+	double* x;
+	x = gauss(n,a,b);
+
     return 0;
 }
