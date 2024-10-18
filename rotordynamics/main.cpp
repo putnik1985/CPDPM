@@ -6,6 +6,9 @@
 #include "uniform_shaft.h"
 #include "rotor.h"
 
+extern "C"{
+#include "../Numerical_Library/numeric_c.h"
+}
 
 int main(int argc, char** argv){
     string line;

@@ -1,9 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <errno.h>
-
+#include "numeric_c.h"
 
 /* gauss: solve linear system of n equations Ax=b */
 double* gauss(int n, double A[n][n], double b[n])

@@ -1,7 +1,4 @@
-#include <stdio.h>
-
-double* gauss(int n, double a[n][n], double b[n]); 
-double* rotation(int n, double a[n][n], double b[n]); 
+#include "numeric_c.h" 
 
 int main()
 {
