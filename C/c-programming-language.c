@@ -269,6 +269,9 @@ int readlines(char *lineptr[], int nlines);
 void writelines(char *lineptr[], int nlines);
 
 void _qsort(void *lineptr[], int left, int rigth, int (*cmp)(void*, void*));
+void _rqsort(void *lineptr[], int left, int rigth, int (*cmp)(void*, void*));
+void _fqsort(void *lineptr[], int left, int rigth);
+
 int numcmp(char*, char*);
 
 /* sort input lines */
@@ -281,15 +284,23 @@ int main(int argc, char** argv){
 
 
         for(int i = 0; i < argc; ++i){
-		if (strcmp("-n",argv[i])) numeric = 1;
-		if (strcmp("-r",argv[i])) reverse = 1;
-		if (strcmp("-f",argv[i])) fold = 1;
-		if (strcmp("-d",argv[i])) directory_order = 1;
+		if (strcmp("-n",argv[i]) == 0) numeric = 1;
+		if (strcmp("-r",argv[i]) == 0) reverse = 1;
+		if (strcmp("-f",argv[i]) == 0) fold = 1;
+		if (strcmp("-d",argv[i]) == 0) directory_order = 1;
 	}
         
 	if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
+
+	     if (reverse) 	
+	     _rqsort((void**) lineptr, 0, nlines-1,
+	           (int (*)(void*, void*))(numeric ? numcmp : strcmp));
+	     else if (fold)
+	     _fqsort((void**) lineptr, 0, nlines-1);
+	     else
 	     _qsort((void**) lineptr, 0, nlines-1,
 	           (int (*)(void*, void*))(numeric ? numcmp : strcmp));
+
 	     writelines(lineptr, nlines);
 	     return 0;
 	     } else {
@@ -316,6 +327,60 @@ void _qsort(void *v[], int left, int right, int (*comp)(void*, void*))
 	   _swap(v, left, last);
 	   _qsort(v, left, last-1, comp);
 	   _qsort(v, last+1, right, comp);
+}
+
+/* rqsort: sort v[left]...v[right] into decreasing order */
+void _rqsort(void *v[], int left, int right, int (*comp)(void*, void*))
+{
+           int i, last;
+	   void _swap(void *v[], int, int);
+
+	   if (left >= right)
+	       return;
+
+	   _swap(v, left, (left + right)/2);
+	   last = left;
+
+	   for( i = left+1; i <= right; i++)
+		   if ((*comp)(v[i], v[left]) > 0)
+			   _swap(v, ++last, i);
+	   _swap(v, left, last);
+	   _rqsort(v, left, last-1, comp);
+	   _rqsort(v, last+1, right, comp);
+}
+
+/* fqsort: sort v[left]...v[right] into increasing order regardless letter case*/
+void _fqsort(void *v[], int left, int right)
+{
+           int i, last;
+	   void _swap(void *v[], int, int);
+
+	   if (left >= right)
+	       return;
+
+	   _swap(v, left, (left + right)/2);
+	   last = left;
+
+	   for( i = left+1; i <= right; i++){
+		   char v1[MAXLINE];
+		   char v2[MAXLINE];
+		   strcpy(v1, v[i]);
+		   strcpy(v2, v[left]);
+
+		   char *sp = v1;
+		   for(; *sp != '\0'; ++sp)
+			   *sp = tolower(*sp);
+		   
+		   sp = v2;
+		   for(; *sp != '\0'; ++sp)
+			   *sp = tolower(*sp);
+	           
+		   if (strcmp(v1, v2) < 0)
+			   _swap(v, ++last, i);
+	   }
+	   _swap(v, left, last);
+	   _fqsort(v, left, last-1);
+	   _fqsort(v, last+1, right);
 }
 
 /* numcmp: compare s1 and s2 numerically */
