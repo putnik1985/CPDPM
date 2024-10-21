@@ -19,6 +19,11 @@ use Cwd qw(getcwd);
 	my $grids_modified = 0;
 	my $tolerance = 0.002;
 	my $file_update = 0;
+	my $next_element  = -$unreal_number;
+	my $next_grid     = -$unreal_number;
+	my $next_property = -$unreal_number;
+	my $next_material = -$unreal_number;
+	
 	
 ##	printf "command file: %12s\n",$command_file;
 ##	printf "  input file: %12s\n", $mesh_file;
@@ -30,13 +35,37 @@ use Cwd qw(getcwd);
 	open(gridh,'<',$mesh_file);
 	     while (<gridh>){
 	         push(@file_lines,$_);
-			 if ($_ =~ /^GRID/){
-				 my @words = split/,/,$_;
+			 my @words = split/,/,$_;
+			 if ($words[0] =~ /^GRID/){
+				 if ($next_grid < $words[1]){
+					 $next_grid = $words[1];
+				 }
                  $file_grids{$words[1]} = $_;				 
 			 }
-		 }
+            if ($words[0] =~ /PSOLID|PBUSH|PSHELL|PBEAML|PBAR/){
+		        if ($next_property < $words[1]) {
+				    $next_property = $words[1];
+			    }				
+		    }
+            if ($words[0] =~ /MAT1/){
+		        if ($next_material < $words[1]) {
+				    $next_material = $words[1];
+			    }				
+		    }
+            if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP|CBEAM/){
+			    if ($next_element < $words[1]) {
+				    $next_element = $words[1];
+			    }
+		    }
+		}
 	close(gridh);
-	####print %file_grids;
+	$next_element++;
+	$next_grid++;
+	$next_material++;
+	$next_property++;
+	
+	##my $test_str = sprintf "stat: %d,%d,%d,%d\n",$next_element,$next_grid,$next_material,$next_property;
+	##print $test_str;
 	
 	open(fh, '<', $command_file) or die $!;
 	my %commands;
