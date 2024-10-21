@@ -67,14 +67,22 @@ int main(int argc, char** argv){
 	cout << R.K;
 
 	int n = 3;
-	double a[3][3] = {{2.,-1.,-1.},
-		          {3.,4.,-2.},
-			  {3.,-2.,4.}};
+	double a[] = {2.,-1.,-1.,
+		      3.,4.,-2.,
+		      3.,-2.,4.};
 
-	double b[3] = {4.,11.,11.};
+	double b[] = {4.,11.,11.};
 
 	double* x;
 	x = gauss(n,a,b);
-
+        cout << "gauss solution:\n";
+        for(int i=0; i < n; ++i)
+            cout << x[i] << ",";
+        cout << "\n";
+	x = rotation(n,a,b);
+        cout << "rotation solution:\n";
+        for(int i=0; i < n; ++i)
+            cout << x[i] << ",";
+        cout << "\n";
     return 0;
 }

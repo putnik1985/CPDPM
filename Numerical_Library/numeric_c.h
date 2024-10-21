@@ -9,9 +9,9 @@
 #include <math.h>
 
 /* gauss: solve linear system of n equations Ax=b */
-double* gauss(int n, double A[n][n], double b[n]);
+double* gauss(int n, double* A, double* b);
 
 /* rotation: solve linear system of n equations Ax=b applying rotation from the left side*/
-double* rotation(int n, double A[n][n], double b[n]);
+double* rotation(int n, double* A, double* b);
 
 #endif
