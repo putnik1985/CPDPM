@@ -13,6 +13,7 @@ int main(int argc, char** argv)
 	double* x;
 
         double (*(*functions[])(int, double* ,double*))  = {gauss, rotation, hausholder, square_root};
+        double (*determinant[])(int, double*)  = {det_gauss, det_rotation, det_hausholder, det_square_root};
         char* messages[] = {"gauss", "rotation", "hausholder", "square_root"};
 
         int method = 0; /* gauss by default */
@@ -40,12 +41,21 @@ int main(int argc, char** argv)
 			func = gauss;
 	}
 */
+	/*
 	x = (*functions[method])(n,a,b);
 	if ( x == NULL) 
 		return -1;
 	printf("%s solution:\n", messages[method]);
 	for(int i = 0; i<n; ++i)
 		printf("%g,", x[i]);
+	*/
+
+        //double det = det_gauss(n, a);
+        //double det = det_hausholder(n, a);
+        //double det = det_rotation(n, a);
+        //double det = det_square_root(n, a);
+        double det = (*determinant[method])(n, a);
+	printf("%s determinant: %12.2f\n",messages[method], det);
 	printf("\n");
 	return 0;
 }

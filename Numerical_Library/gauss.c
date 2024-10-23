@@ -23,3 +23,19 @@ double* gauss(int n, double* A, double* b)
 	}
 	return x;
 }
+/* det_gauss: calculate determinant based on the gauss elimination */ 
+double det_gauss(int n, double* A)
+{
+        for(int i = 0; i < n - 1; ++i)
+		for(int j = i + 1; j < n; ++j){
+			double factor = A[j*n + i] / A[i*n + i];
+			for(int k = i; k < n; ++k)
+				A[j*n + k] -= factor * A[i*n + k];
+		}
+
+	double x = 1.;
+	for(int i = 0; i < n; ++i)
+		x *= A[i*n + i];
+
+ 	return x;
+}

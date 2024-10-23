@@ -70,3 +70,56 @@ double* square_root(int n, double* A, double* b)
 	}
 	return x;
 }
+/* det_square_root: calculate determinant and decompose on matrces S'S*/
+double det_square_root(int n, double* A)
+{
+	double s[n*n];
+
+	s[0*n + 0] = sqrt(A[0*n + 0]);
+	for(int j = 0; j < n; ++j)
+		s[0*n + j] = A[0*n + j] / s[0*n +0];
+
+	for(int i = 1; i < n; ++i){
+		double sum = 0.;
+		for(int k = 0; k < i; ++k)
+			sum += s[k*n + i] * s[k*n + i];
+		s[i*n + i] = sqrt(A[i*n + i] - sum);
+	}
+
+	for(int i = 0; i < n; ++i)
+		for(int j = i+1; j < n; ++j){
+			double sum = 0.;
+			for(int k = 0; k < i; ++k)
+				sum += s[k*n + i] * s[k*n + j];
+
+			s[i*n + j] = (A[i*n+j] - sum)/s[i*n+i];
+		}
+
+        for(int j = 0; j < n; ++j)
+		for(int i = j + 1; i < n; ++i)
+			s[i*n + j] = 0.;
+/*
+	for(int i = 0; i < n; ++i){
+		for(int j = 0; j < n; ++j)
+			printf("%12.1f",s[i*n+j]);
+		printf("\n");
+	}
+        printf("\n");
+	double check[n*n];
+	for(int i = 0; i<n; ++i){
+		for(int j = 0; j<n;++j){
+			check[i*n+j] = 0.;
+			for(int k = 0; k<n; ++k)
+				check[i*n + j] += s[k*n+i] * s[k*n+j];
+			printf("%12.1f",check[i*n+j]);
+
+		}
+		printf("\n");
+	}
+*/
+	double x = 1.;
+	for(int i = 0; i < n; ++i)
+		x *= s[i*n + i] * s[i*n + i];
+
+	return x;
+}
