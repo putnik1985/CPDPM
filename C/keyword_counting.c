@@ -10,7 +10,7 @@ int bufp = 0; /* next free position in buf */
 
 
 
-#define NKEYS 14
+#define NKEYS 13
 struct key {
 	char *word;
 	int count;
@@ -26,13 +26,20 @@ struct key {
 	"void", 0,
 	"volatile", 0,
 	"while", 0,
-	"for", 0,
 	"#", 0,
 	"_", 0
 };
 
+#define NSYMBS 2
+struct key special_symbol [] = {
+	       "_", 0,
+	       "#", 0,
+};
+
 int getword(char *, int);
 int binsearch(char *, struct key *, int);
+int search(char *, struct key *, int);
+
 int getch(void);
 void ungetch(int);
 
@@ -43,15 +50,25 @@ int main()
 	char word[MAXWORD];
 
 	while (getword(word, MAXWORD) != EOF){
-		if ( isalpha(word[0]) || (strcmp(word,"#")==0) )
-			if ((n = binsearch(word, keytab, NKEYS)) >= 0)
+	//	if ( isalpha(word[0]) )
+			if ((n = search(word, keytab, NKEYS)) >= 0)
 				keytab[n].count++;
 	}
 	for (n = 0; n < NKEYS; n++)
-	//	if (keytab[n].count > 0)
 			printf("%4d %s\n",
 					keytab[n].count, keytab[n].word);
+
 	return 0;
+}
+
+/* search_symbol: search special symbol in the special symbol array */
+int search(char* word, struct key tab[], int n)
+{
+	for(int i = 0; i < n; ++i){
+		if (strcmp(word, tab[i].word) == 0) 
+			return i;
+	}
+	return -1;
 }
 
 /* binsearch: find word in tab[0]...tab[n-1] */
