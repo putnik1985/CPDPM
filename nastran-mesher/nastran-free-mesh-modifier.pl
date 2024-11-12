@@ -276,6 +276,12 @@ use Cwd qw(getcwd);
            print "_grid_translate_enclosed_volume_file completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_constraints_file$/) {
+		   ###print $_;
+	       grid_constraints_file($_); 
+           print "\$_grid_constraints_file completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -302,6 +308,52 @@ use Cwd qw(getcwd);
 		     print $_;
 		}
     }
+
+sub read_labels{
+	
+my $list = @_[0]; ## read filename
+my @grids;
+           open(gridsh, "<", $list) or die $!;
+		   my @grids;
+		   
+	       while (<gridsh>) {
+		   if ($_ =~ /Label|label/){
+				 $_ =~ s/^\s+|\s+$//g; ## remove leading and trailing spaces
+				 my @words = split/\s+/,$_;
+				 ##print "\n";
+				 ##print $words[1]."\n";
+                 push(@grids,$words[1]);
+			 }
+		    }
+	       close(gridsh);
+		   ##print "read labels:\n";
+		   ##print @grids;
+		   ##print "\n";
+		   return @grids;
+}
+
+sub grid_constraints_file {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $dofs = $words[2];
+
+           my @grids_to_constraint = &read_labels($list);
+		   ####print "list from file $list\n";
+           ####print @grids_to_constraint;
+           ####print "\n";
+		   
+	       my $line_to_file;
+           $line_to_file = "\n\$grid_spc_plane output:\n";
+           push(@file_lines, $line_to_file);
+		  
+	    for (@grids_to_constraint) {
+	 	     $line_to_file = sprintf "SPC,$spc_id,$_,$dofs,\n";
+             push(@file_lines,$line_to_file);
+	    }
+        $file_update = 1;
+}
+
 
 sub grid_translate_enclosed_volume_file {
 
