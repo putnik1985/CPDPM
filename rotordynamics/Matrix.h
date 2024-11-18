@@ -2,6 +2,7 @@
 #define MATRIX_H
 
 #include "stl.h"
+#include "nvector.h"
 
 #define PRECISION 4
 #define WIDTH 16
@@ -44,7 +45,7 @@ Matrix<T>& operator*(const Matrix<T>& A, const T& b);
 template<typename T>
 Matrix<T>& operator*(const T& b, const Matrix<T>& A);
 template<typename T>
-vector<T>& operator*(const Matrix<T>& A, const vector<T>& v);
+nvector<T>& operator*(const Matrix<T>& A, const nvector<T>& v);
 
 
 template<typename T>

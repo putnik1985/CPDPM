@@ -5,6 +5,8 @@
 #include "disk.h"
 #include "uniform_shaft.h"
 #include "rotor.h"
+#include "nvector.h"
+#include "nvector.cpp"
 
 extern "C"{
 #include "../Numerical_Library/numeric_c.h"
@@ -61,11 +63,31 @@ int main(int argc, char** argv){
                  R.append(us);
              }
         }
+  
+        if (csv.getfield(0).compare("_analysis") == 0 ){
+            auto analysis_type = csv.getfield(1);
+            if (analysis_type.compare("maneuver") == 0){
+                auto speed = stod(csv.getfield(3));
+                auto ang_vel = stod(csv.getfield(5));
+                auto dofs = csv.getfield(7);
+                //cout << speed << "," << ang_vel << "," << dofs << "\n"; 
+                nvector<double> v(R.G.size());
+                auto nodes = v.size() / 4;
+                //cout << nodes << "\n";
+                   for(int i = 0; i < dofs.size(); ++i){
+                        auto dof = dofs.c_str()[i] - '0';
+                        for( int i = 1; i <= nodes; ++i)
+                             v(4 * i - 4 + dof) = ang_vel;
+                   }
+                for(int i = 1; i <= v.size(); ++i)
+                    cout << v(i) << '\n';
+            }
+        }
     } // end of the cycle over the commands
 
     // lets start to solve the equations 
-	cout << R.K;
-
+    //	cout << R.K;
+/*
 	int n = 3;
 	double a[] = {2.,-1.,-1.,
 		      3.,4.,-2.,
@@ -84,5 +106,6 @@ int main(int argc, char** argv){
         for(int i=0; i < n; ++i)
             cout << x[i] << ",";
         cout << "\n";
+*/
     return 0;
 }

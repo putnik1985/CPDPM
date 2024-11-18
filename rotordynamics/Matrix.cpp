@@ -157,16 +157,16 @@ Matrix<T>& operator*(const T& b, const Matrix<T>& A){
 }
 
 template<typename T>
-vector<T>& operator*(const Matrix<T>& A, const vector<T>& v){
+nvector<T>& operator*(const Matrix<T>& A, const nvector<T>& v){
 
      int dim = A.size();
-     vector<T> c;
+     nvector<T> c;
      ////cout << "dimension: " << dim << '\n';
      for(int i=1;i<=dim;++i){
      double s =0;
 
          for(int j=1;j<=dim;++j)
-           s+= A(i,j) * v[j-1];
+           s+= A(i,j) * v(j);
 
      c.push_back(s);  
     }
