@@ -79,33 +79,27 @@ int main(int argc, char** argv){
                         for( int i = 1; i <= nodes; ++i)
                              v(4 * i - 4 + dof) = ang_vel;
                    }
-                for(int i = 1; i <= v.size(); ++i)
-                    cout << v(i) << '\n';
+
+                //cout << "force:\n";
+                nvector<double> force = R.G * v;
+                //for(int i = 1; i <= force.size(); ++i)
+                //    cout << force(i) << '\n';
+                auto n = force.size();
+                double a[n * n];
+                double b[n];
+                for(int i = 0; i < n; ++i){
+                    for(int j = 0; j < n; ++j)
+                        a[n*i + j] = R.K(i+1,j+1);
+                    b[i] = force(i+1);
+                }
+	        double* x;
+	        x = gauss(n,a,b);
+                cout << "gauss solution:\n";
+                for(int i=0; i < n; ++i)
+                    cout << x[i] << ",";
+                cout << "\n";
             }
         }
     } // end of the cycle over the commands
-
-    // lets start to solve the equations 
-    //	cout << R.K;
-/*
-	int n = 3;
-	double a[] = {2.,-1.,-1.,
-		      3.,4.,-2.,
-		      3.,-2.,4.};
-
-	double b[] = {4.,11.,11.};
-
-	double* x;
-	x = gauss(n,a,b);
-        cout << "gauss solution:\n";
-        for(int i=0; i < n; ++i)
-            cout << x[i] << ",";
-        cout << "\n";
-	x = rotation(n,a,b);
-        cout << "rotation solution:\n";
-        for(int i=0; i < n; ++i)
-            cout << x[i] << ",";
-        cout << "\n";
-*/
     return 0;
 }

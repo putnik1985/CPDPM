@@ -10,6 +10,7 @@ class nvector: public vector<T>{ // numberig starts from the 1
 public:
      using vector<T>::vector;
      T& operator()(int i);
+     const T& operator()(int i) const;
 	
 };// nvector class 
 

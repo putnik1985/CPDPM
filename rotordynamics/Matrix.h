@@ -45,7 +45,7 @@ Matrix<T>& operator*(const Matrix<T>& A, const T& b);
 template<typename T>
 Matrix<T>& operator*(const T& b, const Matrix<T>& A);
 template<typename T>
-nvector<T>& operator*(const Matrix<T>& A, const nvector<T>& v);
+nvector<T> operator*(const Matrix<T>& A, const nvector<T>& v);
 
 
 template<typename T>
