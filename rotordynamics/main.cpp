@@ -29,6 +29,8 @@ int main(int argc, char** argv){
     nvector<double> global_nodes;
     double x0{0.0};
     rotor R;
+    nvector<uniform_shaft> shaft_matrices;
+
     Csv csv(ifs);
     while (csv.getline(line) != 0) {
 /*
@@ -63,6 +65,7 @@ int main(int argc, char** argv){
              for(int i = 0; i < n; ++i){
                  global_nodes.push_back(x0); 
                  uniform_shaft us = uniform_shaft(elem_L, rho, E, Ri, Ro);
+                 shaft_matrices.push_back(us);
                  R.append(us);
                  x0 += elem_L;
              }
@@ -110,6 +113,22 @@ int main(int argc, char** argv){
                     printf("%12.4f%12.4f%12.4f\n",global_nodes(i), x[4 * i - 3 - 1], x[4 * i - 2 - 1]);
                 }
                 cout << "\n";
+                printf("Bending Moments and Shear Forces:\n"); 
+                printf("\n%12s%12s%12s%12s%12s\n","X, m", "Qy, kgs", "Qz, kgs", "My, kgs.m", "Mz, kgs.m");
+                auto elem = shaft_matrices.size();
+                nvector<double> load;
+                for(int i = 1; i <= elem; ++i){
+                    uniform_shaft us = shaft_matrices(i);
+                    nvector<double> u(8);
+                            for(int dof = 1; dof <= 4; ++dof){
+                                u(dof) = x[4 * i - 4 + dof - 1];
+                                u(dof + 4) = x[4 * (i+1) - 4 + dof - 1];
+                            }
+
+                    load = us.K * u;
+                    printf("%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(i), load(1), load(2), load(3), load(4));
+                }
+                    printf("%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(elem+1), load(5), load(6), load(7), load(8));
             }
         }
     } // end of the cycle over the commands
