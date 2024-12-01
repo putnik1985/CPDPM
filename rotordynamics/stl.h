@@ -14,6 +14,8 @@
 #include <iomanip>
 #include<stdexcept>
 
+#include<cstdio>
+#define MAXLINE 1000
 #include <map>
 
 using namespace std;
