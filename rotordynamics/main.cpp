@@ -106,15 +106,35 @@ int main(int argc, char** argv){
                 //    cout << x[i] << ",";
                 //cout << "\n";
 
+                ofstream os;
+                os.open("maneuver-displacement.dat",ios_base::out);
+                if (!os) {
+                         cerr << "can not open file: maneuver-displacement.dat\n";
+                         return -1;
+                }
                 printf("Maneuver %.2f rad/sec at %.2f, rpm\n", ang_vel, speed); 
-                printf("\n%12s%12s%12s\n", "X, m", "Y, m", "Z, m"); 
+                printf("\n%12s%12s%12s\n", "X,m", "Y,m", "Z,m"); 
+                char outputstr[MAXLINE];
+                sprintf(outputstr, "%12s%12s%12s\n", "X,m", "Y,m", "Z,m"); 
+                os << outputstr;
+
                 global_nodes.push_back(x0);
                 for(int i=1; i <= global_nodes.size(); ++i){
                     printf("%12.4f%12.4f%12.4f\n",global_nodes(i), x[4 * i - 3 - 1], x[4 * i - 2 - 1]);
+                    sprintf(outputstr, "%12.4f%12.4f%12.4f\n",global_nodes(i), x[4 * i - 3 - 1], x[4 * i - 2 - 1]);
+                    os << outputstr;
                 }
+                    os.close();
                 cout << "\n";
                 printf("Bending Moments and Shear Forces:\n"); 
-                printf("\n%12s%12s%12s%12s%12s\n","X, m", "Qy, kgs", "Qz, kgs", "My, kgs.m", "Mz, kgs.m");
+                os.open("maneuver-shear-bending.dat",ios_base::out);
+                if (!os) {
+                         cerr << "can not open file: maneuver-displacement.dat\n";
+                         return -1;
+                }
+                printf("\n%12s%12s%12s%12s%12s\n","X,m", "Qy,kgs", "Qz,kgs", "My,kgs.m", "Mz,kgs.m");
+                sprintf(outputstr, "%12s%12s%12s%12s%12s\n","X,m", "Qy,kgs", "Qz,kgs", "My,kgs.m", "Mz,kgs.m");
+                os << outputstr;
                 auto elem = shaft_matrices.size();
                 nvector<double> load;
                 for(int i = 1; i <= elem; ++i){
@@ -127,8 +147,15 @@ int main(int argc, char** argv){
 
                     load = us.K * u;
                     printf("%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(i), load(1), load(2), load(3), load(4));
+                    sprintf(outputstr,"%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(i), load(1), load(2), load(3), load(4));
+                    os << outputstr;
+                    sprintf(outputstr,"%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(i+1), load(1), load(2), load(3), load(4));
+                    os << outputstr;
                 }
                     printf("%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(elem+1), load(5), load(6), load(7), load(8));
+                    sprintf(outputstr,"%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(elem+1), load(5), load(6), load(7), load(8));
+                    os << outputstr;
+                    os.close();
             }
         }
     } // end of the cycle over the commands
