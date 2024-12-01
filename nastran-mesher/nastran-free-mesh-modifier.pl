@@ -5,9 +5,11 @@ use Math::Trig;
 use Cwd qw(getcwd);
 
     print "\n";
-
+###usage: perl nastran-free-mesh-modifier.pl file_where_mesh file_where_commands scale_factor_for_length
 	my $mesh_file = $ARGV[0];
     my $command_file = $ARGV[1];
+	###my $scale = $ARGV[2];
+	
 	my $rbe2_fields = 9;
 	my $rbe3_fields = 9;
     my $error = 0.001;	
@@ -130,7 +132,7 @@ use Cwd qw(getcwd);
 	   if ($words[0] =~ /^_grid_rbe2_cylinder$/) {
 		   ####print $_;
 	       grid_rbe2_cylinder($_); 
-           print "_grid_rbe2_cylinder completed\n";		   
+           print "\$_grid_rbe2_cylinder completed\n";		   
        }		   
 
 	   if ($words[0] =~ /^_grid_rbe3_cylinder$/) {
@@ -159,7 +161,7 @@ use Cwd qw(getcwd);
 	   if ($words[0] =~ /^_grid_rbe2_contact$/) {
 		   ####print $_;
 	       grid_rbe2_contact($_); 
-           print "_grid_rbe2_contact completed\n";		   
+           print "\$_grid_rbe2_contact completed\n";		   
        }		   
 
 	   if ($words[0] =~ /^_grid_copy$/) {
@@ -195,7 +197,7 @@ use Cwd qw(getcwd);
 	   if ($words[0] =~ /^_grid_rbe2_radius$/) {
 		   ####print $_;
 	       grid_rbe2_radius($_); 
-           print "_grid_rbe2_radius completed\n";		   
+           print "\$_grid_rbe2_radius completed\n";		   
        }		   
 
 	   if ($words[0] =~ /^_grid_rbe2_contact_cylinder_rotate$/) {
@@ -457,14 +459,12 @@ sub grid_rbe2_cylinder_master_from_list {
 	       close(gridsh);
 		   
     ############print @grids;
-	open(h1, ">>", $mesh_file) or die $!;
-
- 	print h1 "\n\$ @_[0] \n"; 
-	printf h1 "\n\$_grid_rbe2_cylinder_master_from_list:\n";
-   
-   (my $max_grid, my $max_elem, my $max_property, my $max_material) = &mesh_stat();
-	my $new_eid = $max_elem + 1;
-	
+    my $output_str;
+ 	$output_str = sprintf "\n\$ @_[0] \n";
+    push(@file_lines,$output_str);	
+	$output_str = sprintf "\n\$_grid_rbe2_cylinder_master_from_list:\n";
+    push(@file_lines,$output_str);
+		
 	for (@master_grids){
 
 		my $current_grid = $_;
@@ -489,23 +489,29 @@ sub grid_rbe2_cylinder_master_from_list {
 	my $current = 0;
 	my $last = @grids;
 	
-	print h1 "\n";
-	printf h1 "RBE2,%d,%d,123456,",$new_eid++,$current_grid;
+	$output_str = sprintf "\n";
+	push(@file_lines, $output_str);
+	
+	$output_str = sprintf "RBE2,%d,%d,123456,",$next_element++,$current_grid;
+    push(@file_lines, $output_str);
+	
 	for(my $k = 0; $k < $last; $k++) {
 			if ($current_field <= $rbe2_fields) {
-		        printf h1 "%d,",$grids[$k];
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@file_lines, $output_str);
 				++$current_field;
 			} else {
-		        printf h1 "+\n";
-		        printf h1 "+,";
-		        printf h1 "%d,",$grids[$k];				
+		        $output_str = sprintf "+\n";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "+,";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "%d,",$grids[$k];
+                push(@file_lines, $output_str);				
                 $current_field = 3; 				
             }				
 	}
 	}
-	
-	close(h1);
-	
+	$file_update = 1;
 }
 
 
@@ -1644,66 +1650,56 @@ sub grid_rbe2_cylinder {
 		   my $nz = $words[8];
 		   
 	my @grids;
-	
-	open(fh1, '<', $mesh_file) or die $!;
-    my $new_eid;
-	my $new_grid;
-	
-	 while (<fh1>) {
-		###print $_;
-		my @words = split /,/,$_;
-		####print $words[1]."\n"; 
-        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP|CBEAM/){
-			####print $_;
-			if ($new_eid < $words[1]) {
-				$new_eid = $words[1];
-			}	
+        ####print $h . "," . $radius . "\n";
+		for(my $NR = 0; $NR <  @file_lines; ++$NR){
+		    my @words = split /,/,$file_lines[$NR];
+				
+            if ($words[0] =~ /GRID/){
+			    my $x = $words[3];
+			    my $y = $words[4];
+			    my $z = $words[5];
+			    my $point = "$x,$y,$z,";
+                my $cone = "$x0,$y0,$z0,$h,$radius,$nx,$ny,$nz,"; 			
+                if (within_cylinder($point, $cone)){
+					####print $words[1] . "," . $cone ."\n";
+                    push(@grids, $words[1]);				
+                }				
+            }			
 		}
-		
-        if ($words[0] =~ /GRID/){
-			##print "$words[1] -->> $new_grid\n";
-			if ($new_grid < $words[1]) {
-				$new_grid = $words[1];
-			}	
-		}	
-		
-        if ($words[0] =~ /GRID/){
-			my $x = $words[3];
-			my $y = $words[4];
-			my $z = $words[5];
-			my $point = "$x,$y,$z,";
-            my $cone = "$x0,$y0,$z0,$h,$radius,$nx,$ny,$nz,"; 			
-            if (within_cylinder($point, $cone)){
-                push(@grids, $words[1]);				
-            }				
-        }			
-	 }
-	close(fh1);
-	
-	open(fh1, ">>", $mesh_file) or die $!;
 
-	print fh1 "\n\$_grid_rbe2_cylinder output:\n";
+	
+	my $output_str = sprintf "\n\$_grid_rbe2_cylinder output:\n";
+	push(@file_lines,$output_str);
+	
     my $current_field = 5;
 	my $current = 0;
 	my $last = @grids;
 
-	printf fh1 "GRID,%d,0,%g,%g,%g,0\n",++$new_grid,$x0,$y0,$z0;
-	printf fh1 "RBE2,%d,%d,123456,",++$new_eid,$new_grid;
+	my $output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x0,$y0,$z0;
+	push(@file_lines,$output_str);
+
+	$output_str = sprintf "RBE2,%d,%d,123456,",$next_element,$next_grid;
+	push(@file_lines,$output_str);
+    $next_element++;
+	$next_grid++;
+	
 	for(my $k = 0; $k < $last; $k++) {
 
 			if ($current_field <= $rbe2_fields) {
-		        printf fh1 "%d,",$grids[$k];
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@file_lines,$output_str);
 				++$current_field;
 			} else {
-		        printf fh1 "+\n";
-		        printf fh1 "+,";
-		        printf fh1 "%d,",$grids[$k];				
+		        $output_str = sprintf "+\n";
+				push(@file_lines,$output_str);
+		        $output_str = sprintf "+,";
+				push(@file_lines,$output_str);
+		        $output_str = sprintf "%d,",$grids[$k];
+                push(@file_lines,$output_str);				
                 $current_field = 3; 				
             }
-
     }	
-    close(fh1);		
-	
+    $file_update = 1;	
 }
 
 sub grid_rbe2_sphere_copy_translate {
@@ -1779,69 +1775,64 @@ sub grid_rbe2_contact {
 	my $closest_grid;
 	my $min_distance = $radius;
 	
-	open(fh1, '<', $mesh_file) or die $!;
-    my $new_eid;
-	my $new_grid;
 	
-	 while (<fh1>) {
-		###print $_;
-		my @words = split /,/,$_;
-		####print $words[1]."\n"; 
-        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
-			####print $_;
-			if ($new_eid < $words[1]) {
-				$new_eid = $words[1];
-			}	
-		}
-		
-        if ($words[0] =~ /GRID/){
-			##print "$words[1] -->> $new_grid\n";
-			if ($new_grid < $words[1]) {
-				$new_grid = $words[1];
-			}	
-		}	
-		
-        if ($words[0] =~ /GRID/){
-			my $x = $words[3];
-			my $y = $words[4];
-			my $z = $words[5];	
-            my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
-			my $point = "$x,$y,$z,";
-            my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,"; 			
-         
-            if ($distance <= $radius && within_plane($point,$plane)){
-                push(@grids, $words[1]);				
-            }				
-        }			
-	 }
-	close(fh1);
+		for(my $NR = 0; $NR <  @file_lines; ++$NR){
+		    my @words = split /,/,$file_lines[$NR];
+				
+            if ($words[0] =~ /GRID/){
+			  my $gr_id = $words[1];	
+			  my $x = $words[3];
+			  my $y = $words[4];
+			  my $z = $words[5];	
+              my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
+			  my $point = "$x,$y,$z,";
+              my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,";
+              ####my $chplane = within_plane($point,$plane);			  
+              ####print "$gr_id, $distance, $radius, $chplane\n";
+              if ($distance < $radius && within_plane($point,$plane)){
+                  push(@grids, $words[1]);				
+              }				
+			}
+			}
+
 	
 	##print "highest eid: " . $new_eid . "\n";
 	##print "closest grid: " . $closest_grid . "\n";
 	##print "minimum distance: " . $min_distance . "\n";
 
-	open(fh1, ">>", $mesh_file) or die $!;
-	print fh1 "\n\$_grid_rbe2_contact output:\n";
+	my $output_str = sprintf "\n\$_grid_rbe2_contact output:\n";
+	push(@file_lines,$output_str);
+
     my $current_field = 5;
 	my $current = 0;
 	my $last = @grids;
+    #########print "last: $last\n";
+	$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x0,$y0,$z0;
+	push(@file_lines,$output_str);
+	
+	$output_str = sprintf "RBE2,%d,%d,123456,",$next_element,$next_grid;
+	push(@file_lines, $output_str);
 
-	printf fh1 "GRID,%d,0,%g,%g,%g,0\n",++$new_grid,$x0,$y0,$z0;
-	printf fh1 "RBE2,%d,%d,123456,",++$new_eid,$new_grid;
+	$next_grid++;
+	$next_element++;
 	for(my $k = 0; $k < $last; $k++) {
 
 			if ($current_field <= $rbe2_fields) {
-		        printf fh1 "%d,",$grids[$k];
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@file_lines, $output_str);
 				++$current_field;
 			} else {
-		        printf fh1 "+\n";
-		        printf fh1 "+,";
-		        printf fh1 "%d,",$grids[$k];				
+		        $output_str = sprintf "+\n";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "+,";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "%d,",$grids[$k];	
+                push(@file_lines, $output_str);				
                 $current_field = 3; 				
             }
 
     }	
-    close(fh1);			
+	$file_update = 1;
 }
 
 sub mesh_stat {
@@ -2602,6 +2593,11 @@ sub within_cone{
 	my $nx = $cone[5];
 	my $ny = $cone[6];
 	my $nz = $cone[7];
+
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
 	
 	my $alpha = atan2($R0,$h);
 	
@@ -2632,11 +2628,15 @@ sub within_cylinder{
 	my $nz = $cone[7];
 	
 	my $alpha = atan2($R0,$h);
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
 	
 	my $t = ($x - $x0) * $nx + ($y - $y0) * $ny + ($z - $z0) * $nz;
 	my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
-	
-   ($distance**2 - $t**2 < $R0**2) && (abs($t) < $h) ; 
+	#####print sqrt($distance**2 - $t**2) . "," .$R0 . "," . abs($t) . "," . $h . ",";
+   (abs($distance**2 - $t**2) < $R0**2) && (abs($t) < $h) ; 
 }
 
 
@@ -2645,6 +2645,12 @@ sub within_plane{
 ##  my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,"; 			
 	(my $x, my $y, my $z) = split /,/,@_[0];
 	(my $x0, my $y0, my $z0, my $nx, my $ny, my $nz) = split /,/,@_[1];
+	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
+
 	my $d = abs( ($x-$x0) * $nx + ($y-$y0) * $ny +($z-$z0) * $nz );
 	##print "$x,$y,$z,$x0,$y0,$z0,$nx,$ny,$nz,$d\n";
 	abs( ($x-$x0) * $nx + ($y-$y0) * $ny +($z-$z0) * $nz ) < $error;
