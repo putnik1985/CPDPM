@@ -57,5 +57,13 @@ int main(int argc, char** argv)
         double det = (*determinant[method])(n, a);
 	printf("%s determinant: %12.2f\n",messages[method], det);
 	printf("\n");
+        struct complex_number z1 = {1., 2.};
+        struct complex_number z2 = {0., 1.};
+        struct complex_number z3 = csum(z1, z2);
+        printf("%f + i%f\n", z3.x, z3.y);
+        z3 = cmult(z1, z2);
+        printf("%f + i%f\n", z3.x, z3.y);
+        z3 = cdiv(z1, z2);
+        printf("%f + i%f\n", z3.x, z3.y);
 	return 0;
 }

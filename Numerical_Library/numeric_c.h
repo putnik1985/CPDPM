@@ -7,6 +7,10 @@
 #include <string.h>
 #include <errno.h>
 #include <math.h>
+struct complex_number {
+       double x;
+       double y;
+};
 
 /* gauss: solve linear system of n equations Ax=b */
 double* gauss(int n, double* A, double* b);
@@ -27,5 +31,9 @@ double  det_hausholder(int n, double* A);
 double* square_root(int n, double* A, double* b);
 /* det_square_root: calculate determinant and transform to S'S*/
 double det_square_root(int n, double* A);
+
+struct complex_number csum(struct complex_number a, struct complex_number b);
+struct complex_number cmult(struct complex_number a, struct complex_number b);
+struct complex_number cdiv(struct complex_number a, struct complex_number b);
 
 #endif
