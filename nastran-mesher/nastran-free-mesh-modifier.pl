@@ -269,7 +269,7 @@ use Cwd qw(getcwd);
 	   if ($words[0] =~ /^_grid_rbe2_cylinder_master_from_list$/) {
 		   ####print $_;
 	       grid_rbe2_cylinder_master_from_list($_); 
-           print "_grid_rbe2_cylinder_master_from_list completed\n";		   
+           print "\$_grid_rbe2_cylinder_master_from_list completed\n";		   
        }		   
 
 	   if ($words[0] =~ /^_grid_translate_enclosed_volume_file$/) {
@@ -282,7 +282,14 @@ use Cwd qw(getcwd);
 		   ###print $_;
 	       grid_constraints_file($_); 
            print "\$_grid_constraints_file completed\n";		   
+       }
+
+	   if ($words[0] =~ /^_grid_rbe2_sphere_master_from_list$/) {
+		   ####print $_;
+	       grid_rbe2_sphere_master_from_list($_); 
+           print "\$_grid_rbe2_sphere_master_from_list completed\n";		   
        }		   
+	   
 
 	}
 	close(fh);
@@ -438,6 +445,78 @@ sub grid_translate_enclosed_volume_file {
 		}
 				
     $file_update = 1;
+}
+
+sub grid_rbe2_sphere_master_from_list {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $radius = $words[2];
+
+  
+           my @master_grids;
+           open(gridsh, "<", $list) or die $!;
+	       while (<gridsh>) {
+			 my @words = split / /,$_;
+			 if ($words[0] =~ /Label|label/){
+                 push(@master_grids,$words[1]);
+			 }
+		    }
+	       close(gridsh);
+		   
+    ############print @grids;
+    my $output_str;
+ 	$output_str = sprintf "\n\$ @_[0] \n";
+    push(@file_lines,$output_str);	
+	$output_str = sprintf "\n\$_grid_rbe2_sphere_master_from_list:\n";
+    push(@file_lines,$output_str);
+		
+	for (@master_grids){
+
+		my $current_grid = $_;
+		my @words = split/,/,$file_grids{$current_grid};
+		my ($x0, $y0, $z0) = ($words[3], $words[4], $words[5]);
+		
+		my @grids;
+		while (my ($key, $value) = each %file_grids){
+			my @list = split/,/,$value;
+			my ($x, $y, $z) = ($list[3], $list[4], $list[5]);
+		    my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
+            if ($distance < $radius){
+                if ($current_grid != $key) {
+				    push(@grids, $key);
+				}
+            }				
+		}
+		
+		##create RBE2
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids;
+	
+	$output_str = sprintf "\n";
+	push(@file_lines, $output_str);
+	
+	$output_str = sprintf "RBE2,%d,%d,123456,",$next_element++,$current_grid;
+    push(@file_lines, $output_str);
+	
+	for(my $k = 0; $k < $last; $k++) {
+			if ($current_field <= $rbe2_fields) {
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@file_lines, $output_str);
+				++$current_field;
+			} else {
+		        $output_str = sprintf "+\n";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "+,";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "%d,",$grids[$k];
+                push(@file_lines, $output_str);				
+                $current_field = 3; 				
+            }				
+	}
+	}
+	$file_update = 1;
 }
 
 sub grid_rbe2_cylinder_master_from_list {
