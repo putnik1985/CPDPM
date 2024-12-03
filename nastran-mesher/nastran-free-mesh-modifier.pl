@@ -289,6 +289,18 @@ use Cwd qw(getcwd);
 	       grid_rbe2_sphere_master_from_list($_); 
            print "\$_grid_rbe2_sphere_master_from_list completed\n";		   
        }		   
+
+	   if ($words[0] =~ /^_grid_rbe2_cylinder_points_master_from_list$/) {
+		   ####print $_;
+	       grid_rbe2_cylinder_points_master_from_list($_); 
+           print "\$_grid_rbe2_cylinder_points_master_from_list completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_link$/) {
+		   ####print $_;
+	       grid_link($_); 
+           print "\$_grid_link completed\n";		   
+       }		   
 	   
 
 	}
@@ -339,6 +351,85 @@ my @grids;
 		   ##print @grids;
 		   ##print "\n";
 		   return @grids;
+}
+
+sub grid_link {
+	
+	       my @words = split /,/,@_[0];
+		   my $fem_grid = $words[1];
+		   my $list = $words[2];
+		   my $bolt_radius = $words[3];
+		   my $scale = $words[4];
+
+           open(gridsh, "<", $list) or die $!;
+           my $count = 0;
+           my $x0;
+           my $y0;
+           my $z0;
+		   
+		   my @words = split/\s+/,$file_grids{$fem_grid};
+		   my $x1 = $words[3];
+		   my $y1 = $words[4];
+		   my $z1 = $words[5];		   
+		   
+ 	       while (<gridsh>) {
+			 if ($_ =~ /Global coordinates/){
+				 $_ =~ s/^\s+|\s+$//g; ## remove leading and trailing spaces
+				 my @words = split/\s+/,$_;
+                 my $x = $words[3];
+				 my $y = $words[4];
+				 my $z = $words[5];
+				 $x0 += $x;
+				 $y0 += $y;
+				 $z0 += $z;
+				 $count++;
+			 }
+		    }
+			$x0 /= $count;
+			$y0 /= $count;
+			$z0 /= $count;
+			
+			$x0 *= $scale;
+			$y0 *= $scale;
+			$z0 *= $scale;
+			
+		   ##print("$x_min,$y_min,$z_min\n");
+		   ##print("$x_max,$y_max,$z_max\n");
+	       close(gridsh);
+    my $nx = $x1 - $x0;
+    my $ny = $y1 - $y0;
+    my $nz = $z1 - $z0;	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
+    &grid_create_rbe2_from_list("_grid_create_rbe2_from_list,$list,$x0,$y0,$z0,");	 
+
+	my $first_grid =  $fem_grid;
+    my $second_grid = $next_grid - 1;
+
+    my ($rx, $ry, $rz) = &vector_normal($nx, $ny, $nz);	
+	
+	my $output_str = sprintf "\n\$_grid_bolt output:\n";
+	push(@file_lines, $output_str);
+	
+    $output_str = sprintf "CBEAM,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first_grid,$second_grid,$rx,$ry,$rz;
+    push(@file_lines, $output_str);
+	
+	$output_str = sprintf "PBEAML,%d,%d,MSCBML0,ROD,,,,,+\n",$next_property,$next_material;
+	push(@file_lines, $output_str);
+	$output_str = sprintf "+,%.4f,0.0,YES,1.0,%.4f,0.0,\n",$bolt_radius,$bolt_radius;
+	push(@file_lines, $output_str);
+	
+	my   $E = 6.83E+10;
+	my  $nu = 0.33;
+	my $rho = 2848.23;
+	$output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4g,\n",$next_material,$E,$nu,$rho;
+	push(@file_lines, $output_str);
+	$next_element++;
+	$next_property++;
+	$next_material++;
+	$file_update = 1;
 }
 
 sub grid_constraints_file {
@@ -518,6 +609,88 @@ sub grid_rbe2_sphere_master_from_list {
 	}
 	$file_update = 1;
 }
+sub grid_rbe2_cylinder_points_master_from_list {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $radius = $words[2];
+		   my $h = $words[3];
+		   my ($x0, $y0, $z0) = ($words[4], $words[5], $words[6]);
+		   my ($x1, $y1, $z1) = ($words[7], $words[8], $words[9]);
+		   my ($x2, $y2, $z2) = ($words[10], $words[11], $words[12]);
+		   my @u = ($x1 - $x0, $y1 - $y0, $z1 - $z0);
+		   my @v = ($x2 - $x0, $y2 - $y0, $z2 - $z0);
+
+		   my $nx = $u[1] * $v[2] - $v[1] * $u[2];
+		   my $ny = $u[2] * $v[0] - $v[2] * $u[0];
+		   my $nz = $u[0] * $v[1] - $v[0] * $u[1];
+		   
+           my @master_grids;
+           open(gridsh, "<", $list) or die $!;
+	       while (<gridsh>) {
+			 my @words = split / /,$_;
+			 if ($words[0] =~ /Label|label/){
+                 push(@master_grids,$words[1]);
+			 }
+		    }
+	       close(gridsh);
+		   
+    ############print @grids;
+    my $output_str;
+ 	$output_str = sprintf "\n\$ @_[0] \n";
+    push(@file_lines,$output_str);	
+	$output_str = sprintf "\n\$_grid_rbe2_cylinder_master_from_list:\n";
+    push(@file_lines,$output_str);
+		
+	for (@master_grids){
+
+		my $current_grid = $_;
+		my @words = split/,/,$file_grids{$current_grid};
+		my ($x0, $y0, $z0) = ($words[3], $words[4], $words[5]);
+		
+		my @grids;
+		while (my ($key, $value) = each %file_grids){
+			my @list = split/,/,$value;
+			my ($x, $y, $z) = ($list[3], $list[4], $list[5]);
+		    my $point = "$x,$y,$z,";
+            my $cone = "$x0,$y0,$z0,$h,$radius,$nx,$ny,$nz,"; 			
+            if (within_cylinder($point, $cone)){
+                if ($current_grid != $key) {
+				    push(@grids, $key);
+				}
+            }				
+		}
+		
+		##create RBE2
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids;
+	
+	$output_str = sprintf "\n";
+	push(@file_lines, $output_str);
+	
+	$output_str = sprintf "RBE2,%d,%d,123456,",$next_element++,$current_grid;
+    push(@file_lines, $output_str);
+	
+	for(my $k = 0; $k < $last; $k++) {
+			if ($current_field <= $rbe2_fields) {
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@file_lines, $output_str);
+				++$current_field;
+			} else {
+		        $output_str = sprintf "+\n";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "+,";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "%d,",$grids[$k];
+                push(@file_lines, $output_str);				
+                $current_field = 3; 				
+            }				
+	}
+	}
+	$file_update = 1;
+}
+
 
 sub grid_rbe2_cylinder_master_from_list {
 
@@ -737,34 +910,38 @@ sub grid_create_rbe2_from_list {
     ############print @grids;
 	open(h1, ">>", $mesh_file) or die $!;
 
-	printf h1 "\n\$_grid_create_rbe2_from_list:\n";
+	my $output_str = sprintf "\n\$_grid_create_rbe2_from_list:\n";
+	push(@file_lines,$output_str);
 
     my $current_field = 5;
 	my $current = 0;
 	my $last = @grids;
     
-   (my $max_grid, my $max_elem, my $max_property, my $max_material) = &mesh_stat();
-	my $new_grid = $max_grid + 1;
-	my $new_eid = $max_elem + 1;
+
+	$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x0,$y0,$z0;
+	push(@file_lines, $output_str);
 	
-	
-	printf h1 "GRID,%d,0,%g,%g,%g,0\n",$new_grid,$x0,$y0,$z0;
-	printf h1 "RBE2,%d,%d,123456,",$new_eid,$new_grid;
+	$output_str = sprintf "RBE2,%d,%d,123456,",$next_element,$next_grid;
+	push(@file_lines, $output_str);
+	$next_grid++;
+	$next_element++;
 	for(my $k = 0; $k < $last; $k++) {
 
 			if ($current_field <= $rbe2_fields) {
-		        printf h1 "%d,",$grids[$k];
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@file_lines, $output_str);
 				++$current_field;
 			} else {
-		        printf h1 "+\n";
-		        printf h1 "+,";
-		        printf h1 "%d,",$grids[$k];				
+		        $output_str = sprintf "+\n";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "+,";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "%d,",$grids[$k];				
+				push(@file_lines, $output_str);
                 $current_field = 3; 				
             }
 
     }
-	
-    close(h1);
 }
 
 sub grid_rotate {
