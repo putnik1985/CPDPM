@@ -296,12 +296,23 @@ use Cwd qw(getcwd);
            print "\$_grid_rbe2_cylinder_points_master_from_list completed\n";		   
        }		   
 
-	   if ($words[0] =~ /^_grid_link$/) {
+	   if ($words[0] =~ /^_grid_link_grid_to_set$/) {
 		   ####print $_;
-	       grid_link($_); 
-           print "\$_grid_link completed\n";		   
+	       grid_link_grid_to_set($_); 
+           print "\$_grid_link_grid_to_set completed\n";		   
        }		   
 	   
+	   if ($words[0] =~ /^_grid_link_grid_to_grid$/) {
+		   ####print $_;
+	       grid_link_grid_to_grid($_); 
+           print "\$_grid_link_grid_to_grid completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_link_set_to_set$/) {
+		   ####print $_;
+	       grid_link_set_to_set($_); 
+           print "\$_grid_link_set_to_set completed\n";		   
+       }		   
 
 	}
 	close(fh);
@@ -353,7 +364,149 @@ my @grids;
 		   return @grids;
 }
 
-sub grid_link {
+sub cg_from_list{
+	
+my $list = @_[0]; ## read filename
+my @grids;
+           open(gridsh, "<", $list) or die $!;
+           my $count = 0;
+           my $x0;
+           my $y0;
+           my $z0;
+		   		   
+ 	       while (<gridsh>) {
+			 if ($_ =~ /Global coordinates/){
+				 $_ =~ s/^\s+|\s+$//g; ## remove leading and trailing spaces
+				 my @words = split/\s+/,$_;
+                 my $x = $words[3];
+				 my $y = $words[4];
+				 my $z = $words[5];
+				 $x0 += $x;
+				 $y0 += $y;
+				 $z0 += $z;
+				 $count++;
+			 }
+		    }
+			close(gridsh);
+			$x0 /= $count;
+			$y0 /= $count;
+			$z0 /= $count;
+			return($x0, $y0, $z0);
+}
+
+sub grid_link_set_to_set {
+	
+	       my @words = split /,/,@_[0];
+		   my $list1 = $words[1];
+		   my $list2 = $words[2];
+		   my $bolt_radius = $words[3];
+		   my $scale = $words[4];
+ 
+           my ($x0, $y0, $z0) = &cg_from_list($list1);
+           my ($x1, $y1, $z1) = &cg_from_list($list2);
+		   
+			$x0 *= $scale;
+			$y0 *= $scale;
+			$z0 *= $scale;
+
+			$x1 *= $scale;
+			$y1 *= $scale;
+			$z1 *= $scale;
+			
+    my $nx = $x1 - $x0;
+    my $ny = $y1 - $y0;
+    my $nz = $z1 - $z0;	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
+	
+    &grid_create_rbe2_from_list("_grid_create_rbe2_from_list,$list1,$x0,$y0,$z0,");	 
+    &grid_create_rbe2_from_list("_grid_create_rbe2_from_list,$list2,$x1,$y1,$z1,");
+	
+	my $first_grid =  $next_grid - 2;
+    my $second_grid = $next_grid - 1;
+
+    my ($rx, $ry, $rz) = &vector_normal($nx, $ny, $nz);	
+	
+	my $output_str = sprintf "\n\$_grid_link_grid_to_set output:\n";
+	push(@file_lines, $output_str);
+	
+    $output_str = sprintf "CBEAM,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first_grid,$second_grid,$rx,$ry,$rz;
+    push(@file_lines, $output_str);
+	
+	$output_str = sprintf "PBEAML,%d,%d,MSCBML0,ROD,,,,,+\n",$next_property,$next_material;
+	push(@file_lines, $output_str);
+	
+	$output_str = sprintf "+,%.4f,0.0,YES,1.0,%.4f,0.0,\n",$bolt_radius,$bolt_radius;
+	push(@file_lines, $output_str);
+	
+	my   $E = 6.83E+10;
+	my  $nu = 0.33;
+	my $rho = 2848.23;
+	
+	$output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4g,\n",$next_material,$E,$nu,$rho;
+	push(@file_lines, $output_str);
+	
+	$next_element++;
+	$next_property++;
+	$next_material++;
+	$file_update = 1;
+}
+
+sub grid_link_grid_to_grid {
+	
+	       my @words = split /,/,@_[0];
+		   my $first_grid = $words[1];
+		   my $second_grid = $words[2];
+		   my $bolt_radius = $words[3];
+		   my $scale = $words[4];
+
+	   
+		   @words = split/,/,%file_grids{$first_grid};
+		   my $x0 = $words[3];
+		   my $y0 = $words[4];
+		   my $z0 = $words[5];
+		   
+
+		   @words = split/,/,%file_grids{$second_grid};
+		   my $x1 = $words[3];
+		   my $y1 = $words[4];
+		   my $z1 = $words[5];		   
+
+	
+    my $nx = $x1 - $x0;
+    my $ny = $y1 - $y0;
+    my $nz = $z1 - $z0;	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
+    my ($rx, $ry, $rz) = &vector_normal($nx, $ny, $nz);	
+	
+	my $output_str = sprintf "\n\$_grid_link_grid_to_grid output:\n";
+	push(@file_lines, $output_str);
+	
+    $output_str = sprintf "CBEAM,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first_grid,$second_grid,$rx,$ry,$rz;
+    push(@file_lines, $output_str);
+	
+	$output_str = sprintf "PBEAML,%d,%d,MSCBML0,ROD,,,,,+\n",$next_property,$next_material;
+	push(@file_lines, $output_str);
+	$output_str = sprintf "+,%.4f,0.0,YES,1.0,%.4f,0.0,\n",$bolt_radius,$bolt_radius;
+	push(@file_lines, $output_str);
+	
+	my   $E = 6.83E+10;
+	my  $nu = 0.33;
+	my $rho = 2848.23;
+	$output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4g,\n",$next_material,$E,$nu,$rho;
+	push(@file_lines, $output_str);
+	$next_element++;
+	$next_property++;
+	$next_material++;
+	$file_update = 1;
+}
+
+sub grid_link_grid_to_set {
 	
 	       my @words = split /,/,@_[0];
 		   my $fem_grid = $words[1];
@@ -367,7 +520,7 @@ sub grid_link {
            my $y0;
            my $z0;
 		   
-		   my @words = split/\s+/,$file_grids{$fem_grid};
+		   my @words = split/\s+/,%file_grids{$fem_grid};
 		   my $x1 = $words[3];
 		   my $y1 = $words[4];
 		   my $z1 = $words[5];		   
@@ -410,7 +563,7 @@ sub grid_link {
 
     my ($rx, $ry, $rz) = &vector_normal($nx, $ny, $nz);	
 	
-	my $output_str = sprintf "\n\$_grid_bolt output:\n";
+	my $output_str = sprintf "\n\$_grid_link_grid_to_set output:\n";
 	push(@file_lines, $output_str);
 	
     $output_str = sprintf "CBEAM,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first_grid,$second_grid,$rx,$ry,$rz;
