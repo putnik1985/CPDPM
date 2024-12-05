@@ -25,6 +25,7 @@ use Cwd qw(getcwd);
 	my $next_grid     = -$unreal_number;
 	my $next_property = -$unreal_number;
 	my $next_material = -$unreal_number;
+	my $next_spc = 1;
 	
 	
 ##	printf "command file: %12s\n",$command_file;
@@ -58,6 +59,13 @@ use Cwd qw(getcwd);
 			    if ($next_element < $words[1]) {
 				    $next_element = $words[1];
 			    }
+
+            if ($words[0] =~ /[sS][pP][cC]/){
+			    if ($next_spc < $words[1]) {
+				    $next_spc = $words[1];
+			    }
+		    }
+
 		    }
 		}
 	close(gridh);
@@ -65,6 +73,7 @@ use Cwd qw(getcwd);
 	$next_grid++;
 	$next_material++;
 	$next_property++;
+	$next_spc++;
 	
 	##my $test_str = sprintf "stat: %d,%d,%d,%d\n",$next_element,$next_grid,$next_material,$next_property;
 	##print $test_str;
@@ -601,10 +610,11 @@ sub grid_constraints_file {
            push(@file_lines, $line_to_file);
 		  
 	    for (@grids_to_constraint) {
-	 	     $line_to_file = sprintf "SPC,$spc_id,$_,$dofs,\n";
+	 	     $line_to_file = sprintf "SPC,$next_spc,$_,$dofs,\n";
              push(@file_lines,$line_to_file);
 	    }
         $file_update = 1;
+		$next_spc++;
 }
 
 
