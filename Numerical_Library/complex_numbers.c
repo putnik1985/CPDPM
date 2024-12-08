@@ -1,25 +1,47 @@
 #include "numeric_c.h"
-struct complex_number csum(struct complex_number a, struct complex_number b)
+fcomplex csum(fcomplex a, fcomplex b)
 {
-   struct complex_number c;
-   c.x = a.x + b.x;
-   c.y = a.y + b.y;
+   fcomplex c;
+   c.re = a.re + b.re;
+   c.i = a.i + b.i;
    return c;
 }
 
-struct complex_number cmult(struct complex_number a, struct complex_number b)
+fcomplex csub(fcomplex a, fcomplex b)
 {
-   struct complex_number c;
-   c.x = a.x * b.x - a.y * b.y;
-   c.y = a.x * b.y + a.y * b.x;
+   fcomplex c;
+   c.re = a.re - b.re;
+   c.i = a.i - b.i;
    return c;
 }
 
-struct complex_number cdiv(struct complex_number a, struct complex_number b)
+fcomplex cmult(fcomplex a, fcomplex b)
 {
-   struct complex_number c;
-   double mag = b.x * b.x + b.y * b.y;
-   c.x = (a.x * b.x + a.y * b.y) / mag;
-   c.y = (a.y * b.x - a.x * b.y) / mag;
+   fcomplex c;
+   c.re = a.re * b.re - a.i * b.i;
+   c.i = a.re * b.i + a.i * b.re;
    return c;
+}
+
+fcomplex cdiv(fcomplex a, fcomplex b)
+{
+   fcomplex c;
+   double mag = b.re * b.re + b.i * b.i;
+   c.re = (a.re * b.re + a.i * b.i) / mag;
+   c.i = (a.i * b.re - a.re * b.i) / mag;
+   return c;
+}
+
+fcomplex conj(fcomplex a)
+{
+  fcomplex c;
+  c.re = a.re;
+  c.i = - a.i;
+  return c;
+}
+
+double cabs(fcomplex a)
+{
+   double mag = sqrt(a.re * a.re + a.i * a.i);
+   return mag;
 }

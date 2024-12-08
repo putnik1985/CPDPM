@@ -41,14 +41,12 @@ int main(int argc, char** argv)
 			func = gauss;
 	}
 */
-	/*
 	x = (*functions[method])(n,a,b);
 	if ( x == NULL) 
 		return -1;
 	printf("%s solution:\n", messages[method]);
 	for(int i = 0; i<n; ++i)
 		printf("%g,", x[i]);
-	*/
 
         //double det = det_gauss(n, a);
         //double det = det_hausholder(n, a);
@@ -57,13 +55,26 @@ int main(int argc, char** argv)
         double det = (*determinant[method])(n, a);
 	printf("%s determinant: %12.2f\n",messages[method], det);
 	printf("\n");
-        struct complex_number z1 = {1., 2.};
-        struct complex_number z2 = {0., 1.};
-        struct complex_number z3 = csum(z1, z2);
-        printf("%f + i%f\n", z3.x, z3.y);
+        fcomplex z1 = {1., 2.};
+        fcomplex z2 = {1., 1.};
+        fcomplex z3 = csum(z1, z2);
+        printf("%f + i%f\n", z3.re, z3.i);
         z3 = cmult(z1, z2);
-        printf("%f + i%f\n", z3.x, z3.y);
+        printf("%f + i%f\n", z3.re, z3.i);
         z3 = cdiv(z1, z2);
-        printf("%f + i%f\n", z3.x, z3.y);
+        printf("%f + i%f\n", z3.re, z3.i);
+        printf("%f\n", cabs(z1));
+        printf("%f\n", cabs(z2));
+	fcomplex a1[9] = {{1.,0.}, {0., 0.}, {3., 0.},
+		          {0.,0.}, {4., 0.}, {0., 0.},
+		          {3., 0.},{0., 0.}, {10., 0.}};
+
+	fcomplex b1[3] = {{4., 0.}, {22., 0.}, {42.,0.}};
+        fcomplex *x1 = cgauss(n, a1, b1);
+	if ( x1 == NULL) 
+		return -1;
+	printf("%s complex solution:\n", messages[method]);
+	for(int i = 0; i<n; ++i)
+		printf("%g +i %g,", x1[i].re, x1[i].i);
 	return 0;
 }

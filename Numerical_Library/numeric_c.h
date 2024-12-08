@@ -7,15 +7,19 @@
 #include <string.h>
 #include <errno.h>
 #include <math.h>
-struct complex_number {
-       double x;
-       double y;
-};
+
+typedef struct complex_number {
+       double re;
+       double i;
+} fcomplex;
 
 /* gauss: solve linear system of n equations Ax=b */
 double* gauss(int n, double* A, double* b);
 /* det_gauss: calculate matrix A determinant and transform to triangular form */
 double  det_gauss(int n, double* A);
+
+/* cgauss: solve linear system of n equations Ax=b */
+fcomplex* cgauss(int n, fcomplex* A, fcomplex* b);
 
 /* rotation: solve linear system of n equations Ax=b applying rotation from the left side*/
 double* rotation(int n, double* A, double* b);
@@ -32,8 +36,11 @@ double* square_root(int n, double* A, double* b);
 /* det_square_root: calculate determinant and transform to S'S*/
 double det_square_root(int n, double* A);
 
-struct complex_number csum(struct complex_number a, struct complex_number b);
-struct complex_number cmult(struct complex_number a, struct complex_number b);
-struct complex_number cdiv(struct complex_number a, struct complex_number b);
+fcomplex csum(fcomplex a, fcomplex b);
+fcomplex csub(fcomplex a, fcomplex b);
+fcomplex cmult(fcomplex a, fcomplex b);
+fcomplex cdiv(fcomplex a, fcomplex b);
+fcomplex conj(fcomplex a);
+double cabs(fcomplex a);
 
 #endif
