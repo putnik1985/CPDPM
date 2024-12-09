@@ -323,6 +323,12 @@ use Cwd qw(getcwd);
            print "\$_grid_link_set_to_set completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_create_rbe2$/) {
+		   ####print $_;
+	       grid_create_rbe2($_); 
+           print "\$_grid_create_rbe2 completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -401,6 +407,24 @@ my @grids;
 			$y0 /= $count;
 			$z0 /= $count;
 			return($x0, $y0, $z0);
+}
+
+sub grid_create_rbe2 {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $scale = $words[2];
+
+	       my $output_str = sprintf "\n\$_grid_create_rbe2 output:\n";
+	       push(@file_lines, $output_str);
+	
+           my ($x0, $y0, $z0) = &cg_from_list($list);
+		   $x0 *= $scale;
+		   $y0 *= $scale;
+		   $z0 *= $scale;
+
+		   &grid_create_rbe2_from_list("_grid_create_rbe2_from_list,$list,$x0,$y0,$z0,");
+		   $file_update = 1;
 }
 
 sub grid_link_set_to_set {
