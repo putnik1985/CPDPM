@@ -329,6 +329,12 @@ use Cwd qw(getcwd);
            print "\$_grid_create_rbe2 completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_create_cbush$/) {
+		   ####print $_;
+	       grid_create_cbush($_); 
+           print "\$_grid_create_cbush completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -355,6 +361,31 @@ use Cwd qw(getcwd);
 		     print $_;
 		}
     }
+sub grid_create_cbush {
+	
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my ($kx, $ky, $kz, $rx, $ry, $rz) = ($words[2], $words[3],$words[4],$words[5],$words[6],$words[7]);
+
+	       my @grid_pairs = &read_labels($list);
+
+           my $output_str = sprintf "\n\$_grid_create_cbush output:\n";
+           push(@file_lines, $output_str);
+           for (my $i = 0; $i < @grid_pairs; $i+=2) {
+        	##print @grid_pairs[$i] . "," . @grid_pairs[$i+1];
+			##print "\n";
+			my $grid1 = @grid_pairs[$i];
+			my $grid2 = @grid_pairs[$i+1];
+			
+         	$output_str = sprintf "CBUSH,$next_element,$next_property,$grid1,$grid2,,,,0,\n";
+        	push(@file_lines, $output_str);
+			$next_element++;
+           }
+         	$output_str = sprintf "PBUSH,$next_property,K,$kx,$ky,$kz,$rx,$ry,$rz,\n";
+        	push(@file_lines, $output_str);
+           $next_property++;
+           $file_update = 1;
+}
 
 sub read_labels{
 	
