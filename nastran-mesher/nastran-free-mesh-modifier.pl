@@ -335,6 +335,12 @@ use Cwd qw(getcwd);
            print "\$_grid_create_cbush completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_strut_set_to_set$/) {
+		   ####print $_;
+	       grid_strut_set_to_set($_); 
+           print "\$_grid_strut_set_to_set completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -456,6 +462,84 @@ sub grid_create_rbe2 {
 
 		   &grid_create_rbe2_from_list("_grid_create_rbe2_from_list,$list,$x0,$y0,$z0,");
 		   $file_update = 1;
+}
+
+sub grid_strut_set_to_set {
+	
+	       my @words = split /,/,@_[0];
+		   my $list1 = $words[1];
+		   my $list2 = $words[2];
+		   my $nastran_card = $words[3];
+		   my $E = $words[4];
+		   my $nu = $words[5];
+		   my $rho = $words[6];
+		   my $amount = $words[7];
+		   my $scale = $words[8];
+		   
+		   $nastran_card =~ s/;/,/g;
+           my @commands = split/\\n/,$nastran_card;
+           my ($x0, $y0, $z0) = &cg_from_list($list1);
+           my ($x1, $y1, $z1) = &cg_from_list($list2);
+		   
+			$x0 *= $scale;
+			$y0 *= $scale;
+			$z0 *= $scale;
+
+			$x1 *= $scale;
+			$y1 *= $scale;
+			$z1 *= $scale;
+			
+    my $nx = $x1 - $x0;
+    my $ny = $y1 - $y0;
+    my $nz = $z1 - $z0;	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	my $ds = $mag / $amount;
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
+    my ($rx, $ry, $rz) = &vector_normal($nx, $ny, $nz);
+	
+    &grid_create_rbe2_from_list("_grid_create_rbe2_from_list,$list1,$x0,$y0,$z0,");	 
+    &grid_create_rbe2_from_list("_grid_create_rbe2_from_list,$list2,$x1,$y1,$z1,");
+	my $grid_0 = $next_grid - 2;
+	my $grid_1 = $next_grid - 1;
+	
+	my $output_str = sprintf "\n\$_grid_strut_set_to_set output:\n";
+	push(@file_lines, $output_str);	
+	
+	my $first = $grid_0;
+	my $second;
+	for (my $current = 1; $current < $amount; ++$current){
+		    $x0 += $ds * $nx;
+		    $y0 += $ds * $ny;
+		    $z0 += $ds * $nz;
+			$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x0,$y0,$z0;
+	        push(@file_lines, $output_str);
+			$second = $next_grid;
+			$next_grid++;
+            $output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first,$second,$rx,$ry,$rz;
+            push(@file_lines, $output_str);
+			$next_element++;
+			$first = $second;
+	}
+
+            $output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first,$grid_1,$rx,$ry,$rz;
+            push(@file_lines, $output_str);
+			$next_element++;
+	
+	        for (@commands) {
+				 $_ =~ s/prop/$next_property/g;
+				 $_ =~ s/mat/$next_material/g;
+	    	     push(@file_lines, $_);
+				 push(@file_lines,"\n");
+			}	
+
+	        $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4g,\n",$next_material,$E,$nu,$rho;
+	        push(@file_lines, $output_str);
+	$next_element++;
+	$next_property++;
+	$next_material++;
+	$file_update = 1;
 }
 
 sub grid_link_set_to_set {
