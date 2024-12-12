@@ -254,8 +254,15 @@ use Cwd qw(getcwd);
 	   if ($words[0] =~ /^_grid_create_rbe2_from_list$/) {
 		   ####print $_;
 	       grid_create_rbe2_from_list($_); 
-           print "_grid_create_rbe2_from_list completed\n";		   
+           print "\$_grid_create_rbe2_from_list completed\n";		   
        }		   
+
+	   if ($words[0] =~ /^_grid_create_pin_rbe2_from_list$/) {
+		   ####print $_;
+	       grid_create_pin_rbe2_from_list($_); 
+           print "\$_grid_create_pin_rbe2_from_list completed\n";		   
+       }		   
+
 
 	   if ($words[0] =~ /^_grid_modify_from_list$/) {
 		   ####print $_;
@@ -1190,6 +1197,59 @@ sub grid_modify_from_list {
     $grids_modified = 1;
 }
 
+sub grid_create_pin_rbe2_from_list {
+
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $x0 = $words[2];
+		   my $y0 = $words[3];
+		   my $z0 = $words[4];
+  
+           my @grids;
+           open(gridsh, "<", $list) or die $!;
+	       while (<gridsh>) {
+			 my @words = split / /,$_;
+			 if ($words[0] =~ /Label|label/){
+                 push(@grids,$words[1]);
+			 }
+		    }
+	       close(gridsh);
+    ############print @grids;
+	open(h1, ">>", $mesh_file) or die $!;
+
+	my $output_str = sprintf "\n\$_grid_create_rbe2_from_list:\n";
+	push(@file_lines,$output_str);
+
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids;
+    
+
+	$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x0,$y0,$z0;
+	push(@file_lines, $output_str);
+	
+	$output_str = sprintf "RBE2,%d,%d,123,",$next_element,$next_grid;
+	push(@file_lines, $output_str);
+	$next_grid++;
+	$next_element++;
+	for(my $k = 0; $k < $last; $k++) {
+
+			if ($current_field <= $rbe2_fields) {
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@file_lines, $output_str);
+				++$current_field;
+			} else {
+		        $output_str = sprintf "+\n";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "+,";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "%d,",$grids[$k];				
+				push(@file_lines, $output_str);
+                $current_field = 3; 				
+            }
+
+    }
+}
 
 
 sub grid_create_rbe2_from_list {
