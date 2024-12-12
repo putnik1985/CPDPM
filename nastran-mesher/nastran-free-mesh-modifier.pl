@@ -348,6 +348,18 @@ use Cwd qw(getcwd);
            print "\$_grid_strut_set_to_set completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_pinned_strut_set_to_set$/) {
+		   ####print $_;
+	       grid_pinned_strut_set_to_set($_); 
+           print "\$_grid_pinned_strut_set_to_set completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_create_rbe2_circle$/) {
+		   ####print $_;
+	       grid_create_rbe2_circle($_); 
+           print "\$_grid_create_rbe2_circle completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -471,6 +483,48 @@ sub grid_create_rbe2 {
 		   $file_update = 1;
 }
 
+sub grid_create_rbe2_circle {
+
+	       my @words = split /,/,@_[0];
+		   my ($x0,$y0, $z0) = ($words[1], $words[2], $words[3]);
+		   my ($x1,$y1, $z1) = ($words[4], $words[5], $words[6]);
+		   my ($x2,$y2, $z2) = ($words[7], $words[8], $words[9]);
+
+	       my $output_str = sprintf "\n\$_grid_create_rbe2_circle output:\n";
+	       push(@file_lines, $output_str);
+		   my $nx = $x2 - $x1;
+		   my $ny = $y2 - $y1;
+		   my $nz = $z2 - $z1;
+		   my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+		   $nx /= $mag;
+		   $ny /= $mag;
+		   $nz /= $mag;
+		   my ($rx, $ry, $rz) = ($x0-$x1, $y0 - $y1, $z0 - $z1);
+		   my $d = dot_product("$nx,$ny,$nz","$rx,$ry,$rz");
+		   my $rad = sqrt($rx**2 + $ry**2 + $rz**2 - $d**2);
+		   ##projection
+		   $x0 = $x1 + $d * $nx;
+		   $y0 = $y1 + $d * $ny;
+		   $z0 = $z1 + $d * $nz;
+
+		   my $list = "rbe2_circle.dat";
+		   open(fh1,">",$list);
+
+		   	while (my ($key, $value) = each %file_grids){
+			       my @list1 = split/,/,$value;
+			       my ($x, $y, $z) = ($list1[3], $list1[4], $list1[5]);
+		           my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
+                   if (abs($distance - $rad) < $tolerance){
+                       printf fh1 "Label %d\n",$key;     
+              }				
+		    }
+	       
+	       close(fh1);
+		   
+		   &grid_create_rbe2_from_list("_grid_create_rbe2_from_list,$list,$x0,$y0,$z0,");
+		   $file_update = 1;
+}
+
 sub grid_strut_set_to_set {
 	
 	       my @words = split /,/,@_[0];
@@ -549,6 +603,86 @@ sub grid_strut_set_to_set {
 	$file_update = 1;
 }
 
+
+sub grid_pinned_strut_set_to_set {
+	
+	       my @words = split /,/,@_[0];
+		   my $list1 = $words[1];
+		   my $list2 = $words[2];
+		   my $nastran_card = $words[3];
+		   my $E = $words[4];
+		   my $nu = $words[5];
+		   my $rho = $words[6];
+		   my $amount = $words[7];
+		   my $scale = $words[8];
+		   
+		   $nastran_card =~ s/;/,/g;
+           my @commands = split/\\n/,$nastran_card;
+           my ($x0, $y0, $z0) = &cg_from_list($list1);
+           my ($x1, $y1, $z1) = &cg_from_list($list2);
+		   
+			$x0 *= $scale;
+			$y0 *= $scale;
+			$z0 *= $scale;
+
+			$x1 *= $scale;
+			$y1 *= $scale;
+			$z1 *= $scale;
+			
+    my $nx = $x1 - $x0;
+    my $ny = $y1 - $y0;
+    my $nz = $z1 - $z0;	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	my $ds = $mag / $amount;
+	$nx /= $mag;
+	$ny /= $mag;
+	$nz /= $mag;
+    my ($rx, $ry, $rz) = &vector_normal($nx, $ny, $nz);
+	
+    &grid_create_pin_rbe2_from_list("_grid_create_rbe2_from_list,$list1,$x0,$y0,$z0,");	 
+    &grid_create_pin_rbe2_from_list("_grid_create_rbe2_from_list,$list2,$x1,$y1,$z1,");
+	my $grid_0 = $next_grid - 2;
+	my $grid_1 = $next_grid - 1;
+	
+	my $output_str = sprintf "\n\$_grid_strut_set_to_set output:\n";
+	push(@file_lines, $output_str);	
+	
+	my $first = $grid_0;
+	my $second;
+	for (my $current = 1; $current < $amount; ++$current){
+		    $x0 += $ds * $nx;
+		    $y0 += $ds * $ny;
+		    $z0 += $ds * $nz;
+			$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x0,$y0,$z0;
+	        push(@file_lines, $output_str);
+			$second = $next_grid;
+			$next_grid++;
+            $output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first,$second,$rx,$ry,$rz;
+            push(@file_lines, $output_str);
+			$next_element++;
+			$first = $second;
+	}
+
+            $output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first,$grid_1,$rx,$ry,$rz;
+            push(@file_lines, $output_str);
+			$next_element++;
+	
+	        for (@commands) {
+				 $_ =~ s/prop/$next_property/g;
+				 $_ =~ s/mat/$next_material/g;
+	    	     push(@file_lines, $_);
+				 push(@file_lines,"\n");
+			}	
+
+	        $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4g,\n",$next_material,$E,$nu,$rho;
+	        push(@file_lines, $output_str);
+	$next_element++;
+	$next_property++;
+	$next_material++;
+	$file_update = 1;
+}
+
+
 sub grid_link_set_to_set {
 	
 	       my @words = split /,/,@_[0];
@@ -616,6 +750,9 @@ sub grid_link_grid_to_grid {
 		   my $second_grid = $words[2];
 		   my $bolt_radius = $words[3];
 		   my $scale = $words[4];
+		   my $E = $words[5];
+		   my $nu = $words[6];
+		   my $rho = $words[7];		   
 
 	   
 		   @words = split/,/,%file_grids{$first_grid};
@@ -650,9 +787,6 @@ sub grid_link_grid_to_grid {
 	$output_str = sprintf "+,%.4f,0.0,YES,1.0,%.4f,0.0,\n",$bolt_radius,$bolt_radius;
 	push(@file_lines, $output_str);
 	
-	my   $E = 6.83E+10;
-	my  $nu = 0.33;
-	my $rho = 2848.23;
 	$output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4g,\n",$next_material,$E,$nu,$rho;
 	push(@file_lines, $output_str);
 	$next_element++;
