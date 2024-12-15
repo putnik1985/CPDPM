@@ -91,33 +91,29 @@ Matrix<T>& Matrix<T>::operator*=(double a){
 
 
 template<typename T>
-Matrix<T>& operator+(const Matrix<T>& A, const Matrix<T>& B){
+Matrix<T> operator+(const Matrix<T>& A, const Matrix<T>& B){
 
-     if( A.size() == B.size() ){
      Matrix<T> C(A.size());
      int dim = A.size();
      for(int i=1;i<=dim;++i)
      for(int j=1;j<=dim;++j)
      C(i,j) = A(i,j) + B(i,j);
      return C;
-     }
 }
 
 template<typename T>
-Matrix<T>& operator-(const Matrix<T>& A, const Matrix<T>& B){
+Matrix<T> operator-(const Matrix<T>& A, const Matrix<T>& B){
 
-     if( A.size() == B.size() ){
      Matrix<T> C(A.size());
      int dim = A.size();
      for(int i=1;i<=dim;++i)
      for(int j=1;j<=dim;++j)
      C(i,j) = A(i,j) - B(i,j);
      return C;
-     }
 }
 
 template<typename T>
-Matrix<T>& operator*(const Matrix<T>& A, const Matrix<T>& B){
+Matrix<T> operator*(const Matrix<T>& A, const Matrix<T>& B){
 
      if( A.size() == B.size() ){
      int dim = A.size();
@@ -133,7 +129,7 @@ Matrix<T>& operator*(const Matrix<T>& A, const Matrix<T>& B){
 
 
 template<typename T>
-Matrix<T>& operator*(const Matrix<T>& A, const T& b){
+Matrix<T> operator*(const Matrix<T>& A, const T& b){
 
      int dim = A.size();
      Matrix<T> C(dim);
@@ -145,7 +141,7 @@ Matrix<T>& operator*(const Matrix<T>& A, const T& b){
 }
 
 template<typename T>
-Matrix<T>& operator*(const T& b, const Matrix<T>& A){
+Matrix<T> operator*(const T& b, const Matrix<T>& A){
 
      int dim = A.size();
      Matrix<T> C(dim);
@@ -182,4 +178,39 @@ ostream& operator<<(ostream& os, const Matrix<T>& M){
       os << '\n';
       }
 return os;
+}
+
+template<typename T>
+fcomplex* operator*(const fcomplex b, const Matrix<T>& A){
+  int n = A.size();
+  fcomplex* out = (fcomplex*)calloc(n*n, sizeof(fcomplex));
+  for(int i=0; i<n; ++i)
+      for(int j=0; j<n; ++j)
+          out[n*i+j] = {b.re * A(i+1, j+1), b.i * A(i+1, j+1)};
+  return out;
+}
+
+template<typename T>
+fcomplex operator*(const fcomplex a, const T b){
+  return {a.re * b, a.i * b};
+}
+
+template<typename T>
+fcomplex operator+(const fcomplex a, const T b){
+  return {a.re + b, a.i };
+}
+
+template<typename T>
+fcomplex* operator+(const Matrix<T>& A, fcomplex* B){
+  int n = A.size();
+  fcomplex* out = (fcomplex*)calloc(n*n, sizeof(fcomplex));
+  for(int i = 0; i<n; ++i)
+      for(int j = 0; j < n; ++j)
+          out[n*i +j] = B[n*i+j] + A(i+1, j+1);
+  return out;
+}
+
+template<typename T>
+fcomplex* operator+(fcomplex* B, const Matrix<T>& A){
+  return A + B;
 }

@@ -7,6 +7,7 @@ int rotor::append(const linear_bearing& lbr){
         nodes = 1;
         M = Matrix<double>( 4 * nodes);
         K = Matrix<double>( 4 * nodes);
+        D = Matrix<double>( 4 * nodes);
         G = Matrix<double>( 4 * nodes);
     }
 
@@ -15,6 +16,7 @@ int rotor::append(const linear_bearing& lbr){
         for(int j = 1; j <= dofs; ++j){
             M(4*(nodes - 1) + i, 4*(nodes - 1) + j) += lbr.M(i,j);
             K(4*(nodes - 1) + i, 4*(nodes - 1) + j) += lbr.K(i,j);
+            D(4*(nodes - 1) + i, 4*(nodes - 1) + j) += lbr.D(i,j);
         } 
     return 0;
 }
@@ -25,6 +27,7 @@ int rotor::append(const disk& d){
         nodes = 1;
         M = Matrix<double>( 4 * nodes);
         K = Matrix<double>( 4 * nodes);
+        D = Matrix<double>( 4 * nodes);
         G = Matrix<double>( 4 * nodes);
     }
 
@@ -44,6 +47,7 @@ int rotor::append(const uniform_shaft& us){
         nodes = 1;
         M = Matrix<double>(4 * nodes);
         K = Matrix<double>(4 * nodes);
+        D = Matrix<double>(4 * nodes);
         G = Matrix<double>(4 * nodes);
     }
 

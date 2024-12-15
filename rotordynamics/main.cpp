@@ -27,6 +27,7 @@ int main(int argc, char** argv){
     }
 
     nvector<double> global_nodes;
+    vector<pair<int, double> > unbalances;
     double x0{0.0};
     rotor R;
     nvector<uniform_shaft> shaft_matrices;
@@ -41,16 +42,22 @@ int main(int argc, char** argv){
 */
         if ( csv.getfield(0).compare("_linear_bearing") == 0 ){
              double k = stod(csv.getfield(1)); 
-             linear_bearing lbr(k);
+             double d = stod(csv.getfield(2)); 
+             linear_bearing lbr(k,d);
              R.append(lbr);
+             ///cout << R.D;
         }
 
         if ( csv.getfield(0).compare("_disk") == 0 ){
              double m = stod(csv.getfield(1)); 
              double Jp = stod(csv.getfield(2)); 
              double Jd = stod(csv.getfield(3)); 
+             double unb = stod(csv.getfield(4)); 
              disk d(m, Jp, Jd);
              R.append(d);
+             int node = R.K.size() / 4;
+             cout << node << '\n';
+             unbalances.push_back(make_pair(node, unb));
         }
 
         if ( csv.getfield(0).compare("_uniform_shaft") == 0 ){
@@ -73,6 +80,21 @@ int main(int argc, char** argv){
   
         if (csv.getfield(0).compare("_analysis") == 0 ){
             auto analysis_type = csv.getfield(1);
+            if (analysis_type.compare("unbalance") == 0){
+                auto max_speed = stod(csv.getfield(3));
+                fcomplex imag = {0., 1.};
+                double w = max_speed * 2 * M_PI / 60.;
+              
+                fcomplex* F = -w*w * R.M + imag*w * (R.D + w * R.G) + R.K; 
+             /*
+                int n = R.K.size();
+                for(int i=0; i<n; ++i){
+                    for(int j=0; j<n; ++j)
+                        printf("(%f,%f);",F[n*i+j].re, F[n*i+j].i);
+                    printf("\n");
+                }
+             */
+            }
             if (analysis_type.compare("maneuver") == 0){
                 auto speed = stod(csv.getfield(3));
                 auto ang_vel = stod(csv.getfield(5));

@@ -7,6 +7,8 @@
 struct structure {
  Matrix<double> M;
  Matrix<double> K;
+ Matrix<double> D;
+ Matrix<double> H;
 };
 
 #endif
