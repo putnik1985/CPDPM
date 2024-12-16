@@ -27,7 +27,7 @@ int main(int argc, char** argv){
     }
 
     nvector<double> global_nodes;
-    vector<pair<int, double> > unbalances;
+    vector<pair<int, complex<double> > > unbalances;
     double x0{0.0};
     rotor R;
     nvector<uniform_shaft> shaft_matrices;
@@ -53,11 +53,15 @@ int main(int argc, char** argv){
              double Jp = stod(csv.getfield(2)); 
              double Jd = stod(csv.getfield(3)); 
              double unb = stod(csv.getfield(4)); 
+             double phase = stod(csv.getfield(5)); 
+             phase *= M_PI / 180.;
              disk d(m, Jp, Jd);
              R.append(d);
              int node = R.K.size() / 4;
-             cout << node << '\n';
-             unbalances.push_back(make_pair(node, unb));
+             //cout << node << '\n';
+             complex<double> imbalance(unb * cos(phase), unb * sin(phase));
+             //cout << imbalance << '\n';
+             unbalances.push_back(make_pair(node, imbalance));
         }
 
         if ( csv.getfield(0).compare("_uniform_shaft") == 0 ){
@@ -83,9 +87,30 @@ int main(int argc, char** argv){
             if (analysis_type.compare("unbalance") == 0){
                 auto max_speed = stod(csv.getfield(3));
                 fcomplex imag = {0., 1.};
-                double w = max_speed * 2 * M_PI / 60.;
-              
-                fcomplex* F = -w*w * R.M + imag*w * (R.D + w * R.G) + R.K; 
+                double w_max = max_speed * 2 * M_PI / 60.;
+                int n = R.K.size();
+                fcomplex unb[n];
+                for(auto& imb : unbalances){
+                    int node = imb.first;
+                    complex<double> val = imb.second;
+                    unb[4 * node - 3 - 1] = {val.real(), val.imag()};
+                    unb[4 * node - 2 - 1] = {val.imag(),-val.real()};
+                }
+                double w = 0.0;
+                double dw = w_max / 100.;
+                while (w < w_max){
+                       fcomplex* F = -w*w * R.M + imag*w * (R.D + w * R.G) + R.K; 
+                       fcomplex b[n];
+                                 for(int i =0; i < n; ++i)
+                                     b[i] = {w * w * unb[i].re, w * w * unb[i].i};
+                       fcomplex* x = cgauss(n, F,b);
+                       double freq = w / (2 * M_PI);
+                       printf("%12.2f",freq);
+                       for(int i = 1; i <= n / 4; ++i)
+                           printf("%12.4g",cabs(x[4 * i - 3 - 1]));
+                       printf("\n");
+                       w += dw;
+                }
              /*
                 int n = R.K.size();
                 for(int i=0; i<n; ++i){
