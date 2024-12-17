@@ -196,6 +196,11 @@ fcomplex operator*(const fcomplex a, const T b){
 }
 
 template<typename T>
+fcomplex operator*(const T b, const fcomplex a){
+  return {a.re * b, a.i * b};
+}
+
+template<typename T>
 fcomplex operator+(const fcomplex a, const T b){
   return {a.re + b, a.i };
 }

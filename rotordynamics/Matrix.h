@@ -55,6 +55,8 @@ fcomplex* operator*(const fcomplex b, const Matrix<T>& A);
 template<typename T>
 fcomplex operator*(const fcomplex a, const T b);
 template<typename T>
+fcomplex operator*(const T b, const fcomplex a);
+template<typename T>
 fcomplex operator+(const fcomplex a, const T b);
 template<typename T>
 fcomplex* operator+(const Matrix<T>& A, fcomplex* B);
