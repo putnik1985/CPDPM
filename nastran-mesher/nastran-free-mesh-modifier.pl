@@ -147,7 +147,7 @@ use Cwd qw(getcwd);
 	   if ($words[0] =~ /^_grid_rbe3_cylinder$/) {
 		   ####print $_;
 	       grid_rbe3_cylinder($_); 
-           print "_grid_rbe3_cylinder completed\n";		   
+           print "\$_grid_rbe3_cylinder completed\n";		   
        }		   
 
 	   if ($words[0] =~ /^_grid_rbe2_sphere_copy_translate$/) {
@@ -2168,67 +2168,56 @@ sub grid_rbe3_cylinder {
 		   my $nz = $words[8];		   
 		   
 	my @grids;
-	
-	open(fh1, '<', $mesh_file) or die $!;
-    my $new_eid;
-	my $new_grid;
-	
-	 while (<fh1>) {
-		###print $_;
-		my @words = split /,/,$_;
-		####print $words[1]."\n"; 
-        if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP/){
-			####print $_;
-			if ($new_eid < $words[1]) {
-				$new_eid = $words[1];
-			}	
-		}
-		
-        if ($words[0] =~ /GRID/){
-			##print "$words[1] -->> $new_grid\n";
-			if ($new_grid < $words[1]) {
-				$new_grid = $words[1];
-			}	
-		}	
-		
-        if ($words[0] =~ /GRID/){
-			my $x = $words[3];
-			my $y = $words[4];
-			my $z = $words[5];
-		
-			my $point = "$x,$y,$z,";
-            my $cone = "$x0,$y0,$z0,$h,$radius,$nx,$ny,$nz,"; 			
-            if (within_cylinder($point, $cone)){
-                push(@grids, $words[1]);				
-            }				
-        }			
-	 }
-	close(fh1);
-	
-	##print "highest eid: " . $new_eid . "\n";
-	##print "highets grid: " . $new_grid . "\n";
 
-	open(fh1, ">>", $mesh_file) or die $!;
-	print fh1 "\n\$_grid_rbe3_cone output:\n";
+		for(my $NR = 0; $NR <  @file_lines; ++$NR){
+		    my @words = split /,/,$file_lines[$NR];
+				
+            if ($words[0] =~ /GRID/){
+			    my $x = $words[3];
+			    my $y = $words[4];
+			    my $z = $words[5];
+			    my $point = "$x,$y,$z,";
+                my $cone = "$x0,$y0,$z0,$h,$radius,$nx,$ny,$nz,"; 			
+                if (within_cylinder($point, $cone)){
+					####print $words[1] . "," . $cone ."\n";
+                    push(@grids, $words[1]);				
+                }				
+            }			
+		}
+
+	
+	my $output_str = sprintf "\n\$_grid_rbe2_cylinder output:\n";
+	push(@file_lines,$output_str);
+
     my $current_field = 8;
 	my $current = 0;
 	my $last = @grids;
 
-	printf fh1 "GRID,%d,0,%g,%g,%g,0\n",++$new_grid,$x0,$y0,$z0;
-	printf fh1 "RBE3,%d,,%d,123456,1.0,123,",++$new_eid,$new_grid;
+	$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x0,$y0,$z0;
+	push(@file_lines,$output_str);
+	
+	$output_str = sprintf "RBE3,%d,,%d,123456,1.0,123,",$next_element,$next_grid;
+	push(@file_lines,$output_str);
+	$next_element++;
+	$next_grid++;
+	
 	for(my $k = 0; $k < $last; $k++) {
 
 			if ($current_field <= $rbe3_fields) {
-		        printf fh1 "%d,",$grids[$k];
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@file_lines,$output_str);
 				++$current_field;
 			} else {
-		        printf fh1 "+\n";
-		        printf fh1 "+,";
-		        printf fh1 "%d,",$grids[$k];				
+		        $output_str = sprintf "+\n";
+				push(@file_lines,$output_str);
+		        $output_str = sprintf "+,";
+				push(@file_lines,$output_str);
+		        $output_str = sprintf "%d,",$grids[$k];	
+                push(@file_lines,$output_str);				
                 $current_field = 3; 				
             }
     }	
-    close(fh1);		
+    $file_update = 1;		
 }
 
 
