@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iomanip>
 #include<stdexcept>
+#include <complex>
 
 #include<cstdio>
 #define MAXLINE 1000

@@ -9,6 +9,9 @@
 
 #define WRITE_PRECISION 10
 
+extern "C"{
+#include "../Numerical_Library/numeric_c.h"
+}
 
 template<typename T>
 class Matrix{ // numberig starts from the 1
@@ -35,17 +38,30 @@ public:
 
 
 template<typename T>
-Matrix<T>& operator+(const Matrix<T>& A, const Matrix<T>& B);
+Matrix<T> operator+(const Matrix<T>& A, const Matrix<T>& B);
 template<typename T>
-Matrix<T>& operator-(const Matrix<T>& A, const Matrix<T>& B);
+Matrix<T> operator-(const Matrix<T>& A, const Matrix<T>& B);
 template<typename T>
-Matrix<T>& operator*(const Matrix<T>& A, const Matrix<T>& B);
+Matrix<T> operator*(const Matrix<T>& A, const Matrix<T>& B);
 template<typename T>
-Matrix<T>& operator*(const Matrix<T>& A, const T& b);
+Matrix<T> operator*(const Matrix<T>& A, const T& b);
 template<typename T>
-Matrix<T>& operator*(const T& b, const Matrix<T>& A);
+Matrix<T> operator*(const T& b, const Matrix<T>& A);
 template<typename T>
 nvector<T> operator*(const Matrix<T>& A, const nvector<T>& v);
+
+template<typename T>
+fcomplex* operator*(const fcomplex b, const Matrix<T>& A);
+template<typename T>
+fcomplex operator*(const fcomplex a, const T b);
+template<typename T>
+fcomplex operator*(const T b, const fcomplex a);
+template<typename T>
+fcomplex operator+(const fcomplex a, const T b);
+template<typename T>
+fcomplex* operator+(const Matrix<T>& A, fcomplex* B);
+template<typename T>
+fcomplex* operator+(fcomplex* B, const Matrix<T>& A);
 
 
 template<typename T>

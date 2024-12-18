@@ -25,8 +25,9 @@ int main(int argc, char** argv){
        cerr << "can not open file: " << filename << "\n";
        return -1;
     }
-
+    double global_mass = 0.;
     nvector<double> global_nodes;
+    vector<pair<int, complex<double> > > unbalances;
     double x0{0.0};
     rotor R;
     nvector<uniform_shaft> shaft_matrices;
@@ -41,16 +42,27 @@ int main(int argc, char** argv){
 */
         if ( csv.getfield(0).compare("_linear_bearing") == 0 ){
              double k = stod(csv.getfield(1)); 
-             linear_bearing lbr(k);
+             double d = stod(csv.getfield(2)); 
+             linear_bearing lbr(k,d);
              R.append(lbr);
+             //////cout << R.D;
         }
 
         if ( csv.getfield(0).compare("_disk") == 0 ){
              double m = stod(csv.getfield(1)); 
              double Jp = stod(csv.getfield(2)); 
              double Jd = stod(csv.getfield(3)); 
+             double unb = stod(csv.getfield(4)); 
+             double phase = stod(csv.getfield(5)); 
+             phase *= M_PI / 180.;
              disk d(m, Jp, Jd);
              R.append(d);
+             int node = R.K.size() / 4;
+             //cout << node << '\n';
+             complex<double> imbalance(unb * cos(phase), unb * sin(phase));
+             //cout << imbalance << '\n';
+             unbalances.push_back(make_pair(node, imbalance));
+             global_mass += m;
         }
 
         if ( csv.getfield(0).compare("_uniform_shaft") == 0 ){
@@ -60,6 +72,7 @@ int main(int argc, char** argv){
              auto Ri = stod(csv.getfield(4)); 
              auto Ro = stod(csv.getfield(5)); 
              auto  n = stod(csv.getfield(6)); // number of the elements
+             global_mass += M_PI * (Ro * Ro - Ri * Ri) * L * rho;
 
              double elem_L = L / n;
              for(int i = 0; i < n; ++i){
@@ -73,6 +86,78 @@ int main(int argc, char** argv){
   
         if (csv.getfield(0).compare("_analysis") == 0 ){
             auto analysis_type = csv.getfield(1);
+            if (analysis_type.compare("unbalance") == 0){
+                auto max_speed = stod(csv.getfield(3));
+                fcomplex imag = {0., 1.};
+                double w_max = max_speed * 2 * M_PI / 60.;
+                int n = R.K.size();
+                fcomplex unb[n];
+                    for(int i = 0; i < n; ++i)
+                        unb[i] = {0., 0.};
+
+                for(auto& imb : unbalances){
+                    /////cout << imb.first << " " << imb.second << '\n';
+                    int node = imb.first;
+                    complex<double> val = imb.second;
+                    unb[4 * node - 3 - 1] = {val.real(), val.imag()};
+                    unb[4 * node - 2 - 1] = {val.imag(),-val.real()};
+                }
+                /******************************
+                    for(int i = 0; i < n; ++i)
+                     cout << unb[i].re << " " << unb[i].i << '\n';
+                *****************************/
+
+                nvector<double> v(n);
+                nvector<double> u(n);
+                for(int i = 1; i <= n/4; ++i){
+                    v(4*i-3) = 1.;
+                    u(4*i-2) = 1.;
+                }
+
+                //////  cout << "global mass: " << global_mass << endl;
+                double mass_y = 0.;
+                  for(int i = 1; i <=n; ++i)
+                      for(int j = 1; j <= n; ++j)
+                          mass_y += v(i) * R.M(i,j) * v(j);
+                //////  cout << "mass y: " << mass_y << endl;
+                double mass_z = 0.;
+                  for(int i = 1; i <=n; ++i)
+                      for(int j = 1; j <= n; ++j)
+                          mass_z += u(i) * R.M(i,j) * u(j);
+                  ////cout << "mass z: " << mass_z << endl;
+                //return -1;
+                double w = 0.0;
+                double dw = w_max / 100.;
+             /***************************************
+                cout << R.D;
+                return -1;
+             ***************************************/
+                while (w < w_max){
+                       fcomplex* F = -w * w * R.M + imag * w * (R.D + w * R.G) + R.K; 
+                       fcomplex b[n];
+                                 for(int i =0; i < n; ++i)
+                                     b[i] = {w * w * unb[i].re, w * w * unb[i].i};
+                          /***************
+                                 for(int i = 0; i < n; ++i)
+                                     printf("(%g,%g)\n", b[i].re, b[i].i);
+                          ***************/
+                       fcomplex* x = cgauss(n, F,b);
+                       double freq = w / (2 * M_PI);
+                       printf("%12.2f",freq);
+                       for(int i = 1; i <= n / 4; ++i)
+                           printf("%12.4f%12.4f",cabs(x[4 * i - 3 - 1]), cabs(x[4 * i - 2 - 1]));
+                       printf("\n");
+                       w += dw;
+                }
+             /*
+                int n = R.K.size();
+                for(int i=0; i<n; ++i){
+                    for(int j=0; j<n; ++j)
+                        printf("(%f,%f);",F[n*i+j].re, F[n*i+j].i);
+                    printf("\n");
+                }
+             */
+            }
             if (analysis_type.compare("maneuver") == 0){
                 auto speed = stod(csv.getfield(3));
                 auto ang_vel = stod(csv.getfield(5));

@@ -7,10 +7,11 @@
 
 class linear_bearing: public structure {
  public:
- linear_bearing(double k);
+ linear_bearing(double k, double d);
 
  private:
  double k;
+ double damp;
 };
 
 #endif
