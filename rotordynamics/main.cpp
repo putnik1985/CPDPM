@@ -45,7 +45,7 @@ int main(int argc, char** argv){
              double d = stod(csv.getfield(2)); 
              linear_bearing lbr(k,d);
              R.append(lbr);
-             ///cout << R.D;
+             //////cout << R.D;
         }
 
         if ( csv.getfield(0).compare("_disk") == 0 ){
@@ -128,11 +128,12 @@ int main(int argc, char** argv){
                 //return -1;
                 double w = 0.0;
                 double dw = w_max / 100.;
+             /***************************************
+                cout << R.D;
+                return -1;
+             ***************************************/
                 while (w < w_max){
                        fcomplex* F = -w * w * R.M + imag * w * (R.D + w * R.G) + R.K; 
-                       ////fcomplex* F = -w * w * R.M + imag * w *  w * R.G + R.K; 
-                       ////fcomplex* F = -w * w * R.M + imag * w * R.D + R.K; 
-                       /////fcomplex* F = cmult((imag * w),(imag * w)) * R.M  + R.K; 
                        fcomplex b[n];
                                  for(int i =0; i < n; ++i)
                                      b[i] = {w * w * unb[i].re, w * w * unb[i].i};

@@ -12,6 +12,7 @@ m(m), Jp(Jp), Jd(Jd)
   M(4,4) = Jd;
   
   K = Matrix<double>(dofs);
+  D = Matrix<double>(dofs);
 
   G = Matrix<double>(dofs);
   G(3,4) = Jp;

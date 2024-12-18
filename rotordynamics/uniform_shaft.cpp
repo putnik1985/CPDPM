@@ -9,6 +9,7 @@ uniform_shaft::uniform_shaft(double L, double rho, double E, double Ri, double R
  {
 	   unsigned int dofs = 8;
 	   K = Matrix<double>(dofs);
+	   D = Matrix<double>(dofs);
 	 
        auto J = M_PI * (pow(Ro, 4) - pow(Ri, 4))/4.;
        auto A = M_PI * (pow(Ro, 2) - pow(Ri, 2));
