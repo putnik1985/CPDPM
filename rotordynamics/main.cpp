@@ -92,12 +92,21 @@ int main(int argc, char** argv){
                 double w_max = max_speed * 2 * M_PI / 60.;
                 int n = R.K.size();
                 fcomplex unb[n];
+                    for(int i = 0; i < n; ++i)
+                        unb[i] = {0., 0.};
+
                 for(auto& imb : unbalances){
+                    /////cout << imb.first << " " << imb.second << '\n';
                     int node = imb.first;
                     complex<double> val = imb.second;
                     unb[4 * node - 3 - 1] = {val.real(), val.imag()};
                     unb[4 * node - 2 - 1] = {val.imag(),-val.real()};
                 }
+                /******************************
+                    for(int i = 0; i < n; ++i)
+                     cout << unb[i].re << " " << unb[i].i << '\n';
+                *****************************/
+
                 nvector<double> v(n);
                 nvector<double> u(n);
                 for(int i = 1; i <= n/4; ++i){
@@ -105,31 +114,37 @@ int main(int argc, char** argv){
                     u(4*i-2) = 1.;
                 }
 
-                  cout << "global mass: " << global_mass << endl;
+                //////  cout << "global mass: " << global_mass << endl;
                 double mass_y = 0.;
                   for(int i = 1; i <=n; ++i)
                       for(int j = 1; j <= n; ++j)
                           mass_y += v(i) * R.M(i,j) * v(j);
-                  cout << "mass y: " << mass_y << endl;
+                //////  cout << "mass y: " << mass_y << endl;
                 double mass_z = 0.;
                   for(int i = 1; i <=n; ++i)
                       for(int j = 1; j <= n; ++j)
                           mass_z += u(i) * R.M(i,j) * u(j);
-                  cout << "mass z: " << mass_z << endl;
-                return -1;
+                  ////cout << "mass z: " << mass_z << endl;
+                //return -1;
                 double w = 0.0;
                 double dw = w_max / 100.;
                 while (w < w_max){
-                       //fcomplex* F = -w*w * R.M + imag*w * (R.D + w * R.G) + R.K; 
-                       fcomplex* F = cmult((imag * w),(imag * w)) * R.M  + R.K; 
+                       fcomplex* F = -w * w * R.M + imag * w * (R.D + w * R.G) + R.K; 
+                       ////fcomplex* F = -w * w * R.M + imag * w *  w * R.G + R.K; 
+                       ////fcomplex* F = -w * w * R.M + imag * w * R.D + R.K; 
+                       /////fcomplex* F = cmult((imag * w),(imag * w)) * R.M  + R.K; 
                        fcomplex b[n];
                                  for(int i =0; i < n; ++i)
                                      b[i] = {w * w * unb[i].re, w * w * unb[i].i};
+                          /***************
+                                 for(int i = 0; i < n; ++i)
+                                     printf("(%g,%g)\n", b[i].re, b[i].i);
+                          ***************/
                        fcomplex* x = cgauss(n, F,b);
                        double freq = w / (2 * M_PI);
                        printf("%12.2f",freq);
                        for(int i = 1; i <= n / 4; ++i)
-                           printf("%12.4g",cabs(x[4 * i - 3 - 1]));
+                           printf("%12.4f%12.4f",cabs(x[4 * i - 3 - 1]), cabs(x[4 * i - 2 - 1]));
                        printf("\n");
                        w += dw;
                 }
