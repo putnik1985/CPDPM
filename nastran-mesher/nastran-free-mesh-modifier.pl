@@ -55,12 +55,12 @@ use Cwd qw(getcwd);
 				    $next_material = $words[1];
 			    }				
 		    }
-            if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP|CBEAM/){
+		 if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP|CBEAM|CBAR/){
 			    if ($next_element < $words[1]) {
 				    $next_element = $words[1];
 			    }
 
-            if ($words[0] =~ /[sS][pP][cC]/){
+            if ($words[0] =~ /SPC/){
 			    if ($next_spc < $words[1]) {
 				    $next_spc = $words[1];
 			    }
@@ -370,6 +370,18 @@ use Cwd qw(getcwd);
 		   ####print $_;
 	       grid_cbush_pinned_strut_point_to_set($_); 
            print "\$_grid_cbush_strut_point_to_set completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_free_end_bolt$/) {
+		   ####print $_;
+	       grid_free_end_bolt($_); 
+           print "\$_grid_free_end_bolt completed\n";		   
+       }		   
+
+	   if ($words[0] =~ /^_grid_fixed_end_bolt$/) {
+		   ####print $_;
+	       grid_fixed_end_bolt($_); 
+           print "\$_grid_fixed_end_bolt completed\n";		   
        }		   
 
 	}
@@ -1935,6 +1947,152 @@ ENDDATA";
 	     printf newfh "$nastran_path $fullname old=no news=no";
 	close newfh;
 	
+}
+
+sub create_free_end_bolt {
+	
+	my @words = split /,/,@_[0];
+	my($x0, $y0, $z0) = ($words[1], $words[2], $words[3]);
+	my $radius = $words[4];
+	my $length = $words[5]; 
+   
+	my $E = $words[6];
+	my $nu = $words[7];
+	my $rho = $words[8];
+	my ($nx, $ny, $nz) = ($words[9], $words[10], $words[11]);
+	my $head_radius = $words[12];
+	
+	my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+	$nx /= $mag;
+	$ny /= $mag;
+	$nx /= $mag;
+	my $x1 = $x0 + $length * $nx;
+	my $y1 = $y0 + $length * $ny;
+	my $z1 = $z0 + $length * $nz;
+	my $output_str = sprintf "\n\$_create_free_end_bolt\n";
+	push(@file_lines, $output_str);
+
+    $output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x0,$y0,$z0;
+	push(@file_lines, $output_str);
+	my $first_grid = $next_grid;
+	$next_grid++;
+    $output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x1,$y1,$z1;
+	push(@file_lines, $output_str);
+    my $second_grid = $next_grid;
+	$next_grid++;
+	
+	my ($rx, $ry, $rz) = &vector_normal($nx,$ny,$nz);
+    $output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first_grid,$second_grid,$rx,$ry,$rz;
+    push(@file_lines, $output_str);
+    $next_element++;
+	$output_str = sprintf "PBARL,$next_property,$next_material,MSCBML0,ROD,,,,,+\n+,$radius,0.0,\n";
+	push(@file_lines, $output_str);
+	$next_property++;
+    $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4g,\n",$next_material,$E,$nu,$rho;
+    push(@file_lines, $output_str);
+	$next_material++;
+	
+	my @grids;
+	while (my ($grid_id, $grid_input) = each %file_grids) {
+		my @words = split/,/,$grid_input;
+		my ($x, $y, $z) = ($words[3], $words[4], $words[5]);
+		my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
+		if ( $distance < $head_radius){
+			push(@grids, $grid_id);
+		}
+	}
+
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids;
+    
+	if (@grids < 1) {
+			$output_str = sprintf "\$RBE2,was not created for the $first_grid\n";
+	        push(@file_lines, $output_str);
+	        return;
+	}
+	
+	$output_str = sprintf "RBE2,%d,%d,123456,",$next_element,$first_grid;
+	push(@file_lines, $output_str);
+	for(my $k = 0; $k < $last; $k++) {
+			if ($current_field <= $rbe2_fields) {
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@file_lines, $output_str);
+				++$current_field;
+			} else {
+		        $output_str = sprintf "+\n";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "+,";
+				push(@file_lines, $output_str);
+		        $output_str = sprintf "%d,",$grids[$k];				
+				push(@file_lines, $output_str);
+                $current_field = 3; 				
+            }
+    }
+	$next_element++;
+}
+
+sub grid_free_end_bolt {
+	
+	       my @words = split /,/,@_[0];
+           my $list = $words[1];
+           my $bolt_radius = $words[2];
+           my $bolt_length = $words[3];
+           ## direction where to extend
+		   my $nx = $words[4];
+		   my $ny = $words[5];
+		   my $nz = $words[6];
+           my ($E, $nu, $rho) = ($words[7], $words[8], $words[9]);
+           my $head_radius = $words[10]; 		   
+  
+           open(gridsh, "<", $list) or die $!;
+		   		   
+ 	       while (<gridsh>) {
+			 if ($_ =~ /Global coordinates/){
+				 $_ =~ s/^\s+|\s+$//g; ## remove leading and trailing spaces
+				 my @words = split/\s+/,$_;
+                 my $x = $words[3];
+				 my $y = $words[4];
+				 my $z = $words[5];
+				 ####print "head: $head_radius\n";
+				 &create_free_end_bolt("_create_free_end_bolt,$x,$y,$z,$bolt_radius,$bolt_length,$nx,$ny,$nz,$E,$nu,$rho,$head_radius,");
+			 }
+		    }
+			close(gridsh);     
+            $file_update = 1;
+}
+
+sub grid_fixed_end_bolt {
+	
+	       my @words = split /,/,@_[0];
+           my $list = $words[1];
+           my $bolt_radius = $words[2];
+           my $bolt_length = $words[3];
+           ## direction where to extend
+		   my $nx = $words[4];
+		   my $ny = $words[5];
+		   my $nz = $words[6];
+           my ($E, $nu, $rho) = ($words[7], $words[8], $words[9]);
+           my $head_radius = $words[10]; 		   
+  
+           open(gridsh, "<", $list) or die $!;
+		   		   
+ 	       while (<gridsh>) {
+			 if ($_ =~ /Global coordinates/){
+				 $_ =~ s/^\s+|\s+$//g; ## remove leading and trailing spaces
+				 my @words = split/\s+/,$_;
+                 my $x = $words[3];
+				 my $y = $words[4];
+				 my $z = $words[5];
+				 ####print "head: $head_radius\n";
+				 &create_free_end_bolt("_create_free_end_bolt,$x,$y,$z,$bolt_radius,$bolt_length,$nx,$ny,$nz,$E,$nu,$rho,$head_radius,");
+				 my $grid = $next_grid - 1;
+	             my $output_str = sprintf "\nSPC,$next_spc,$grid,123456,\n";
+	             push(@file_lines, $output_str);				 
+			 }
+		    }
+			close(gridsh);     
+            $file_update = 1;
 }
 
 sub grid_translate {
