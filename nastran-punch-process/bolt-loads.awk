@@ -22,6 +22,7 @@ BEGIN{
 	type_number = type[label];
 	###print type_number;
 	####exit;
+	
 	printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq", "Elem", "MZZ-A", "MYY-A", "MZZ-B", "MYY-B", "Shear-Y", "Shear-Z", "Axial", "Torque")
 	count = 0
 	while (getline < file > 0){
@@ -51,6 +52,30 @@ BEGIN{
 						axial = $2
 						torque = $3
 					}
+
+					moment = sqrt(mza * mza + mya * mya);
+					if (max_moment[count] < moment) {
+					    max_moment[count] = moment;
+					}
+
+					moment = sqrt(mzb * mzb + myb * myb);
+					if (max_moment[count] < moment) {
+					    max_moment[count] = moment;
+					}
+					
+					shear = sqrt(shear_y * shear_y + shear_z * shear_z);
+					if (max_shear[count] < shear) {
+					    max_shear[count] = shear;
+					}
+
+					if (max_axial[count] < abs(axial)) {
+					    max_axial[count] = abs(axial);
+					}
+					
+					if (max_torque[count] < abs(torque)) {
+					    max_torque[count] = abs(torque);
+					}
+					
                     str = sprintf("%12d%12d%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n",case_number, 0, eid, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
 					####print str
 					id = count "," eid
@@ -83,6 +108,14 @@ BEGIN{
      	                      printf("%s", bolts[eid])
 						  }
 	                    
-                    }						
+                    }		
+
+                    printf("\n%16s%16s%16s%16s%16s\n","Subcase#", "Moment, lbf.in", "Shear, lbf", "Axial, lbf", "Torque, lbf.in");	
+                    for(i=1; i<=count; ++i)
+                     	printf("%16d%16.1f%16.1f%16.1f%16.1f\n", i, max_moment[i], max_shear[i], max_axial[i], max_torque[i]);				
+}
+
+function abs(x){
+ return (x>0) ? x : -x;
 }
 
