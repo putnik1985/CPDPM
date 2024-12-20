@@ -18,9 +18,10 @@ BEGIN{
 	label  = data["label"];
 	boltsf = data["bolts_id"]
 
-        ######print file, label, eid
+    ###print file, label, eid
 	type_number = type[label];
-	####print type_number;
+	###print type_number;
+	####exit;
 	printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq", "Elem", "MZZ-A", "MYY-A", "MZZ-B", "MYY-B", "Shear-Y", "Shear-Z", "Axial", "Torque")
 	count = 0
 	while (getline < file > 0){
@@ -53,10 +54,12 @@ BEGIN{
                     str = sprintf("%12d%12d%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n",case_number, 0, eid, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
 					####print str
 					id = count "," eid
-					###print id
+					##print id
 					bolts[id] = str
 					if (getline < file > 0){
 						eid = $1
+					} else {
+					  break;
 					}
 						
 				    }
