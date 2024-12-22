@@ -1,0 +1,25 @@
+set title "Rotor System \n Unbalance response"
+set xlabel "Frequency, Hz"
+set ylabel "Deflections" 
+plot 'unbalance-displacement.dat' using 1:2 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:3 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:4 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:5 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:6 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:7 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:8 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:9 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:10 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:11 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:12 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:13 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:14 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:15 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:16 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:17 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:18 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:19 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:20 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:21 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:22 title columnhead with lines,\
+     'unbalance-displacement.dat' using 1:23 title columnhead with lines

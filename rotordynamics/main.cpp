@@ -132,6 +132,29 @@ int main(int argc, char** argv){
                 cout << R.D;
                 return -1;
              ***************************************/
+                       char outputstr[MAXLINE];
+                       ofstream os;
+                       os.open("unbalance-displacement.dat",ios_base::out);
+                       if (!os) {
+                                cerr << "can not open unbalance-displacement.dat\n";
+                                return -1;
+                       }
+                       printf("%12s","Frequency,Hz");
+                       sprintf(outputstr,"%12s","Frequency,Hz");
+                       os << outputstr;
+                       for(int i = 1; i <= n / 4; ++i){
+                           char outputy[MAXLINE];
+                           char outputz[MAXLINE];
+                           sprintf(outputy,"point#%d-y",i);
+                           sprintf(outputz,"point#%d-z",i);
+                           printf("%12s%12s", outputy, outputz);
+                           sprintf(outputstr, "%12s%12s", outputy, outputz);
+                           os << outputstr;
+                       }
+                       printf("\n");
+                       sprintf(outputstr, "\n");
+                       os << outputstr;
+
                 while (w < w_max){
                        fcomplex* F = -w * w * R.M + imag * w * (R.D + w * R.G) + R.K; 
                        fcomplex b[n];
@@ -144,20 +167,43 @@ int main(int argc, char** argv){
                        fcomplex* x = cgauss(n, F,b);
                        double freq = w / (2 * M_PI);
                        printf("%12.2f",freq);
-                       for(int i = 1; i <= n / 4; ++i)
+                       sprintf(outputstr,"%12.2f",freq);
+                       os << outputstr;
+                       for(int i = 1; i <= n / 4; ++i){
                            printf("%12.4f%12.4f",cabs(x[4 * i - 3 - 1]), cabs(x[4 * i - 2 - 1]));
+                           sprintf(outputstr, "%12.4f%12.4f",cabs(x[4 * i - 3 - 1]), cabs(x[4 * i - 2 - 1]));
+                           os << outputstr;
+                       }
                        printf("\n");
+                       sprintf(outputstr, "\n");
+                       os << outputstr;
                        w += dw;
                 }
-             /*
-                int n = R.K.size();
-                for(int i=0; i<n; ++i){
-                    for(int j=0; j<n; ++j)
-                        printf("(%f,%f);",F[n*i+j].re, F[n*i+j].i);
-                    printf("\n");
+                os.close();
+
+                os.open("gnuplot-unbalance-displacement.dat",ios_base::out);
+                os << "set title \"Rotor System \\n Unbalance response\"" << endl;
+                os << "set xlabel \"Frequency, Hz\""<< endl;
+                os << "set ylabel \"Deflections\" " << endl;
+                sprintf(outputstr,"plot 'unbalance-displacement.dat' using 1:2 title columnhead with lines,\\\n");
+                os << outputstr;
+                sprintf(outputstr,"     'unbalance-displacement.dat' using 1:3 title columnhead with lines,\\\n");
+                os << outputstr;
+
+                for(int i = 2; i < n/4; ++i){
+                    sprintf(outputstr,"     'unbalance-displacement.dat' using 1:%d title columnhead with lines,\\\n", 2*i);
+                    os << outputstr;
+                    sprintf(outputstr,"     'unbalance-displacement.dat' using 1:%d title columnhead with lines,\\\n", 2*i+1);
+                    os << outputstr;
                 }
-             */
+                    sprintf(outputstr,"     'unbalance-displacement.dat' using 1:%d title columnhead with lines,\\\n", 2*(n/4));
+                    os << outputstr;
+                    sprintf(outputstr,"     'unbalance-displacement.dat' using 1:%d title columnhead with lines\n", 2*(n/4)+1);
+                    os << outputstr;
+                os.close();
+                system("gnuplot -persist -e \"call 'gnuplot-unbalance-displacement.dat'\"");
             }
+
             if (analysis_type.compare("maneuver") == 0){
                 auto speed = stod(csv.getfield(3));
                 auto ang_vel = stod(csv.getfield(5));
