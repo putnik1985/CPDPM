@@ -1,0 +1,5 @@
+set title "Rotor System \n Rotor Deflections under Maneuver"
+set xlabel "X"
+set ylabel "Deflections" 
+plot 'maneuver-displacement.dat' using 1:2 title columnhead with lines,\
+     'maneuver-displacement.dat' using 1:3 title columnhead with lines,\

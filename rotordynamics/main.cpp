@@ -256,6 +256,20 @@ int main(int argc, char** argv){
                     os << outputstr;
                 }
                     os.close();
+                os.open("gnuplot-maneuver-displacement.dat",ios_base::out);
+                if (!os) {
+                         cerr << "can not open gnuplot-maneuver-displacement.dat\n";
+                         return -1;
+                }
+                os << "set title \"Rotor System \\n Rotor Deflections under Maneuver\"" << endl;
+                os << "set xlabel \"X\""<< endl;
+                os << "set ylabel \"Deflections\" " << endl;
+                sprintf(outputstr,"plot 'maneuver-displacement.dat' using 1:2 title columnhead with lines,\\\n");
+                os << outputstr;
+                sprintf(outputstr,"     'maneuver-displacement.dat' using 1:3 title columnhead with lines,\\\n");
+                os << outputstr;
+                os.close();
+                system("gnuplot -persist -e \"call 'gnuplot-maneuver-displacement.dat'\""); 
                 cout << "\n";
                 printf("Bending Moments and Shear Forces:\n"); 
                 os.open("maneuver-shear-bending.dat",ios_base::out);
