@@ -3,16 +3,25 @@
 
 int main(int argc, char** argv)
 {
-	int n = 3;
-	double a[9] = {1., 0., 3.,
-		       0., 4., 0.,
-		       3., 0., 10.};
-
-	double b[3] = {4.,22.,42.};
+	int n = 5;
+	double a[25] = {0.71235, 0.33973, 0.28615, 0.30388, 0.29401,
+                       0.33973, 1.18585, -0.21846, -0.06685, -0.37360,
+                       0.28615, -0.21846, 0.18159, 0.27955, 0.38898,
+                       0.30388, -0.06685, 0.27955, 0.23195, 0.20496,
+                       0.29401, -0.37360, 0.38898, 0.20496, 0.46004};
+/*************
+	double a[25] = {1., 0., 0., 0., 0.,
+                         0., 2., 0., 0., 0.,
+                         0., 0., -1., 0., 0.,
+                         0., 0.,  0., 3., 0.,
+                         0., 0.,  0., 0.,-0.9};    
+*******************/
+	double b[5] = {4.,22.,42., 0., 0.};
 
 	double* x;
 
         double (*(*functions[])(int, double* ,double*))  = {gauss, rotation, hausholder, square_root};
+        double (*(*eigs[])(double*, int, double*, double*))  = {jacobi};
         double (*determinant[])(int, double*)  = {det_gauss, det_rotation, det_hausholder, det_square_root};
         char* messages[] = {"gauss", "rotation", "hausholder", "square_root"};
 
@@ -22,25 +31,27 @@ int main(int argc, char** argv)
 		if (strcmp("-r",argv[i]) == 0) method = 1;
 		if (strcmp("-h",argv[i]) == 0) method = 2;
 		if (strcmp("-s",argv[i]) == 0) method = 3;
+		if (strcmp("-j",argv[i]) == 0) method = 4;
 	}
-/*
-        switch (method){
-		case 1:
-			func = gauss;
-			break;
-		case 2:
-			func = rotation;
-			break;
-		case 3: 
-			func = hausholder;
-			break;
-		case 4:
-			func = square_root;
-			break;
-		default:
-			func = gauss;
-	}
-*/
+        if (method == 4) {
+            double d[n];
+            double v[n][n];
+            int iter; 
+            iter = (*eigs[0])(a, n, d, v);
+            printf("jacobi rotations: %d\n", iter);
+
+            printf("eigenvalues:\n");
+            for(int i=0; i<n; ++i)
+                printf("%12.6f\n",d[i]);
+
+            printf("eigenvectors:\n");
+            for(int i = 0; i < n; ++i){
+                for(int j = 0; j < n ; ++j)
+                    printf("%12.6f", v[i*n+j]);
+                printf("\n");
+            }
+            return 0;
+        }
 	x = (*functions[method])(n,a,b);
 	if ( x == NULL) 
 		return -1;

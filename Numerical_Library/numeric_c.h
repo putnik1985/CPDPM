@@ -7,6 +7,12 @@
 #include <string.h>
 #include <errno.h>
 #include <math.h>
+// this section is from the Numerical Reciepes in C
+#include "nrutil.h"
+#define ROTATE(a,i,j,k,l) g=a[i*n+j]; h=a[k*n+l]; a[i*n+j]=g-s*(h+g*tau);\
+                          a[k*n+l]=h+s*(g-h*tau);
+
+#define JACOBI_MAX_ITER 50
 
 typedef struct complex_number {
        double re;
@@ -42,5 +48,7 @@ fcomplex cmult(fcomplex a, fcomplex b);
 fcomplex cdiv(fcomplex a, fcomplex b);
 fcomplex conj(fcomplex a);
 double cabs(fcomplex a);
+
+int jacobi(double *a, int n, double *d, double *v);
 
 #endif
