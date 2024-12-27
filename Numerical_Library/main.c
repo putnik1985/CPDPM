@@ -35,16 +35,17 @@ int main(int argc, char** argv)
 	}
         if (method == 4) {
             double d[n];
-            double v[n][n];
+            double v[n * n];
             int iter; 
             iter = (*eigs[0])(a, n, d, v);
-            printf("jacobi rotations: %d\n", iter);
+            printf("\n                                         Jacobi Rotations Solution\n");
+            printf("\nJacobi rotations: %d\n", iter);
 
-            printf("eigenvalues:\n");
+            printf("\nEigenvalues:\n");
             for(int i=0; i<n; ++i)
                 printf("%12.6f\n",d[i]);
 
-            printf("eigenvectors:\n");
+            printf("\nEigenvectors:\n");
             for(int i = 0; i < n; ++i){
                 for(int j = 0; j < n ; ++j)
                     printf("%12.6f", v[i*n+j]);

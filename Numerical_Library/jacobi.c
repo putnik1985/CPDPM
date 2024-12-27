@@ -29,7 +29,6 @@ int jacobi(double *a, int n, double* d, double* v)
  }
 
   int nrot = 0;
-
   for(i=1; i<= JACOBI_MAX_ITER; ++i){
       sm = 0.;
       for(ip=0; ip < n-1; ip++){
@@ -87,6 +86,14 @@ int jacobi(double *a, int n, double* d, double* v)
                         for(j=0;j<n;++j){
                             ROTATE(v,j,ip,j,iq)
                         }
+/***************************************************************************************
+                        printf("iteration = %d\n",nrot);
+                        for(int i=0; i<n; ++i){
+                            for(int j=0; j<n; ++j)
+                                printf("%f,",v[i*n+j]);
+                            printf("\n");
+                        }
+***************************************************************************************/
                         ++(nrot);
               }
           }
