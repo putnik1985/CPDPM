@@ -8,7 +8,6 @@
 #include <errno.h>
 #include <math.h>
 // this section is from the Numerical Reciepes in C
-#include "nrutil.h"
 #define ROTATE(a,i,j,k,l) g=a[i*n+j]; h=a[k*n+l]; a[i*n+j]=g-s*(h+g*tau);\
                           a[k*n+l]=h+s*(g-h*tau);
 

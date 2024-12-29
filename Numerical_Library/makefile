@@ -1,9 +1,9 @@
 cxx = gcc
 compile = -c
 link = -o
-headers = numeric_c.h nrutil.h
-objects = main.o gauss.o rotation.o hausholder.o square_root.o complex_numbers.o jacobi.o nrutil.o
-libs = main.c gauss.c rotation.c hausholder.c square_root.c complex_numbers.c jacobi.c nrutil.c
+headers = numeric_c.h 
+objects = main.o gauss.o rotation.o hausholder.o square_root.o complex_numbers.o jacobi.o 
+libs = main.c gauss.c rotation.c hausholder.c square_root.c complex_numbers.c jacobi.c
 target = algebra
 
 $(target): $(objects) $(libs) 

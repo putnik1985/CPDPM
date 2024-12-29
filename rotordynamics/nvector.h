@@ -3,7 +3,6 @@
 
 #include "stl.h"
 
-
 template<typename T>
 class nvector: public vector<T>{ // numberig starts from the 1
 

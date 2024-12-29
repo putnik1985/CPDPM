@@ -1,6 +1,80 @@
 #include "Matrix.h"
 
 template<typename T>
+Matrix<T> transpose(const Matrix<T>& A){
+  int n = A.size();
+  Matrix<T> M(n);
+  for(int i=1; i<=n; ++i)
+      for(int j=1; j<=n; ++j)
+          M(i,j) = A(j,i);
+
+  return M;
+}
+
+template<typename T>
+Matrix<T> inverse(const Matrix<T>& A){
+  int n = A.size();
+  Matrix<T> M(n);
+  for(int i=1; i<=n; ++i)
+      M(i,i) = 1. / A(i,i);
+
+  return M;
+}
+
+template<typename T>
+nvector<T> sqrt(const nvector<T>& v){
+  int n = v.size();
+  nvector<T> vec(n);
+  for(int i=1; i<=n; ++i)
+      vec(i) = sqrt(v(i));
+
+  return vec;
+}
+
+template<typename T>
+Matrix<T> sqrt(const Matrix<T>& A){
+  int n = A.size();
+  Matrix<T> M(n);
+  for(int i=1; i<=n; ++i)
+      for(int j=1; j<=n; ++j)
+          M(i,j) = sqrt(A(i,j));
+
+  return M;
+}
+
+template<typename T>
+nvector<T> operator/(const nvector<T>& v, T a){
+  int n = v.size();
+  nvector<T> vec(n);
+
+  for(int i=1; i<=n; ++i)
+      vec(i) = v(i) / a;
+
+  return vec;
+}
+
+template<typename T>
+T* Matrix<T>::c_matrix(){
+   int n = this->size();
+   T* a = (T*)calloc(n*n, sizeof(T));
+   for(int i = 0; i < n; ++i)
+       for(int j = 0; j<n; ++j)
+           a[i*n+j] = (*this)(i+1, j+1);
+
+   return a;
+}
+
+template<typename T>
+Matrix<T>::Matrix(T* a, int dim):
+dimension(dim)
+{
+v.resize(dim*dim);
+  for(int i = 0; i < dim; ++i)
+      for(int j = 0; j < dim; ++j)
+          v[i*dim+j] = a[i*dim+j];
+}
+
+template<typename T>
 Matrix<T>::Matrix(int dim):dimension(dim){v.resize(dim*dim);}
 
 template<typename T>	
@@ -219,3 +293,29 @@ template<typename T>
 fcomplex* operator+(fcomplex* B, const Matrix<T>& A){
   return A + B;
 }
+/******************************************************
+template<typename T>
+int natural_modes(Matrix<T> M, Matrix<T> K){
+    int n = M.size();
+    T* a = (T*)calloc(n*n, sizeof(T));
+    T* v = (T*)calloc(n*n, sizeof(T));
+    T* d = (T*)calloc(n  , sizeof(T));
+
+    if (!a) {
+            cerr << "allocation failure a matrix\n";
+            return -1;
+    }
+
+    if (!v) {
+            cerr << "allocation failure v matrix\n";
+            return -1;
+    }
+
+    if (!d) {
+            cerr << "allocation failure d vector\n";
+            return -1;
+    }
+
+    return 0;
+}
+********************************************************/

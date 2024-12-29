@@ -33,6 +33,8 @@ public:
     vector<T> row(const int i);
     void transpose();
     Matrix& operator*=(double a);
+    Matrix(T* a, int n);
+    T* c_matrix();
 	
 };// Matrix class 
 
@@ -66,5 +68,20 @@ fcomplex* operator+(fcomplex* B, const Matrix<T>& A);
 
 template<typename T>
 ostream& operator<<(ostream& os, const Matrix<T>& M);
+
+template<typename T>
+Matrix<T> inverse(const Matrix<T>& A);
+
+template<typename T>
+nvector<T> sqrt(const nvector<T>& v);
+
+template<typename T>
+nvector<T> operator/(const nvector<T>& v, T a);
+
+template<typename T>
+Matrix<T> transpose(const Matrix<T>& A);
+
+template<typename T>
+Matrix<T> sqrt(const Matrix<T>& A);
 
 #endif

@@ -7,6 +7,9 @@
 #include "rotor.h"
 #include "nvector.h"
 #include "nvector.cpp"
+#include "analysis.h"
+#include "analysis.cpp"
+
 
 extern "C"{
 #include "../Numerical_Library/numeric_c.h"
@@ -86,6 +89,9 @@ int main(int argc, char** argv){
   
         if (csv.getfield(0).compare("_analysis") == 0 ){
             auto analysis_type = csv.getfield(1);
+            if (analysis_type.compare("natural_modes") == 0){
+                natural_modes(R.M, R.K, global_nodes);
+            }
             if (analysis_type.compare("unbalance") == 0){
                 auto max_speed = stod(csv.getfield(3));
                 fcomplex imag = {0., 1.};
