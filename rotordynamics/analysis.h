@@ -1,6 +1,7 @@
 #ifndef ANALYSIS_H
 #define ANALYSIS_H
 
+#define MAX_MODES 8 
 #include "Matrix.h"
 /////#include "Matrix.cpp"
 

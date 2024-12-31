@@ -48,21 +48,77 @@ int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes){
 
     vector<int>shapes;
 
-    cout << "Natural Frequencies, Hz\n";
-    for(const auto& x: frequencies) 
-        cout << x << endl;
-/****************************    
-    n = nodes.size();
-    for(int i=1; i<=n; ++i){
-        printf("%12.6f",nodes(i));
-        for(const auto& num:shapes){
-           printf("%12.6f%12.6f",modes(4*i-3,num), modes(4*i-2,num)); 
-        }
-        printf("\n");
+    ofstream os;
+    os.open("natural-frequencies.dat",ios_base::out);
+    if (!os){
+            cerr << "can not write to natural frequencies\n";
+            return -1;
     }
-*****************************/
+    os << "Natural Frequencies, Hz\n";
+    for(int mode = 1; mode <= MAX_MODES; ++mode)
+        os << frequencies(mode) << endl;
+    os.close();
+
+//    for(const auto& x: frequencies) 
+//        cout << x << endl;
+
+    os.open("natural-mode-shapes.dat",ios_base::out);
+    char outputstr[MAXLINE];
+
+    if (!os){
+            cerr << "can not write to natural modes\n";
+            return -1;
+    }
+    n = nodes.size();
+    sprintf(outputstr, "%24s", "X,m"); 
+    os << outputstr;
+    for(int mode = 1; mode <= MAX_MODES; ++mode){
+            char output1[MAXLINE];
+            char output2[MAXLINE];
+            sprintf(output1,"mode#%dY(%.1fHz)",mode,frequencies(mode));
+            sprintf(output2,"mode#%dZ(%.1fHz)",mode,frequencies(mode));
+            sprintf(outputstr, "%24s%24s", output1, output2); 
+            os << outputstr;
+    }
+    sprintf(outputstr, "\n");
+    os << outputstr;
+
+    for(int i=1; i<=n; ++i){
+        sprintf(outputstr, "%24.6f",nodes(i));
+        os << outputstr;
+        for(int mode = 1; mode <= MAX_MODES; ++mode){
+                sprintf(outputstr, "%24.6f%24.6f",modes(4*i-3,mode), modes(4*i-2,mode)); 
+                os << outputstr;
+        }
+        sprintf(outputstr,"\n");
+        os << outputstr;
+    }
+
     free(a);
     free(v);
     free(d);
+    os.close();
+
+                os.open("gnuplot-natural-mode-shapes.dat",ios_base::out);
+                os << "set title \"Rotor System \\n Mode Shapes\"" << endl;
+                os << "set xlabel \"X\""<< endl;
+                os << "set ylabel \"Deflections\" " << endl;
+                sprintf(outputstr,"plot 'natural-mode-shapes.dat' using 1:2 title columnhead with lines,\\\n");
+                os << outputstr;
+                sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:3 title columnhead with lines,\\\n");
+                os << outputstr;
+
+                for(int i = 2; i < MAX_MODES; ++i){
+                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines,\\\n", 2*i);
+                    os << outputstr;
+                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines,\\\n", 2*i+1);
+                    os << outputstr;
+                }
+                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines,\\\n", 2*MAX_MODES);
+                    os << outputstr;
+                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines\n", 2*MAX_MODES+1);
+                    os << outputstr;
+                os.close();
+                system("gnuplot -persist -e \"call 'gnuplot-natural-mode-shapes.dat'\"");
     return 0;
 }

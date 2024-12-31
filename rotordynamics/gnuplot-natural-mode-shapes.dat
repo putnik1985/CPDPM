@@ -1,0 +1,19 @@
+set title "Rotor System \n Mode Shapes"
+set xlabel "X"
+set ylabel "Deflections" 
+plot 'natural-mode-shapes.dat' using 1:2 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:3 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:4 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:5 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:6 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:7 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:8 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:9 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:10 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:11 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:12 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:13 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:14 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:15 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:16 title columnhead with lines,\
+     'natural-mode-shapes.dat' using 1:17 title columnhead with lines

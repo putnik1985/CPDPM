@@ -1,5 +1,25 @@
 #include "numeric_c.h"
 
+void eigsort(double* d, double *v, int n){
+
+     int k, j, i;
+     double p;
+     for(i=0; i<n-1; ++i){
+         p = d[k=i];
+         for(j=i+1; j<n; ++j)
+             if (d[j] <= p) p = d[k=j];
+         if (k != i) {
+             d[k] = d[i];
+             d[i] = p;
+             for(j=0; j<n; ++j) {
+                 p = v[j*n+i];
+                 v[j*n+i] = v[j*n+k];
+                 v[j*n+k] = p;
+             }
+         }
+      }
+}
+
 int jacobi(double *a, int n, double* d, double* v)
 {
  int j, iq, ip, i;
@@ -41,6 +61,7 @@ int jacobi(double *a, int n, double* d, double* v)
       if (sm == 0.) {
           free(z);
           free(b);
+          eigsort(d, v, n);
           return nrot;
       }
 
