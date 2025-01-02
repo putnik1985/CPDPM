@@ -1,0 +1,1 @@
+C:\plmapps\NX2000\NXNASTRAN\bin\nastranw C:\Users\ni097270\Analysis\CPDM\CPDPM\NASA-Open-Source\random.nas old=no news=no out=trash

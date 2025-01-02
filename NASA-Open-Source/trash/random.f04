@@ -1,0 +1,99 @@
+1
+ MACHINE                        MODEL                 OPERATING SYSTEM       Simcenter Nastran  BUILD DATE         RUN DATE
+ Intel64 Family 6 Mod           12th Gen Intel(R) Co  Windows 10             VERSION 1992.0037  SEP  1, 2021       JAN  2, 2025
+
+ 
+                            ===    S i m c e n t e r  N a s t r a n   E X E C U T I O N   S U M M A R Y    ===
+
+ Day_Time  Elapsed     I/O_Mb      Del_Mb     CPU_Sec    Del_CPU    Subroutine
+ 
+ 12:22:08     0:00        0.0         0.0         0.0        0.0    SEMTRN   BGN
+ 12:22:08     0:00        0.0         0.0         0.0        0.0    SEMTRN   END
+ 12:22:08     0:00        0.0         0.0         0.0        0.0    DBINIT   BGN
+      ** CURRENT PROJECT ID = ' "BLANK" '  ** CURRENT VERSION ID =          1
+
+     S U M M A R Y   O F   F I L E   A S S I G N M E N T   F O R   T H E   P R I M A R Y   D A T A B A S E     ( DBSNO   1, SCN20.2 )
+
+    ASSIGNED PHYSICAL FILE NAME (/ORIGINAL)      LOGICAL NAME     DBSET        STATUS    BUFFSIZE     CLUSTER SIZE      TIME STAMP
+    ---------------------------------------      ------------     -----        ------    --------     ------------     ------------
+    c:/users/.../temp/random.T19520_7.MASTER     MASTER           MASTER       NEW          32769           1          250102122208
+    c:/users/.../temp/random.T19520_7.DBALL      DBALL            DBALL        NEW          32769           1          250102122209
+    c:/users/.../temp/random.T19520_7.OBJSCR     OBJSCR           OBJSCR       NEW           8193           1          250102122210
+               **** MEM FILE ****                * N/A *          SCRATCH 
+    c:/.../temp/random.T19520_7.SCRATCH          SCRATCH          SCRATCH      NEW          32769           1          250102122211
+    c:/users/.../temp/random.T19520_7.SCR300     SCR300           SCRATCH      NEW          32769           1          250102122212
+ 12:22:08     0:00        7.0         7.0         0.0        0.0    DBINIT   END
+ 12:22:08     0:00        7.0         0.0         0.0        0.0    XCSA     BGN
+
+     S U M M A R Y   O F   F I L E   A S S I G N M E N T   F O R   T H E   D E L I V E R Y   D A T A B A S E   ( DBSNO   2, SCN20.2 )
+
+    ASSIGNED PHYSICAL FILE NAME (/ORIGINAL)      LOGICAL NAME     DBSET        STATUS    BUFFSIZE     CLUSTER SIZE      TIME STAMP
+    ---------------------------------------      ------------     -----        ------    --------     ------------     ------------
+    c:/plmapps/.../em64tntl/SSS.MASTERA          MASTERA          MASTER       OLD           8193           1          210901143252
+   /./sss.MASTERA                           
+    c:/plmapps/.../scnas/em64tntl/SSS.MSCOBJ     MSCOBJ           MSCOBJ       OLD           8193           1          210901143257
+   /./sss.MSCOBJ                            
+    c:/plmapps/.../scnas/em64tntl/SSS.MSCSOU     MSCSOU           MSCSOU       OLD           8193           1          210901143258
+   /./sss.MSCSOU                            
+ 12:22:08     0:00      622.0       615.0         0.1        0.1    XCSA     END
+
+
+ *** PARALLEL PROCESSES CPU INFORMATION (SECONDS) ***
+
+  MODULE     PROCESS-1     PROCESS-2     PROCESS-3     PROCESS-4     PROCESS-5     PROCESS-6     PROCESS-7     PROCESS-8
+  --------   -----------   -----------   -----------   -----------   -----------   -----------   -----------   -----------
+  ========   ===========   ===========   ===========   ===========   ===========   ===========   ===========   ===========
+  MODULE     PROCESS- 9    PROCESS-10    PROCESS-11    PROCESS-12    PROCESS-13    PROCESS-14    PROCESS-15    PROCESS-16
+  --------   -----------   -----------   -----------   -----------   -----------   -----------   -----------   -----------
+  ========   ===========   ===========   ===========   ===========   ===========   ===========   ===========   ===========
+  MODULE     PROCESS-17    PROCESS-18    PROCESS-19    PROCESS-20    PROCESS-21    PROCESS-22    PROCESS-23    PROCESS-24
+  --------   -----------   -----------   -----------   -----------   -----------   -----------   -----------   -----------
+  ========   ===========   ===========   ===========   ===========   ===========   ===========   ===========   ===========
+  
+ *** SYSTEM WARNING MESSAGE 6299 (PARCPU)
+     NO PARALLEL PROCESS CREATED
+
+ *** TOTAL MEMORY AND DISK USAGE STATISTICS ***
+
+ +---------- SPARSE SOLUTION MODULES -----------+         +------------- MAXIMUM DISK USAGE -------------+
+      HIWATER               SUB_DMAP        DMAP               HIWATER               SUB_DMAP        DMAP
+      (WORDS)   DAY_TIME      NAME         MODULE                 (MB)   DAY_TIME      NAME         MODULE
+            0   12:22:08    PREFACE     0  PREFACE              16.625   12:22:08    PREFACE     0  PREFACE 
+
+
+ *** DATABASE USAGE STATISTICS ***
+ 
+ +------------------ LOGICAL DBSETS ------------------+   +------------------------- DBSET FILES -------------------------+
+  DBSET      ALLOCATED   BLOCKSIZE        USED    USED     FILE       ALLOCATED     HIWATER       HIWATER  I/O TRANSFERRED
+              (BLOCKS)     (WORDS)    (BLOCKS)       %                 (BLOCKS)    (BLOCKS)          (MB)             (GB)
+ 
+  MASTER          5000       32768          59    1.18     MASTER          5000          59        14.750            0.576
+  DBALL        2000000       32768           4    0.00     DBALL        2000000           4         1.000            0.002
+  OBJSCR          5000        8192           6    0.12     OBJSCR          5000           6         0.375            0.002
+  SCRATCH      4011678       32768          13    0.00    (MEMFILE        11678          11         2.750            0.000)
+                                                           SCRATCH      2000000           1         0.250            0.000
+                                                           SCR300       2000000           1         0.250            0.000
+                                                                                                            ==============
+                                                                                                     TOTAL:          0.580
+ 
+ *** BUFFER POOL AND SCRATCH 300 USAGE STATISTICS ***
+ 
+ +----------------- BUFFER POOL -----------------+      +-------------------------- SCRATCH 300 --------------------------+ 
+   OPTION        BLOCKS      BLOCKS      BLOCKS           OPTION    HIWATER               SUB_DMAP        DMAP     OPN/CLS
+  SELECTED     ALLOCATED     REUSED     RELEASED         SELECTED  (BLOCKS)   DAY_TIME      NAME         MODULE    COUNTER
+  GINO,EXEC       11674        6883           0              2           1    12:22:08    PREFACE     0  PREFACE       0
+
+
+ *** SUMMARY OF PHYSICAL FILE I/O ACTIVITY ***
+
+ ASSIGNED PHYSICAL FILE NAME                                   RECL (BYTES)  READ/WRITE COUNTS   WSIZE  (WNUM)  MAP-I/O CNT
+ ------------------------------------------------------------  -----------  -------------------  -------------  -----------
+ c:/users/ni097270/appdata/local/temp/random.T19520_7.SCRATCH       262144          0/1            N/A            N/A          
+ c:/users/ni097270/appdata/local/temp/random.T19520_7.OBJSCR         65536          0/25           N/A            N/A          
+ c:/users/ni097270/appdata/local/temp/random.T19520_7.MASTER        262144          2/2358         N/A            N/A          
+ c:/users/ni097270/appdata/local/temp/random.T19520_7.DBALL         262144          2/9            N/A            N/A          
+ c:/users/ni097270/appdata/local/temp/random.T19520_7.SCR300        262144          0/1            N/A            N/A          
+ c:/plmapps/nx2000/nxnastran/scnas/em64tntl/SSS.MASTERA              65536         82/0            N/A            N/A          
+ c:/plmapps/nx2000/nxnastran/scnas/em64tntl/SSS.MSCOBJ               65536          8/0            N/A            N/A          
+ c:/plmapps/nx2000/nxnastran/scnas/em64tntl/SSS.MSCSOU               65536          6/0            N/A            N/A          
+ 
