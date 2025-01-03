@@ -77,7 +77,7 @@
                 * *                                 * *
                 * * * * * * * * * * * * * * * * * * * *
                 * * * * * * * * * * * * * * * * * * * *
-1                                                                           JANUARY   2, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     1
+1                                                                           JANUARY   3, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     1
                                                                                                                                     
 0        N A S T R A N    F I L E    A N D    S Y S T E M    P A R A M E T E R    E C H O                                           
 0                                                                                                                                   
@@ -88,7 +88,7 @@
      NASTRAN DIAGA=128 DIAGB=0 $(C:/PLMAPPS/NX2000/NXNASTRAN/CONF/NASTRAN.RCF[8])    
      NASTRAN REAL=4250271744 $(MEMORY LIMIT FOR MPI AND OTHER SPECIALIZED MODULES)   
      ASSIGN OUTPUT4='./save/fort11.test',UNIT=11                                     
-1                                                                           JANUARY   2, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     2
+1                                                                           JANUARY   3, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     2
                                                                                                                                     
 0        N A S T R A N    E X E C U T I V E    C O N T R O L    E C H O                                                             
 0                                                                                                                                   
@@ -100,12 +100,13 @@
      DIAG 8,13                                                                               
      $INCLUDE ./save/sol111z.v69                                                             
      COMPILE SEDRCVR, NOLIST, NOREF $                                                        
-     ALTER 'PJ1,QG,UG' $                                                                     
-     TYPE PARM,,I,Y,NFREQ $                                                                  
-     TYPE PARM,,I,Y,NSUB $                                                                   
-     TYPE PARM,,I,Y,NR31 $                                                                   
-     TYPE PARM,,I,Y,NF $                                                                     
-     TYPE PARM,,I,Y,ZERO $                                                                   
+     $$ALTER 'PJ1,QG,UG' $                                                                   
+     ALTER 'SDR2' $                                                                          
+     TYPE PARM,,I,N,NFREQ $                                                                  
+     TYPE PARM,,I,N,NSUB $                                                                   
+     TYPE PARM,,I,N,NR31 $                                                                   
+     TYPE PARM,,I,N,NF $                                                                     
+     TYPE PARM,,I,N,ZERO $                                                                   
      PARAML PJ1//'TRAILER'/1/S,N,NF3 $                                                       
      PARAML PJ1//'TRAILER'/2/S,N,NR3 $                                                       
      MATMOD PJ1,,,,,/PJ1C,/10 $                                                              
@@ -142,15 +143,15 @@
      MESSAGE //'' $                                                                          
      MESSAGE //'RESPONSE OUTPUT ARE RMS RESULTS' $                                           
      MESSAGE //'' $                                                                          
-     COMPILE CHCKINP NOLIST,NOREF $                                                          
-     (SEE NASTRAN SOURCE PROGRAM COMPILATION FOR LISTING OF DMAP SEQUENCE)
-     END $                                                                                   
-1                                                                           JANUARY   2, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     3
+1                                                                           JANUARY   3, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     3
                                                                                                                                     
 0        N A S T R A N    E X E C U T I V E    C O N T R O L    E C H O                                                             
 0                                                                                                                                   
                                                                                                                                     
                                                                                                                                     
+     COMPILE CHCKINP NOLIST,NOREF $                                                          
+     (SEE NASTRAN SOURCE PROGRAM COMPILATION FOR LISTING OF DMAP SEQUENCE)
+     END $                                                                                   
      COMPILE SUBDMAP=FINT,NOLIST,NOREF $                                                     
      (SEE NASTRAN SOURCE PROGRAM COMPILATION FOR LISTING OF DMAP SEQUENCE)
      END $                                                                                   
@@ -159,12 +160,90 @@
      END $                                                                                   
      $END OF INCLUDE FILE ./save/sol111z.v69                                                 
      CEND                                                                                    
- *** USER FATAL MESSAGE 802 (CKALTR)
-     NO MATCH WAS FOUND FOR STRING1.
-     SUBDMAP: SEDRCVR   SOUIN: MSCSOU    DMAP LINE NUMBER K1:       0  DMAP LINE NUMBER K2:       0
-       ALTER: ALTER 'PJ1,QG,UG' $                                                 TYPE
+1                                                                           JANUARY   3, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     4
+                                                                                                                                    
+0                                                                                                                                   
+0        N A S T R A N   S O U R C E   P R O G R A M   C O M P I L A T I O N             SUBDMAP  =  SEDRCVR                        
+     DMAP-DMAP INSTRUCTION                                                                                                          
+      OLD NO.  NEW NO.   ( *I* = INSERTED,   *D* = DELETED )                                                                        
+ *** USER WARNING MESSAGE 1 (XGPIDG)
+     POSSIBLE ERROR IN DMAP INSTRUCTION MATMOD     INSTRUCTION NO. 114
+     THE LAST   11 INPUT DATA BLOCK(S) ARE NOT SPECIFIED AND WILL BE ASSUMED TO BE PURGED.
+ *** USER WARNING MESSAGE 1 (XGPIDG)
+     POSSIBLE ERROR IN DMAP INSTRUCTION ADD5       INSTRUCTION NO. 115
+     THE LAST    1 INPUT DATA BLOCK(S) ARE NOT SPECIFIED AND WILL BE ASSUMED TO BE PURGED.
+1                                                                           JANUARY   3, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     5
+                                                                                                                                    
+0                                                                                                                                   
+0                                                                                                                                   
+                                                                                                                                    
+                                                                                                                                    
+ *** USER FATAL MESSAGE 22 (XGPIDG)
+     ERROR IN DMAP INSTRUCTION ADD        INSTRUCTION NO. 117
+     DATA BLOCK NAMED PJ1RR MUST BE DEFINED PRIOR TO THIS INSTRUCTION
+ *** USER FATAL MESSAGE 22 (XGPIDG)
+     ERROR IN DMAP INSTRUCTION PARTN      INSTRUCTION NO. 121
+     DATA BLOCK NAMED PJ1R MUST BE DEFINED PRIOR TO THIS INSTRUCTION
+ *** SYSTEM INFORMATION MESSAGE 781 (CGPIB)
+     SUBDMAP SEDRCVR  HAS GENERATED ONE OR MORE FATAL ERROR(S) (SEE ABOVE MESSAGES)--NOGO =        2
+1                                                                           JANUARY   3, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     6
+                                                                                                                                    
+0                                                                                                                                   
+0        N A S T R A N   S O U R C E   P R O G R A M   C O M P I L A T I O N             SUBDMAP  =  CHCKINP                        
+     DMAP-DMAP INSTRUCTION                                                                                                          
+      NO.                                                                                                                           
+ *** USER FATAL MESSAGE 73 (XGPIDG)
+     THE PARAMETER NAMED NREQ IS UNDEFINED
+ *** USER WARNING MESSAGE 1 (XGPIDG)
+     POSSIBLE ERROR IN DMAP INSTRUCTION MATMOD     INSTRUCTION NO.  29
+     THE LAST   11 INPUT DATA BLOCK(S) ARE NOT SPECIFIED AND WILL BE ASSUMED TO BE PURGED.
+ *** USER FATAL MESSAGE 10 (XGPIDG)
+     ERROR IN DMAP INSTRUCTION MERGE      INSTRUCTION NO.  30
+     ILLEGAL INPUT DATA BLOCK SPECIFICATION.
+ *** SYSTEM INFORMATION MESSAGE 781 (CGPIB)
+     SUBDMAP CHCKINP  HAS GENERATED ONE OR MORE FATAL ERROR(S) (SEE ABOVE MESSAGES)--NOGO =        2
+1                                                                           JANUARY   3, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     7
+                                                                                                                                    
+0                                                                                                                                   
+0        N A S T R A N   S O U R C E   P R O G R A M   C O M P I L A T I O N             SUBDMAP  =  FINT                           
+     DMAP-DMAP INSTRUCTION                                                                                                          
+      NO.                                                                                                                           
+ *** USER FATAL MESSAGE 13 (XGPIDG)
+     ERROR IN DMAP INSTRUCTION TABLE      INSTRUCTION NO.   2
+     DMAP INSTRUCTION NOT IN MODULE LIBRARY.
+ *** USER WARNING MESSAGE 216 (PRER2V)
+     VARIABLE NAME EXCEEDS 8 CHARACTERS AT POSITION 15  OF  SUBDMAP   STATEMENT .
+     VARIABLE NAME IS TRUNCATED TO  NSUBMATG.
+     RESULTANT PROCESSING MAY BE INCORRECT OR AMBIGUOUS.
+     *** COMPILATION DIAGNOSTIC INFORMATION ***
+        1. STATEMENT TYPE: SUBDMAP STATEMENT
+        2. SUBDMAP STATEMENT SUBTYPE: NFNS    
+        3. DMAP SEQUENCE NUMBER:            7
+        4. STATEMENT: 
+            NFNS = NFREQ*NSUBMATGEN ,/ONEX/4/3/NFNS/0/1/NFNS/1/NFREQ/3
+ *** USER FATAL MESSAGE 213 (PRER2O)
+     BINARY OPERATOR   PRECEDED BY  OPERATOR  AT POSITION  27  OF  SUBDMAP   STATEMENT
+     *** COMPILATION DIAGNOSTIC INFORMATION ***
+        1. SAME AS PREVIOUS COMPILATION DIAGNOSTIC
+ *** SYSTEM INFORMATION MESSAGE 781 (CGPIB)
+     SUBDMAP FINT     HAS GENERATED ONE OR MORE FATAL ERROR(S) (SEE ABOVE MESSAGES)--NOGO =        2
+1                                                                           JANUARY   3, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     8
+                                                                                                                                    
+0                                                                                                                                   
+0        N A S T R A N   S O U R C E   P R O G R A M   C O M P I L A T I O N             SUBDMAP  =  CALCRMS                        
+     DMAP-DMAP INSTRUCTION                                                                                                          
+      NO.                                                                                                                           
+ *** USER WARNING MESSAGE 1 (XGPIDG)
+     POSSIBLE ERROR IN DMAP INSTRUCTION MATMOD     INSTRUCTION NO.   2
+     THE LAST   11 INPUT DATA BLOCK(S) ARE NOT SPECIFIED AND WILL BE ASSUMED TO BE PURGED.
+1                                                                           JANUARY   3, 2025  SIMCENTER NASTRAN  9/ 1/21   PAGE     9
+                                                                                                                                    
+0                                                                                                                                   
+0                                                                                                                                   
+                                                                                                                                    
+                                                                                                                                    
  *** SYSTEM INFORMATION MESSAGE 480 (XSEMIN)
-     JOB TERMINATED DUE TO ABOVE ERROR(S) IN THE FILE MANAGEMENT SECTION.
+     JOB TERMINATED DUE TO ABOVE ERRORS IN THE DMAP COMPILER (XGPI)
 0FATAL ERROR
 1                                        * * * END OF JOB * * *
  

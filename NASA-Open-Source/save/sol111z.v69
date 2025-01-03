@@ -1,5 +1,6 @@
 compile sedrcvr, nolist, noref $
-alter 'pj1,qg,ug' $
+$$alter 'pj1,qg,ug' $
+alter 'SDR2' $
 
 type parm,,I,N,nfreq $
 type parm,,I,N,nsub $
