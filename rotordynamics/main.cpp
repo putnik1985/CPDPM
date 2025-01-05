@@ -91,6 +91,7 @@ int main(int argc, char** argv){
             auto analysis_type = csv.getfield(1);
             if (analysis_type.compare("natural_modes") == 0){
                 natural_modes(R.M, R.K, global_nodes);
+                cout << "Natural Modes Analysis Completed\n";
             }
             if (analysis_type.compare("unbalance") == 0){
                 auto max_speed = stod(csv.getfield(3));
@@ -145,7 +146,7 @@ int main(int argc, char** argv){
                                 cerr << "can not open unbalance-displacement.dat\n";
                                 return -1;
                        }
-                       printf("%12s","Frequency,Hz");
+                       ///printf("%12s","Frequency,Hz");
                        sprintf(outputstr,"%12s","Frequency,Hz");
                        os << outputstr;
                        for(int i = 1; i <= n / 4; ++i){
@@ -153,11 +154,11 @@ int main(int argc, char** argv){
                            char outputz[MAXLINE];
                            sprintf(outputy,"point#%d-y",i);
                            sprintf(outputz,"point#%d-z",i);
-                           printf("%12s%12s", outputy, outputz);
+                           ////printf("%12s%12s", outputy, outputz);
                            sprintf(outputstr, "%12s%12s", outputy, outputz);
                            os << outputstr;
                        }
-                       printf("\n");
+                       ////printf("\n");
                        sprintf(outputstr, "\n");
                        os << outputstr;
 
@@ -172,15 +173,15 @@ int main(int argc, char** argv){
                           ***************/
                        fcomplex* x = cgauss(n, F,b);
                        double freq = w / (2 * M_PI);
-                       printf("%12.2f",freq);
+                       ////printf("%12.2f",freq);
                        sprintf(outputstr,"%12.2f",freq);
                        os << outputstr;
                        for(int i = 1; i <= n / 4; ++i){
-                           printf("%12.4f%12.4f",cabs(x[4 * i - 3 - 1]), cabs(x[4 * i - 2 - 1]));
+                           ///printf("%12.4f%12.4f",cabs(x[4 * i - 3 - 1]), cabs(x[4 * i - 2 - 1]));
                            sprintf(outputstr, "%12.4f%12.4f",cabs(x[4 * i - 3 - 1]), cabs(x[4 * i - 2 - 1]));
                            os << outputstr;
                        }
-                       printf("\n");
+                       ///printf("\n");
                        sprintf(outputstr, "\n");
                        os << outputstr;
                        w += dw;
@@ -208,6 +209,7 @@ int main(int argc, char** argv){
                     os << outputstr;
                 os.close();
                 system("gnuplot -persist -e \"call 'gnuplot-unbalance-displacement.dat'\"");
+                cout << "Unbalance Response Analysis Completed\n";
             }
 
             if (analysis_type.compare("maneuver") == 0){
@@ -249,15 +251,15 @@ int main(int argc, char** argv){
                          cerr << "can not open file: maneuver-displacement.dat\n";
                          return -1;
                 }
-                printf("Maneuver %.2f rad/sec at %.2f, rpm\n", ang_vel, speed); 
-                printf("\n%12s%12s%12s\n", "X,m", "Y,m", "Z,m"); 
+                ///printf("Maneuver %.2f rad/sec at %.2f, rpm\n", ang_vel, speed); 
+                ///printf("\n%12s%12s%12s\n", "X,m", "Y,m", "Z,m"); 
                 char outputstr[MAXLINE];
                 sprintf(outputstr, "%12s%12s%12s\n", "X,m", "Y,m", "Z,m"); 
                 os << outputstr;
 
                 global_nodes.push_back(x0);
                 for(int i=1; i <= global_nodes.size(); ++i){
-                    printf("%12.4f%12.4f%12.4f\n",global_nodes(i), x[4 * i - 3 - 1], x[4 * i - 2 - 1]);
+                    ///printf("%12.4f%12.4f%12.4f\n",global_nodes(i), x[4 * i - 3 - 1], x[4 * i - 2 - 1]);
                     sprintf(outputstr, "%12.4f%12.4f%12.4f\n",global_nodes(i), x[4 * i - 3 - 1], x[4 * i - 2 - 1]);
                     os << outputstr;
                 }
@@ -276,14 +278,14 @@ int main(int argc, char** argv){
                 os << outputstr;
                 os.close();
                 system("gnuplot -persist -e \"call 'gnuplot-maneuver-displacement.dat'\""); 
-                cout << "\n";
-                printf("Bending Moments and Shear Forces:\n"); 
+                ////cout << "\n";
+                ///printf("Bending Moments and Shear Forces:\n"); 
                 os.open("maneuver-shear-bending.dat",ios_base::out);
                 if (!os) {
                          cerr << "can not open file: maneuver-displacement.dat\n";
                          return -1;
                 }
-                printf("\n%12s%12s%12s%12s%12s\n","X,m", "Qy,kgs", "Qz,kgs", "My,kgs.m", "Mz,kgs.m");
+                ///printf("\n%12s%12s%12s%12s%12s\n","X,m", "Qy,kgs", "Qz,kgs", "My,kgs.m", "Mz,kgs.m");
                 sprintf(outputstr, "%12s%12s%12s%12s%12s\n","X,m", "Qy,kgs", "Qz,kgs", "My,kgs.m", "Mz,kgs.m");
                 os << outputstr;
                 auto elem = shaft_matrices.size();
@@ -297,16 +299,17 @@ int main(int argc, char** argv){
                             }
 
                     load = us.K * u;
-                    printf("%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(i), load(1), load(2), load(3), load(4));
+                ////    printf("%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(i), load(1), load(2), load(3), load(4));
                     sprintf(outputstr,"%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(i), load(1), load(2), load(3), load(4));
                     os << outputstr;
                     sprintf(outputstr,"%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(i+1), load(1), load(2), load(3), load(4));
                     os << outputstr;
                 }
-                    printf("%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(elem+1), load(5), load(6), load(7), load(8));
+                ////    printf("%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(elem+1), load(5), load(6), load(7), load(8));
                     sprintf(outputstr,"%12.4f%12.1f%12.1f%12.1f%12.1f\n", global_nodes(elem+1), load(5), load(6), load(7), load(8));
                     os << outputstr;
                     os.close();
+                    cout << "Maneuver analysis completed\n";
             }
         }
     } // end of the cycle over the commands
