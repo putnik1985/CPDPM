@@ -33,6 +33,7 @@ use Cwd qw(getcwd);
 ##	printf "\n";
 
 	my %file_grids;
+	my %file_cbars;
 	my @file_lines;
 	
 	open(gridh,'<',$mesh_file);
@@ -45,6 +46,13 @@ use Cwd qw(getcwd);
 				 }
                  $file_grids{$words[1]} = $_;				 
 			 }
+
+			 if ($words[0] =~ /^CBAR/){
+				 ######print $words[1] . $_ ;
+                 $file_cbars{$words[1]} = $_;				 
+			 }
+
+
             if ($words[0] =~ /PSOLID|PBUSH|PSHELL|PBEAML|PBAR/){
 		        if ($next_property < $words[1]) {
 				    $next_property = $words[1];
@@ -384,6 +392,12 @@ use Cwd qw(getcwd);
            print "\$_grid_fixed_end_bolt completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_cbar_modify_properties$/) {
+		   ####print $_;
+	       cbar_modify_properties($_); 
+           print "\$_cbar_modify_properties completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -410,6 +424,64 @@ use Cwd qw(getcwd);
 		     print $_;
 		}
     }
+	
+sub cbar_modify_properties {
+	
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my $nastran_card = $words[2];
+		   my $E = $words[3];
+		   my $nu = $words[4];
+		   my $rho = $words[5];
+		   
+		   $nastran_card =~ s/;/,/g;
+           my @commands = split/\\n/,$nastran_card;
+
+	
+	my $output_str = sprintf "\n\$_cbar_modify_properties output:\n";
+	push(@file_lines, $output_str);	
+
+	
+	for (@commands) {
+	     $_ =~ s/prop/$next_property/g;
+		 $_ =~ s/mat/$next_material/g;
+	     push(@file_lines, $_);
+		 push(@file_lines,"\n");
+	}	
+    $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4g,\n",$next_material,$E,$nu,$rho;
+	push(@file_lines, $output_str);
+
+	open(fh1, '<', $list);
+       while(<fh1>){
+     	 $_ =~ s/^\s+|\s+$//g; ## remove leading and trailing spaces
+		 my @words = split/\s+/,$_;
+         if ($words[0] =~ /^[1-9]/){
+             ###print $words[0] . "\n";
+			 my @line = split/,/,$file_cbars{$words[0]};
+			 ####print $file_cbars{$words[0]} . "\n";
+			 $line[2] = $next_property;
+			 $file_cbars{$words[0]} = join(",",@line);
+		 }			 
+	   }
+    close(fh1);    		
+
+#    while (my($key, $value) = each %file_cbars){
+#		print $value . "\n";
+#	}
+#    return;
+	
+    for(my $NR = 0; $NR < @file_lines; $NR++){
+		my @words = split/,/,$file_lines[$NR];
+		if ($words[0] =~ /^CBAR/){
+			$file_lines[$NR] = $file_cbars{$words[1]};
+		}
+	}
+			
+	$next_property++;
+	$next_material++;
+	$file_update = 1;
+}	
+	
 sub grid_create_cbush {
 	
 	       my @words = split /,/,@_[0];
@@ -1997,7 +2069,9 @@ sub create_free_end_bolt {
 		my @words = split/,/,$grid_input;
 		my ($x, $y, $z) = ($words[3], $words[4], $words[5]);
 		my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
-		if ( $distance < $head_radius){
+		my $point = "$x,$y,$z,";
+        my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,"; 
+		if ( $distance < $head_radius and &within_plane($point,$plane)){
 			push(@grids, $grid_id);
 		}
 	}
