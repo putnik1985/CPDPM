@@ -1720,6 +1720,7 @@ sub grid_create_rbe2_from_list {
             }
 
     }
+	$file_update = 1;
 }
 
 sub grid_rotate {
