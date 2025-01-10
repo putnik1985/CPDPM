@@ -8,148 +8,148 @@ type parm,,I,N,nr31 $
 type parm,,I,N,nf $
 type parm,,I,N,zero $
 
-paraml pj1//'trailer'/1/s,n,nf3 $
-paraml pj1//'trailer'/2/s,n,nr3 $
+paraml pj1//'trailer'/1/s,n,nf3 $ nf3 is a number of columns in PJ1
+paraml pj1//'trailer'/2/s,n,nr3 $ nr3 is a number of rows in PJ1
 
-matmod pj1,,,,,/pj1c,/10 $
-add5 pj1,pj1c,,/pj1rr/(0.5,0.0)/(0.5,0.0) $
-modtrl pj1rr/////1 $
-add pj1rr,/pj1rr $
+$matmod pj1,,,,,/pj1c,/10 $
+$add5 pj1,pj1c,,/pj1rr/(0.5,0.0)/(0.5,0.0) $
+$modtrl pj1rr/////1 $
+$add pj1rr,/pj1rr $
 
-nr31 = nr3-1 $
-nf = nf3/3 $
+$nr31 = nr3-1 $
+$nf = nf3/3 $
 
-matgen ,/pj11/6/nr3/nr31/nr3 $
-partn pj1r,,pj11/,pjj1,,/1 $
-trnsp pjj1/pjj1t $
+$matgen ,/pj11/6/nr3/nr31/nr3 $
+$partn pj1r,,pj11/,pjj1,,/1 $
+$trnsp pjj1/pjj1t $
 
 
-zero=-nf $
-file psdt=append $
-do while (zero<2*nf) 
-   zero = zero + nf $
-   matgen ,/pjcol/6/nf3/zero/nf/nf3 $
-   partn pjj1t,,pjcol/,pjj1c,,/1 $
-   append pjj1c,/psdt/2 $
-enddo 
+$zero=-nf $
+$file psdt=append $
+$do while (zero<2*nf) 
+$   zero = zero + nf $
+$   matgen ,/pjcol/6/nf3/zero/nf/nf3 $
+$   partn pjj1t,,pjcol/,pjj1c,,/1 $
+$   append pjj1c,/psdt/2 $
+$enddo 
 
-matprn psdt// $
+$matprn psdt// $
 
-paraml ug//'trailer'/1/s,n,nfns $
-paraml ol2//'trailer'/1/s,n,nfreq $
-nsub = nfns/nfreq $
-tabpt ol2// $
+$paraml ug//'trailer'/1/s,n,nfns $
+$paraml ol2//'trailer'/1/s,n,nfreq $
+$nsub = nfns/nfreq $
+$tabpt ol2// $
 
-call chckinpt psdt/psd/nfreq/nsub $
-call fint psd,ol2/psdint/nfreq/nsub $
+$call chckinpt psdt/psd/nfreq/nsub $
+$call fint psd,ol2/psdint/nfreq/nsub $
 
-drmh1  ,,,oes1,/,,,,tstress,mstress,,/ $
-call calcrms mstress,psdint/strsrms $
+$drmh1  ,,,oes1,/,,,,tstress,mstress,,/ $
+$call calcrms mstress,psdint/strsrms $
 
-drmh3  ,,,,,tstress,strsrms,,,,/,,oes1new,/'statics' $
+$drmh3  ,,,,,tstress,strsrms,,,,/,,oes1new,/'statics' $
 
-equivx oes1new/oes1/-1 $
-output4 strsrms//-1/11 $
+$equivx oes1new/oes1/-1 $
+$output4 strsrms//-1/11 $
 
-sort2=false $
-app1='freqresp' $
+$sort2=false $
+$app1='freqresp' $
 
-message //'' $
-message //'response output are rms results' $
-message //'' $
+$message //'' $
+$message //'response output are rms results' $
+$message //'' $
 
-compile chckinp nolist,noref $
-subdmap chckinpt psd/psdt/nfreq/nsub $
-type parm,,I,n,nfreq,nsub,nfns,i,j $
+$compile chckinp nolist,noref $
+$subdmap chckinpt psd/psdt/nfreq/nsub $
+$type parm,,I,n,nfreq,nsub,nfns,i,j $
 
-paraml psd//'trailer'/1/s,n,nscol $
-paraml psd//'trailer'/2/s,n,nsrow $
+$paraml psd//'trailer'/1/s,n,nscol $
+$paraml psd//'trailer'/2/s,n,nsrow $
 
-if (nfreq<>nsrow) then $
-    message //'' $
-	message //'error: number of rows in psd matrix is' $
-	message //'       not an equal to the number of frequencies' $
- 	message //'       number of rows:  '/nsrow $
-	message //'       number of frequencies:'/nreq $
- 	message //'' $
-	exit $
+$if (nfreq<>nsrow) then $
+$    message //'' $
+$	message //'error: number of rows in psd matrix is' $
+$	message //'       not an equal to the number of frequencies' $
+$ 	message //'       number of rows:  '/nsrow $
+$	message //'       number of frequencies:'/nreq $
+$ 	message //'' $
+$	exit $
 	
-endif $
+$endif $
 
-if (nsub<>nscol) then $	
-    message //'' $
-	message //'error: number of columns in psd matrix is' $
-	message //'       not an equal to the number of input subcases' $
- 	message //'       number of columns:  '/nscol $
-	message //'       number of subcases:'/nsub $
- 	message //'' $
-	exit $
-endif $	
+$if (nsub<>nscol) then $	
+$    message //'' $
+$	message //'error: number of columns in psd matrix is' $
+$	message //'       not an equal to the number of input subcases' $
+$ 	message //'       number of columns:  '/nscol $
+$	message //'       number of subcases:'/nsub $
+$ 	message //'' $
+$	exit $
+$endif $	
 
-file psdt=append $
-purgex /psdt,,,,/ $
-i=1
-nfns=nsub*nfreq
-do while (i<=nsub)
-   j = nfreq*(i-1) + 1
-   matmod psd,,,,,/psdi,/1/i $
-   merge ,,psdi,,,,,pvec/psdx/1 $
-   append psdx,/psdt/2 $
-   i = i + 1
-enddo $
+$file psdt=append $
+$purgex /psdt,,,,/ $
+$i=1
+$nfns=nsub*nfreq
+$do while (i<=nsub)
+$   j = nfreq*(i-1) + 1
+$   matmod psd,,,,,/psdi,/1/i $
+$   merge ,,psdi,,,,,pvec/psdx/1 $
+$   append psdx,/psdt/2 $
+$   i = i + 1
+$enddo $
 
-return $
-end $
+$return $
+$end $
 
-compile subdmap=fint,nolist,noref $
-subdmap fint psd,fol/psdint/nfreq/nsub $
-table
-type parm,,i,n,nfreq,nsub,nfns,i,iwrd $
-type parm,,rs,n,freq1,freq2,freq3 $
-type parm,,cs,n,dfreq $
+$compile subdmap=fint,nolist,noref $
+$subdmap fint psd,fol/psdint/nfreq/nsub $
+$table
+$type parm,,i,n,nfreq,nsub,nfns,i,iwrd $
+$type parm,,rs,n,freq1,freq2,freq3 $
+$type parm,,cs,n,dfreq $
 
-file one=ovrwrt/onex=ovrwrt/lfreq=ovrwrt $
+$file one=ovrwrt/onex=ovrwrt/lfreq=ovrwrt $
 
-nfns = nfreq*nsubmatgen ,/onex/4/3/nfns/0/1/nfns/1/nfreq/3 $
-diagonal onex/one/'whole'/0.0 $
+$nfns = nfreq*nsubmatgen ,/onex/4/3/nfns/0/1/nfns/1/nfreq/3 $
+$diagonal onex/one/'whole'/0.0 $
 
-paraml fol//'dti'/0/3/s,n,freq2 $
-paraml fol//'dti'/0/4/s,n,freq3 $
-dfreq = cmplx(0.5*(freq3-freq2),0.0) $
-add5 one,,,,/dfcol/dfreq $
+$paraml fol//'dti'/0/3/s,n,freq2 $
+$paraml fol//'dti'/0/4/s,n,freq3 $
+$dfreq = cmplx(0.5*(freq3-freq2),0.0) $
+$add5 one,,,,/dfcol/dfreq $
 
-i = 2 $
-do while (i<nfreq) $
+$i = 2 $
+$do while (i<nfreq) $
 
-   freq1 = freq2 $
-   freq2 = freq3 $
-   iwrd = i+3 $
-   paraml fol//'dti'/0/iwrd/s,n,freq3 $
-   dfreq = cmplx((0.5*(freq3-freq1)),0.0) $
-   matgen ,/onex/4/3/nfns/0/1/nfns/i/nfreq/3 $
-   diagonal onex/one/'whole'/0.0 $
-   add5 one,dfcol,,,/ifreq/dfreq $
-   equivx ifreq/dfcol/-1 $
-   i = i + 1
-enddo $
+$   freq1 = freq2 $
+$   freq2 = freq3 $
+$   iwrd = i+3 $
+$   paraml fol//'dti'/0/iwrd/s,n,freq3 $
+$   dfreq = cmplx((0.5*(freq3-freq1)),0.0) $
+$   matgen ,/onex/4/3/nfns/0/1/nfns/i/nfreq/3 $
+$   diagonal onex/one/'whole'/0.0 $
+$   add5 one,dfcol,,,/ifreq/dfreq $
+$   equivx ifreq/dfcol/-1 $
+$   i = i + 1
+$enddo $
 
-   dfreq = cmplx(0.5*(freq3-freq2), 0.0) $
-   matgen ,/onex/4/3/nfns/0/1/nfns/nfreq/nfreq/3 $
-   diagonal onex/one/'whole'/0.0 $
-   add5 one,dfcol,,,/ifreq/dfreq $
-   equivx ifreq/dfcol/-1 $
+$   dfreq = cmplx(0.5*(freq3-freq2), 0.0) $
+$   matgen ,/onex/4/3/nfns/0/1/nfns/nfreq/nfreq/3 $
+$   diagonal onex/one/'whole'/0.0 $
+$   add5 one,dfcol,,,/ifreq/dfreq $
+$   equivx ifreq/dfcol/-1 $
    
-   add dfcol,psd/psdint///1 $
-   return $
-end $
+$   add dfcol,psd/psdint///1 $
+$   return $
+$end $
 
-compile subdmap=calcrms,nolist,noref $
-subdmap calcrms phi,psdreal/phirms $
+$compile subdmap=calcrms,nolist,noref $
+$subdmap calcrms phi,psdreal/phirms $
 
-matmod phi,,,,,/phic,/10 $
-add phi,phic/psp///1 $
-mpyad psp,psdreal,/phipsd $
+$matmod phi,,,,,/phic,/10 $
+$add phi,phic/psp///1 $
+$mpyad psp,psdreal,/phipsd $
 
-diagonal phipsd/phirms/'whole'/0.5 $
-return $
-end $
+$diagonal phipsd/phirms/'whole'/0.5 $
+$return $
+$end $
