@@ -50,4 +50,6 @@ double cabs(fcomplex a);
 
 int jacobi(double *a, int n, double *d, double *v);
 
+double* krylov(double* a, int n);
+
 #endif

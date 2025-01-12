@@ -32,7 +32,24 @@ int main(int argc, char** argv)
 		if (strcmp("-h",argv[i]) == 0) method = 2;
 		if (strcmp("-s",argv[i]) == 0) method = 3;
 		if (strcmp("-j",argv[i]) == 0) method = 4;
+		if (strcmp("-krylov",argv[i]) == 0) method = 5;
 	}
+        if (method == 5) {
+            double a[16] = { -5.509882, 1.870086, 0.422908, 0.008814,
+                              0.287865,-11.811654, 5.71190, 0.058717,
+                             0.049099, 4.308033, -12.970687, 0.229326,
+                             0.006235, 0.269851, 1.397369, -17.596207};
+            int n = 4;
+            double* p = krylov(a, n);
+            if (p == NULL) {
+                           printf("no solution\n");
+                           return -1;
+            }
+            printf("krylov solution:\n");
+            for(int i = 0; i<n; ++i)
+                printf("p[%d] = %f,", i+1, p[i]);
+            printf("\n");
+        }
         if (method == 4) {
             double d[n];
             double v[n * n];
