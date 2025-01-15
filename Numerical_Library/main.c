@@ -33,14 +33,26 @@ int main(int argc, char** argv)
 		if (strcmp("-s",argv[i]) == 0) method = 3;
 		if (strcmp("-j",argv[i]) == 0) method = 4;
 		if (strcmp("-krylov",argv[i]) == 0) method = 5;
+		if (strcmp("-laguer",argv[i]) == 0) method = 6;
 	}
+        if (method == 6) {
+           fcomplex a[2] = {{1., 0.}, {0., 0.}, {1., 0.}}; 
+           int n = 2;
+           fcomplex x = {0., 0.};
+           int iter;
+           laguer(a, n, &x, &iter);
+           printf("x = (%.4f,%.4f), iter = %d\n", x.r, x.i, iter);  
+        }
         if (method == 5) {
             double a[16] = { -5.509882, 1.870086, 0.422908, 0.008814,
                               0.287865,-11.811654, 5.71190, 0.058717,
                              0.049099, 4.308033, -12.970687, 0.229326,
                              0.006235, 0.269851, 1.397369, -17.596207};
             int n = 4;
-            double* p = krylov(a, n);
+            double b[4] = { 2., 0.,
+                            0., 1.};
+            n = 2;
+            double* p = krylov(b, n);
             if (p == NULL) {
                            printf("no solution\n");
                            return -1;
@@ -87,11 +99,11 @@ int main(int argc, char** argv)
         fcomplex z1 = {1., 2.};
         fcomplex z2 = {1., 1.};
         fcomplex z3 = csum(z1, z2);
-        printf("%f + i%f\n", z3.re, z3.i);
+        printf("%f + i%f\n", z3.r, z3.i);
         z3 = cmult(z1, z2);
-        printf("%f + i%f\n", z3.re, z3.i);
+        printf("%f + i%f\n", z3.r, z3.i);
         z3 = cdiv(z1, z2);
-        printf("%f + i%f\n", z3.re, z3.i);
+        printf("%f + i%f\n", z3.r, z3.i);
         printf("%f\n", cabs(z1));
         printf("%f\n", cabs(z2));
 	fcomplex a1[9] = {{1.,0.}, {0., 0.}, {3., 0.},
@@ -104,6 +116,6 @@ int main(int argc, char** argv)
 		return -1;
 	printf("%s complex solution:\n", messages[method]);
 	for(int i = 0; i<n; ++i)
-		printf("%g +i %g,", x1[i].re, x1[i].i);
+		printf("%g +i %g,", x1[i].r, x1[i].i);
 	return 0;
 }

@@ -12,9 +12,18 @@
                           a[k*n+l]=h+s*(g-h*tau);
 
 #define JACOBI_MAX_ITER 50
+#define EPSS 1.e-7
+#define MR 8
+#define MT 10
+#define MAXIT (MR*MT)
+
+static double maxarg1,maxarg2;
+#define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1)>(maxarg2)?\
+(maxarg1) : (maxarg2))
+
 
 typedef struct complex_number {
-       double re;
+       double r;
        double i;
 } fcomplex;
 
@@ -42,14 +51,22 @@ double* square_root(int n, double* A, double* b);
 double det_square_root(int n, double* A);
 
 fcomplex csum(fcomplex a, fcomplex b);
+fcomplex cadd(fcomplex a, fcomplex b);
 fcomplex csub(fcomplex a, fcomplex b);
 fcomplex cmult(fcomplex a, fcomplex b);
+fcomplex cmul(fcomplex a, fcomplex b);
 fcomplex cdiv(fcomplex a, fcomplex b);
 fcomplex conj(fcomplex a);
 double cabs(fcomplex a);
+fcomplex rcmul(double a, fcomplex b);
+fcomplex csqrt(fcomplex a);
+
 
 int jacobi(double *a, int n, double *d, double *v);
 
 double* krylov(double* a, int n);
+
+/* Laguerre method from Numerical Recieps in C */
+void laguer(fcomplex a[], int m, fcomplex *x, int *its);
 
 #endif
