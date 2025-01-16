@@ -36,11 +36,13 @@ int main(int argc, char** argv)
 		if (strcmp("-laguer",argv[i]) == 0) method = 6;
 	}
         if (method == 6) {
-           fcomplex a[2] = {{1., 0.}, {0., 0.}, {1., 0.}}; 
-           int n = 2;
+           int deg = 2;
+           fcomplex a[3] = {{-6., 2.}, {-1.,-5.}, {1., 0.}}; 
+//         fcomplex a[3] = {{2., 0.}, {-2.,0.}, {1., 0.}}; 
            fcomplex x = {0., 0.};
            int iter;
-           laguer(a, n, &x, &iter);
+           laguer(a, deg, &x, &iter);
+           printf("laguer solution:\n");
            printf("x = (%.4f,%.4f), iter = %d\n", x.r, x.i, iter);  
         }
         if (method == 5) {

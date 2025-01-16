@@ -1,11 +1,17 @@
 #include "numeric_c.h"
-void laguer(fcomplex a[], int m, fcomplex *x, int *its)
+void laguer(fcomplex* a, int m, fcomplex *x, int *its)
 {
      int iter, j;
      double abx, abp, abm, err;
      fcomplex dx, x1, b, g, h, sq, gp, gm, g2;
      static double frac[MR+1] = {0., 0.5, 0.25, 0.75, 0.13, 0.38, 0.62, 0.88, 1.};
-     
+/*******************************
+     printf("initial guess (%.2f,%.2f)\n", x->r, x->i); 
+     for(int i=0; i<=m; ++i)
+         printf("(%.2f,%.2f)*x^%d+",a[i].r, a[i].i,i);
+     printf("\n");
+********************************/
+
      for(iter = 1; iter <= MAXIT; ++iter){
          *its = iter;
           b = a[m];
@@ -19,6 +25,11 @@ void laguer(fcomplex a[], int m, fcomplex *x, int *its)
               b = cadd(cmul(*x,b), a[j]);
               err = cabs(b) + abx * err;
           }
+/*************************************************
+          printf("p(x0)=(%.2f,%.2f)\n",b.r, b.i);
+          printf("p'(x0)=(%.2f,%.2f)\n",d.r, d.i);
+          printf("p''(x0)=(%.2f,%.2f)\n",f.r, f.i);
+**********************************************/
 
           err *= EPSS;
           if (cabs(b) <= err ) 
