@@ -398,6 +398,12 @@ use Cwd qw(getcwd);
            print "\$_cbar_modify_properties completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_grid_to_ground$/) {
+		   ###print $_;
+	       grid_to_ground($_); 
+           print "\$_grid_to_ground completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -481,6 +487,56 @@ sub cbar_modify_properties {
 	$next_material++;
 	$file_update = 1;
 }	
+
+sub grid_to_ground {
+	
+	       my @words = split /,/,@_[0];
+		   my $list = $words[1];
+		   my ($nx, $ny, $nz) = ($words[2], $words[3],$words[4]);
+		   my ($kx, $ky, $kz, $rx, $ry, $rz) = ($words[5], $words[6],$words[7],$words[8],$words[9],$words[10]);
+
+	       my @grid_to_ground = &read_labels($list);
+
+           my $output_str = sprintf "\n\$_grid_to_ground output:\n";
+           push(@file_lines, $output_str);
+		   open(temph,">","temp.dat");
+           for (my $i = 0; $i < @grid_to_ground; $i++) {
+        	##print @grid_pairs[$i] . "," . @grid_pairs[$i+1];
+			##print "\n";
+			my $grid1 = @grid_to_ground[$i];
+			my @words = split/,/,$file_grids{$grid1};
+			my ($x0, $y0, $z0) = ($words[3], $words[4], $words[5]);
+			my $grid2 = $next_grid++;
+			print temph "label $grid2\n";
+			$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$grid2,$x0,$y0,$z0;
+	        push(@file_lines, $output_str);
+         	$output_str = sprintf "CBUSH,$next_element,$next_property,$grid1,$grid2,$nx,$ny,$nz,0,\n";
+        	push(@file_lines, $output_str);
+			$next_element++;
+           }
+		   close(temph);
+		   
+		    my ($x0, $y0, $z0) = &cg_from_list($list);
+		    $list = "temp.dat";
+		    &grid_create_rbe2_from_list("_grid_create_rbe2_from_list,$list,$x0,$y0,$z0,");
+			my $grid1 = $next_grid-1;
+			
+            $output_str = sprintf "\n create ground point\n";
+	        push(@file_lines, $output_str);
+			my $grid2 = $next_grid++;
+			$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$grid2,$x0,$y0,$z0;
+	        push(@file_lines, $output_str);
+         	$output_str = sprintf "CBUSH,$next_element,$next_property,$grid1,$grid2,$nx,$ny,$nz,0,\n";
+            push(@file_lines, $output_str);	
+            $output_str = sprintf "SPC,$next_spc,$grid2,123456,\n";	
+			push(@file_lines, $output_str);
+			$next_spc++;
+         	$output_str = sprintf "PBUSH,$next_property,K,$kx,$ky,$kz,$rx,$ry,$rz,\n";
+        	push(@file_lines, $output_str);
+            $next_property++;
+            $file_update = 1;
+}
+
 	
 sub grid_create_cbush {
 	
