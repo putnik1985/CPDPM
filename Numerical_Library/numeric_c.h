@@ -16,6 +16,8 @@
 #define MR 8
 #define MT 10
 #define MAXIT (MR*MT)
+#define EPS 2.0E-6
+#define MAXM 100
 
 static double maxarg1,maxarg2;
 #define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1)>(maxarg2)?\
@@ -60,6 +62,7 @@ fcomplex conj(fcomplex a);
 double cabs(fcomplex a);
 fcomplex rcmul(double a, fcomplex b);
 fcomplex csqrt(fcomplex a);
+fcomplex complex(double a, double b);
 
 
 int jacobi(double *a, int n, double *d, double *v);
@@ -68,5 +71,6 @@ double* krylov(double* a, int n);
 
 /* Laguerre method from Numerical Recieps in C */
 void laguer(fcomplex a[], int m, fcomplex *x, int *its);
+void zroots(fcomplex a[], int m, fcomplex roots[], int polish);
 
 #endif

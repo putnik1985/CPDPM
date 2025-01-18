@@ -57,3 +57,38 @@ void laguer(fcomplex* a, int m, fcomplex *x, int *its)
        fprintf(stderr, "too many itrations in laguer\n");
        return;
 }
+
+void zroots(fcomplex a[], int m, fcomplex roots[], int polish){
+     int i, its, j, jj;
+     fcomplex x, b, c, ad[MAXM];
+
+     for(j=0; j<=m; j++) ad[j]=a[j];
+
+     for(j=m; j>=1; j--) {
+         x = complex(0., 0.);
+         laguer(ad, j, &x, &its);
+//         printf("----------------------------------\n");
+//         printf("root: (%f, %f)\n", x.r, x.i);
+         if (fabs(x.i) <= 2. * EPS * fabs(x.r)) x.i = 0.;
+         roots[j] = x;
+         b = ad[j];
+         for(jj=j-1; jj>=0; jj--) {
+             c=ad[jj];
+             ad[jj]=b;
+             b=cadd(cmul(x,b),c);
+         }
+      }
+
+      if (polish)
+          for (j=1; j<=m; j++)
+               laguer(a,m,&roots[j],&its);
+
+          for(j=2; j<=m; j++){
+              x=roots[j];
+              for(i=j-1; i>=1; i--){
+                  if (roots[i].r <= x.r) break;
+                  roots[i+1]=roots[i];
+              }
+              roots[i+1]=x;
+          }
+}

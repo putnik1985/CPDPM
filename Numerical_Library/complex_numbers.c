@@ -1,4 +1,13 @@
 #include "numeric_c.h"
+
+fcomplex complex(double a, double b)
+{
+   fcomplex c;
+   c.r = a;
+   c.i = b;
+   return c;
+}
+
 fcomplex csum(fcomplex a, fcomplex b)
 {
    fcomplex c;

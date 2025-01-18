@@ -37,13 +37,20 @@ int main(int argc, char** argv)
 	}
         if (method == 6) {
            int deg = 2;
-           fcomplex a[3] = {{-6., 2.}, {-1.,-5.}, {1., 0.}}; 
-//         fcomplex a[3] = {{2., 0.}, {-2.,0.}, {1., 0.}}; 
-           fcomplex x = {0., 0.};
-           int iter;
-           laguer(a, deg, &x, &iter);
+           fcomplex a[MAXM] = {{-6., 2.}, {-1.,-5.}, {1., 0.}}; 
+           fcomplex roots[MAXM] = {{0., 0.}, {0., 0.}, {0., 0.}};
+           printf("equation:\n");
+           for(int i=0; i<deg; ++i)
+               printf("(%f+%fi)x^(%d)+",a[i].r, a[i].i, i);
+           printf("(%f+%fi)x^(%d)=0\n",a[deg].r, a[deg].i, deg);
+
+           zroots(a, deg, roots, 1);
            printf("laguer solution:\n");
-           printf("x = (%.4f,%.4f), iter = %d\n", x.r, x.i, iter);  
+           for(int i=1; i<=deg; ++i){
+               fcomplex x = roots[i];
+               printf("x = (%.4f,%.4f)\n", x.r, x.i);  
+           }
+
         }
         if (method == 5) {
             double a[16] = { -5.509882, 1.870086, 0.422908, 0.008814,
