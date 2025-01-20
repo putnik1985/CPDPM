@@ -32,7 +32,7 @@ BEGIN{
 					}
                        if (found){
 					              subcase[++record]=subcase_num;
-					              printf("%12s%12s%12s%12s%12s\n","Subcase#", "Freq,Hz", "Fx", "Fy", "Fz")
+					              printf("%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq,Hz", "Fx", "Fy", "Fz", "Mx", "My", "Mz")
 					              while (getline < file > 0 && $1 !~/TITLE/){
 					                     freq = $1;
                                          fx = $2
@@ -42,7 +42,7 @@ BEGIN{
 										     if (fx > fx_max) fx_max = fx;
 											 if (fy > fy_max) fy_max = fy;
                                              if (fz > fz_max) fz_max = fz;											
-					                         printf("%12d%12.1f%12.1f%12.1f%12.1f\n", subcase_num, freq, fx, fy, fz);
+					                         printf("%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n", subcase_num, freq, fx, fy, fz, mx, my, mz);
 					                     }
 
 				                  }### while (getline < file > 0 && $1 !~/TITLE/)

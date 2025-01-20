@@ -1,6 +1,6 @@
 BEGIN{
       if (ARGC < 6){
-	       print "usage: awk -f notching.awk file=input.pch subcase=1 cbush=1981818 inputs=677368 notch=1172.0";
+	       print "usage: awk -f notching.awk file=input.pch subcase=1 cbush=1981818 inputs=677368 notch=1225.5,1225.5,1225.5,25421.4,43235.3,27373.4";
 	       exit;
        }
 
@@ -19,6 +19,14 @@ BEGIN{
         notch  = data["notch"];
         label  = "cbush";
 
+       split(notch,t,",");
+	   fx_notch = t[1];
+	   fy_notch = t[2];
+	   fz_notch = t[3];
+	   mx_notch = t[4];
+	   my_notch = t[5];
+	   mz_notch = t[6];
+	   
        excitation_type = "$ACCELERATION";
        excitation_direction = subcase;
 
@@ -43,18 +51,25 @@ BEGIN{
 						   found = ($1 == eid)
 					   
                                         if (found){
-					   printf("%12s%12s%12s%12s%12s\n","Subcase#", "Freq,Hz", "Fx", "Fy", "Fz")
+					   printf("%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq,Hz", "Fx", "Fy", "Fz", "Mx", "My", "Mz")
 					   while (getline < file > 0 && $1 !~/TITLE/){
 					          freq = $1;
-                                                  fx = $2
+                              fx = $2
 					          fy = $3
 					          fz = $4
+							  getlinbe < file
+							  mx = $2;
+							  my = $3;
+							  mz = $4
 						  if (freq ~ /^[0-9]/){
-					              printf("%12d%12.1f%12.1f%12.1f%12.1f\n", subcase, freq, fx, fy, fz);
+					              printf("%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n", subcase, freq, fx, fy, fz, mx, my, mz);
 						      frequencies[++record]=freq;
 						      load_x[freq] = fx;
 						      load_y[freq] = fy;
 						      load_z[freq] = fz;
+							  mom_x[freq] = mx;
+							  mom_y[freq] = my;
+							  mom_z[freq] = mz;
 					      }
 
 				           }
@@ -75,8 +90,8 @@ BEGIN{
 				   while (getline < file > 0 && $1 !~/TITLE/){
 					          ####print $0;
 					          freq = $1;
-                                                  ax = $3
-			                          ay = $4 
+                              ax = $3
+			                  ay = $4 
 					          az = $5 
 						  if (freq ~ /^[0-9]/){
 					              printf("%12d%12.1f%12.1f%12.1f%12.1f\n", subcase, freq, ax, ay, az);
@@ -89,18 +104,32 @@ BEGIN{
 		}
 	}
 	### do notching
+	
 	print "Notched Input and Output"
-        printf("%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq,Hz", "Ax", "Ay", "Az", "Fx", "Fy", "Fz")
+        printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq,Hz", "Ax", "Ay", "Az", "Fx", "Fy", "Fz", "Mx", "My", "Mz")
 	for(i=1; i<=record; ++i){
 		freq = frequencies[i];
+		
 		fx = load_x[freq];
 		fy = load_y[freq];
 		fz = load_z[freq];
-		f1 = max(fx,fy);
-		fmax = max(f1,fz);
-		sf = 1.0;
-	        if (fmax > notch)
-			sf = notch / fmax;
+		mx = mom_x[freq];
+		my = mom_y[freq];
+		mz = mom_z[freq];
+		
+		s1 = calculate_sf(fx, fx_notch);
+		s2 = calculate_sf(fy, fy_notch);
+		s3 = calculate_sf(fz, fy_notch);
+		s4 = calculate_sf(mx, mx_notch);
+		s5 = calculate_sf(my, my_notch);
+		s6 = calculate_sf(mz, mz_notch);
+
+        smin_12 = min(s1, s2);
+        smin_34 = min(s3, s4);
+        smin_56 = min(s5, s6);		
+
+        s1 = min(smin_12, smin_34)
+		sf = min(s1, smin_56);
 
 	        accel[excitation_direction "," freq] *= sf;	
 	        ax = accel["1" "," freq];
@@ -110,7 +139,11 @@ BEGIN{
 		fx *= sf;
 		fy *= sf;
 		fz *= sf;
-                printf("%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n", subcase, freq, ax, ay, az, fx, fy, fz);
+		mx *= sf;
+		my *= sf;
+		mz *= sf;
+
+                printf("%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n", subcase, freq, ax, ay, az, fx, fy, fz, mx, my, mz);
 	}
 
 	print "";
@@ -140,4 +173,18 @@ function max(a,b){
             return a;
 	else 
 	    return b;
+}
+
+function calculate_sf(f, fnotch){
+ if (f <= fnotch)
+     return 1.; 
+ else
+     return fnotch / f;
+}
+
+function min(a,b){
+	if (a > b)
+            return b;
+	else 
+	    return a;
 }
