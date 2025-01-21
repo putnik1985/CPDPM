@@ -26,6 +26,7 @@ BEGIN{
 	   mx_notch = t[4];
 	   my_notch = t[5];
 	   mz_notch = t[6];
+	   ##############print fx_notch, fy_notch, fz_notch, mx_notch, my_notch, mz_notch
 	   
        excitation_type = "$ACCELERATION";
        excitation_direction = subcase;
@@ -57,7 +58,7 @@ BEGIN{
                               fx = $2
 					          fy = $3
 					          fz = $4
-							  getlinbe < file
+							  getline < file
 							  mx = $2;
 							  my = $3;
 							  mz = $4

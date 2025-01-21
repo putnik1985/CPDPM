@@ -38,6 +38,11 @@ BEGIN{
                                          fx = $2
 					                     fy = $3
 					                     fz = $4
+										 getline < file;
+										 mx = $2
+										 my = $3
+										 mz = $4
+										 
 						                 if (freq ~ /^[0-9]/){
 										     if (fx > fx_max) fx_max = fx;
 											 if (fy > fy_max) fy_max = fy;
@@ -46,6 +51,7 @@ BEGIN{
 					                     }
 
 				                  }### while (getline < file > 0 && $1 !~/TITLE/)
+								  printf("\n");
 				        }## if(found)
 						found = 0;
 						FX_MAX[record] = fx_max;
