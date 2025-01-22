@@ -10,8 +10,9 @@ type parm,,I,N,zero $
 
 paraml pj1//'trailer'/1/s,n,nf3 $ nf3 is a number of columns in PJ1
 paraml pj1//'trailer'/2/s,n,nr3 $ nr3 is a number of rows in PJ1
-
-$matmod pj1,,,,,/pj1c,/10 $
+message //'       number of columns in PJ1:  '/nf3 $
+message //'          number of rows in PJ1:  '/nr3 $
+matmod pj1,,,,,/pj1c,/10 $
 $add5 pj1,pj1c,,/pj1rr/(0.5,0.0)/(0.5,0.0) $
 $modtrl pj1rr/////1 $
 $add pj1rr,/pj1rr $

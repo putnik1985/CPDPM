@@ -17,8 +17,8 @@ symbol=DELDIR='c:/plmapps/nx2000/nxnastran/scnas/nast/del' $(program default)
 symbol=DEMODIR='c:/plmapps/nx2000/nxnastran/scnas/nast/demo' $(program default)
 symbol=SSSALTERDIR='c:/plmapps/nx2000/nxnastran/scnas/nast/misc/sssalter' $(program default)
 symbol=TPLDIR='c:/plmapps/nx2000/nxnastran/scnas/nast/tpl' $(program default)
-SDIR='c:/users/ni097270/appdata/local/temp/random.T784_52'
-DBS='c:/users/ni097270/appdata/local/temp/random.T784_52'
+SDIR='c:/users/ni097270/appdata/local/temp/random.T9528_35'
+DBS='c:/users/ni097270/appdata/local/temp/random.T9528_35'
 SCR=yes
 SMEM=20.0X
 NEWDEL='c:/plmapps/nx2000/nxnastran/scnas/em64tntl/SSS'
@@ -42,9 +42,9 @@ FPE:         no
 --------------------------------------------------------------------------------------
 Current resource limits:
  Physical memory:                    32439 MB
- Physical memory available:          19621 MB
- Paging file size:                   37303 MB
- Paging file size available:         23622 MB
+ Physical memory available:          21212 MB
+ Paging file size:                   37559 MB
+ Paging file size available:         25805 MB
  Virtual memory:                 134217727 MB
  Virtual memory available:       134213539 MB
 --------------------------------------------------------------------------------------
@@ -59,61 +59,61 @@ System configuration:
  Raw model ID:     8666
  Config number:    8666
  Physical memory:  32439 MB
- Virtual memory:   37303 MB
+ Virtual memory:   37559 MB
  Numeric format:   64-bit little-endian IEEE.
  Bytes per word:   8
  Disk block size:  512 bytes (64 words)
  Remote shell cmd: Remote capabilities not available.
 --------------------------------------------------------------------------------------
-Simcenter Nastran started  Fri Jan 10 09:18:52 E 2025
- 09:18:52  Beginning Analysis
+Simcenter Nastran started  Wed Jan 22 07:37:35 E 2025
+ 07:37:35  Beginning Analysis
 
- 09:18:52  Simcenter NASTRAN Authorization Information - System Attributes
- 09:18:52  --------------------------------------------------------
- 09:18:52  Model: 12th Gen Intel(R) Core(TM) i7-12
- 09:18:52  Machine: Intel64 Family 6 Model 154 Stepp
- 09:18:52  OS: Windows 10
- 09:18:52  Version:
- 09:18:52  License File(s): 28000@MTLLICSVR1; 28000@mtlptc02
-
-
- 09:18:53  Simcenter NASTRAN Licensing Information
- 09:18:53  --------------------------------------
- 09:18:53  Sold To ID:            10176373 - MACDONALD, DETTWILER
- 09:18:53  Webkey Access Code:    BO0Z982YGC
- 09:18:53  License File Issuer:   SIEMENS
+ 07:37:35  Simcenter NASTRAN Authorization Information - System Attributes
+ 07:37:35  --------------------------------------------------------
+ 07:37:35  Model: 12th Gen Intel(R) Core(TM) i7-12
+ 07:37:35  Machine: Intel64 Family 6 Model 154 Stepp
+ 07:37:35  OS: Windows 10
+ 07:37:35  Version:
+ 07:37:35  License File(s): 28000@MTLLICSVR1; 28000@mtlptc02
 
 
- 09:18:54  Simcenter NASTRAN Authorization Information - Checkout Successful
- 09:18:54  -----------------------------------------------------------------
- 09:18:54  License for module Simcenter Nastran Basic checked out successfully
-
- 09:18:54  Reading INCLUDE file "./save/sol111z.v69"
- 09:18:54  155 records read from INCLUDE file "./save/sol111z.v69"
-
- 09:18:54  Simcenter NASTRAN Authorization Information - Checkout Successful
- 09:18:54  -----------------------------------------------------------------
- 09:18:54  License for module Simcenter Nastran Dynamic Response checked out successfully
+ 07:37:36  Simcenter NASTRAN Licensing Information
+ 07:37:36  --------------------------------------
+ 07:37:36  Sold To ID:            10176373 - MACDONALD, DETTWILER
+ 07:37:36  Webkey Access Code:    BO0Z982YGC
+ 07:37:36  License File Issuer:   SIEMENS
 
 
- 09:18:54  Simcenter NASTRAN Authorization Information - Checkout Successful
- 09:18:54  -----------------------------------------------------------------
- 09:18:54  License for module Simcenter Nastran DMAP checked out successfully
+ 07:37:37  Simcenter NASTRAN Authorization Information - Checkout Successful
+ 07:37:37  -----------------------------------------------------------------
+ 07:37:37  License for module Simcenter Nastran Basic checked out successfully
 
- 09:18:54  Analysis started.
- 09:18:54  Geometry access/verification to CAD part initiated (if needed).
- 09:18:54  Geometry access/verification to CAD part successfully completed (if needed).
- 09:18:54  Finite element model generation started.
- 09:18:54  Finite element model generated 19 degrees of freedom.
- 09:18:54  Finite element model generation successfully completed.
- 09:18:54  Application of Loads and Boundary Conditions to the finite element model started.
- 09:18:54  Application of Loads and Boundary Conditions to the finite element model successfully completed.
- 09:18:54  Solution of the system equations for frequency response started.
- 09:18:54  Solution of the system equations for frequency response successfully completed.
- 09:18:54  Frequency response analysis completed.
- 09:18:54  NSEXIT: EXIT(0)
- 09:18:56  Analysis complete  0
-Real:        4.051 seconds ( 0:00:04.051)
-User:        0.187 seconds ( 0:00:00.187)
-Sys:         0.281 seconds ( 0:00:00.281)
-Simcenter Nastran finished Fri Jan 10 09:18:56 E 2025
+ 07:37:37  Reading INCLUDE file "./save/sol111z.v69"
+ 07:37:37  156 records read from INCLUDE file "./save/sol111z.v69"
+
+ 07:37:37  Simcenter NASTRAN Authorization Information - Checkout Successful
+ 07:37:37  -----------------------------------------------------------------
+ 07:37:37  License for module Simcenter Nastran Dynamic Response checked out successfully
+
+
+ 07:37:37  Simcenter NASTRAN Authorization Information - Checkout Successful
+ 07:37:37  -----------------------------------------------------------------
+ 07:37:37  License for module Simcenter Nastran DMAP checked out successfully
+
+ 07:37:37  Analysis started.
+ 07:37:37  Geometry access/verification to CAD part initiated (if needed).
+ 07:37:37  Geometry access/verification to CAD part successfully completed (if needed).
+ 07:37:37  Finite element model generation started.
+ 07:37:37  Finite element model generated 19 degrees of freedom.
+ 07:37:37  Finite element model generation successfully completed.
+ 07:37:37  Application of Loads and Boundary Conditions to the finite element model started.
+ 07:37:37  Application of Loads and Boundary Conditions to the finite element model successfully completed.
+ 07:37:37  Solution of the system equations for frequency response started.
+ 07:37:37  Solution of the system equations for frequency response successfully completed.
+ 07:37:37  Frequency response analysis completed.
+ 07:37:37  NSEXIT: EXIT(0)
+ 07:37:38  Analysis complete  0
+Real:        2.981 seconds ( 0:00:02.981)
+User:        0.171 seconds ( 0:00:00.171)
+Sys:         0.312 seconds ( 0:00:00.312)
+Simcenter Nastran finished Wed Jan 22 07:37:38 E 2025
