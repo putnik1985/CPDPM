@@ -102,6 +102,7 @@ BEGIN{
                     mz = $4;
 					
                     printf("\n%12s%12.2f%12.2f%12.2f%12.2f%12.2f%12.2f\n", "RMS:", fx, fy, fz, mx, my, mz);
+                    printf("\n%12s%12.2f%12.2f%12.2f%12.2f%12.2f%12.2f\n", "3 x RMS:", 3 * fx, 3 * fy, 3 * fz, 3 * mx, 3 * my, 3 * mz);
 					
                 }					
             }			 
