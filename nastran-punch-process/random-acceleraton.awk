@@ -42,9 +42,10 @@ BEGIN{
 			getline < file;
 			getline < file;		
             while (getline < file > 0 && $0 !~ /\$TITLE/){
-                if ($1 == point_id)
+                if ($1 == point_id){
                     printf("%12s%12.2f%12.2f%12.2f\n","RMS", $3 / G, $4 / G, $5 / G);
-                    printf("%12s%12.2f%12.2f%12.2f\n","3 x RMS", $3 / G, $4 / G, $5 / G);					
+                    printf("%12s%12.2f%12.2f%12.2f\n","3 x RMS", 3 * $3 / G, 3 * $4 / G, 3 * $5 / G);
+                }					
             }			 
 		}
 	}####while (getline < file > 0)
