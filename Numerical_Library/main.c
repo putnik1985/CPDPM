@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	}
         if (method == 6) {
            int deg = 2;
-           fcomplex a[MAXM] = {{-6., 2.}, {-1.,-5.}, {1., 0.}}; 
+           fcomplex a[MAXM] = {{1., 0.}, {2.,0.}, {1., 0.}}; 
            fcomplex roots[MAXM] = {{0., 0.}, {0., 0.}, {0., 0.}};
            printf("equation:\n");
            for(int i=0; i<deg; ++i)
@@ -58,9 +58,11 @@ int main(int argc, char** argv)
                              0.049099, 4.308033, -12.970687, 0.229326,
                              0.006235, 0.269851, 1.397369, -17.596207};
             int n = 4;
-            double b[4] = { 2., 0.,
-                            0., 1.};
-            n = 2;
+            double b[9] = { 5., 30., -48., 
+                            3., 14., -24.,
+                            3., 15., -25.};
+            
+            n = 3;
             double* p = krylov(b, n);
             if (p == NULL) {
                            printf("no solution\n");
