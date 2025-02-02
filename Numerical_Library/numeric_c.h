@@ -19,6 +19,10 @@
 #define EPS 2.0E-6
 #define MAXM 100
 
+#define RADIX 2.0
+#define SWAP(g,h) {y=(g);(g)=(h);(h)=y;}
+
+
 static double maxarg1,maxarg2;
 #define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1)>(maxarg2)?\
 (maxarg1) : (maxarg2))
@@ -72,5 +76,9 @@ double* krylov(double* a, int n);
 /* Laguerre method from Numerical Recieps in C */
 void laguer(fcomplex a[], int m, fcomplex *x, int *its);
 void zroots(fcomplex a[], int m, fcomplex roots[], int polish);
+
+void balanc(double* a, int n);
+void elmhes(double* a, int n);
+void hqr(double *a, int n, double *wr, double *wi);
 
 #endif
