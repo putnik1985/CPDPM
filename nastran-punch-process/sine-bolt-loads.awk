@@ -63,6 +63,18 @@ BEGIN{
 					
 					
                     str = sprintf("%12d%12.2f%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n",subcase, freq, eid, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
+					moment = sqrt(mza * mza + mya * mya);
+					if (moment > moment_max) moment_max = moment;
+					
+					moment = sqrt(mzb * mzb + myb * myb);
+					if (moment > moment_max) moment_max = moment;
+					
+					shear = sqrt(shear_y * shear_y + shear_z * shear_z);
+					if (shear > shear_max) shear_max = shear;
+					
+					if (axial > axial_max) axial_max = axial;
+					if (torque > torque_max) torque_max = torque;
+					
 					####print str
 					id = count "," eid
 					##print id
@@ -89,7 +101,9 @@ BEGIN{
      	                      printf("%s", bolts[eid])
 						  }
 	                    
-                    }		
+                    }
+                    printf("\n%16s%16s%16s%16s%16s\n","Subcase#", "Moment, lbf.in", "Shear, lbf", "Axial, lbf", "Torque, lbf.in");	
+                   	printf("%16d%16.1f%16.1f%16.1f%16.1f\n", 0, moment_max, shear_max, axial_max, torque_max);									
 }
 
 function abs(x){

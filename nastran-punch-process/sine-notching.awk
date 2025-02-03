@@ -1,6 +1,6 @@
 BEGIN{
       if (ARGC < 6){
-	       print "usage: awk -f notching.awk file=input.pch subcase=1 cbush=1981818 inputs=677368 notch=1225.5,1225.5,1225.5,25421.4,43235.3,27373.4";
+	       print "usage: awk -f sine-notching.awk file=input.pch subcase=1 cbush=1981818 inputs=677368 notch=1225.5,1225.5,1225.5,25421.4,43235.3,27373.4";
 	       exit;
        }
 

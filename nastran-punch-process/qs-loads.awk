@@ -44,10 +44,25 @@ BEGIN{
 						      mz = $4
 					      }
 					      printf("%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n",case_number, fx, fy, fz, mx, my, mz)
+						  if (abs(fx) > fx_max) fx_max = abs(fx);
+						  if (abs(fy) > fy_max) fy_max = abs(fy);
+						  if (abs(fz) > fz_max) fz_max = abs(fz);
+
+						  if (abs(mx) > mx_max) mx_max = abs(mx);
+						  if (abs(my) > my_max) my_max = abs(my);
+						  if (abs(mz) > mz_max) mz_max = abs(mz);						  
 				        }
 				}
 			}
 		}
 	}
+
+					      printf("%12s%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n","Maximum:", fx_max, fy_max, fz_max, mx_max, my_max, mz_max)
 }
 
+function abs(x){
+  if (x > 0) 
+      return x
+  else 
+      return -x;
+}
