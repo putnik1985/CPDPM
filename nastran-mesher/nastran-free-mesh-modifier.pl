@@ -508,7 +508,7 @@ sub grid_to_ground {
 			my ($x0, $y0, $z0) = ($words[3], $words[4], $words[5]);
 			my $grid2 = $next_grid++;
 			print temph "label $grid2\n";
-			$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$grid2,$x0,$y0,$z0;
+			$output_str = sprintf "GRID,%d,0,%.4f,%.4f,%.4f,0\n",$grid2,$x0,$y0,$z0;
 	        push(@file_lines, $output_str);
          	$output_str = sprintf "CBUSH,$next_element,$next_property,$grid1,$grid2,$nx,$ny,$nz,0,\n";
         	push(@file_lines, $output_str);
@@ -524,7 +524,7 @@ sub grid_to_ground {
             $output_str = sprintf "\n create ground point\n";
 	        push(@file_lines, $output_str);
 			my $grid2 = $next_grid++;
-			$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$grid2,$x0,$y0,$z0;
+			$output_str = sprintf "GRID,%d,0,%.4f,%.4f,%.4f,0\n",$grid2,$x0,$y0,$z0;
 	        push(@file_lines, $output_str);
          	$output_str = sprintf "CBUSH,$next_element,$next_property,$grid1,$grid2,$nx,$ny,$nz,0,\n";
             push(@file_lines, $output_str);	
