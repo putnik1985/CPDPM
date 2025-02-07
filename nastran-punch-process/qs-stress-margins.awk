@@ -44,6 +44,11 @@ BEGIN{
 						 readline();
                          sxx = $3
 						 sxy = $4
+						 if (NF < 5) { 
+						        s = sxy; 
+								sxy = substr(s, 1, length(s) - 8)
+                                ####print sxy								
+						 } 
 						 
 						 readline();
 						 readline();
@@ -85,7 +90,7 @@ BEGIN{
 				   
 			   mos_yield = Fy / (FSy * vm_max) - 1
 			   mos_ultimate = Fu / (FSu * vm_max) - 1
-			   printf("%12d%12.2f%12.2f%12.2f\n",case_number, vm_max, mos_yield, mos_ultimate)
+			   printf("%12d%12.2f%12.2f%12.2f\n", case_number, vm_max, mos_yield, mos_ultimate)
 			   }
 			   
 
