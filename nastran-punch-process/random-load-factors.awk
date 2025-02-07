@@ -37,6 +37,26 @@ END {
 	
 	f_z =0.;
 	z_max = 0.;
+
+
+	recordx = 0;
+	while(getline < filex > 0){
+	       Xxt[++recordx] = $1;
+		   Xyt[recordx] = $2;
+	}
+
+	recordy = 0;
+	while(getline < filey > 0){
+	       Yxt[++recordy] = $1;
+		   Yyt[recordy] = $2;
+	}
+
+	recordz = 0;
+	while(getline < filez > 0){
+	       Zxt[++recordz] = $1;
+		   Zyt[recordz] = $2;
+	}
+
 	
 	scale = 100;
 	printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","Mode#", "Frequency(Hz)", "T1", "T2", "T3", "R1", "R2", "R3");
@@ -76,31 +96,17 @@ END {
 		sumrz += rz;
 
 
-	record = 0;
-	while(getline < filex > 0){
-	       xt[++record] = $1;
-		   yt[record] = $2;
-	}	
+	
     f_x = frequency[i];
-	wx = get_yt(f_x)
+	wx = get_Xyt(f_x)
 	rvlfx += t[2] * t[2] * Pi/2 * f_x * Q * wx; ## square of the load factor
-	############print rvlfx	
-	record = 0;
-	while(getline < filey > 0){
-	       xt[++record] = $1;
-		   yt[record] = $2;
-	}	
+
     f_y = frequency[i];
-	wy = get_yt(f_y)
+	wy = get_Yyt(f_y)
 	rvlfy += t[3] * t[3] * Pi/2 * f_y * Q * wy; ## square of the load factor
 
-	record = 0;
-	while(getline < filez > 0){
-	       xt[++record] = $1;
-		   yt[record] = $2;
-	}	
     f_z = frequency[i];
-	wz = get_yt(f_z)
+	wz = get_Zyt(f_z)
 	rvlfz += t[4] * t[4] * Pi/2 * f_z * Q * wz; ## square of the load factor
 		
 	}
@@ -127,52 +133,51 @@ END {
 
 	printf("\n");
 	printf("X psd input file:%s\n", filex);
-	record = 0;
-	while(getline < filex > 0){
-	       xt[++record] = $1;
-		   yt[record] = $2;
-	}	
 	printf("\nX direction:\n");
 
-	wx = get_yt(f_xmax)
+	wx = get_Xyt(f_xmax)
 	printf("%12s%12s%12s%12s%12s\n","Freq,Hz", "Q", "W", "Grms", "3xGrms");
 	G = sqrt(Pi/2 * f_xmax * Q * wx);
 	printf("%12.2f%12.2f%12.2f%12.2f%12.2f\n", f_xmax, Q, wx, G, 3*G);
 
 	printf("\n");
 	printf("Y psd input file:%s\n", filey);
-	record = 0;
-	while(getline < filey > 0){
-	       xt[++record] = $1;
-		   yt[record] = $2;
-	}
 	printf("\nY direction:\n");
 
-	wy = get_yt(f_ymax)
+	wy = get_Yyt(f_ymax)
 	printf("%12s%12s%12s%12s%12s\n","Freq,Hz", "Q", "W", "Grms", "3xGrms");
 	G = sqrt(Pi/2 * f_ymax * Q * wy);
 	printf("%12.2f%12.2f%12.2f%12.2f%12.2f\n", f_ymax, Q, wy, G, 3*G);
 
 	printf("\n");
 	printf("Z psd input file:%s\n", filez);
-	record = 0;
-	while(getline < filez > 0){
-	       xt[++record] = $1;
-		   yt[record] = $2;
-	}
 	printf("\nZ direction:\n");
 
-	wz = get_yt(f_zmax)
+	wz = get_Zyt(f_zmax)
 	printf("%12s%12s%12s%12s%12s\n","Freq,Hz", "Q", "W", "Grms", "3xGrms");
 	G = sqrt(Pi/2 * f_zmax * Q * wz);
 	printf("%12.2f%12.2f%12.2f%12.2f%12.2f\n", f_zmax, Q, wz, G, 3*G);
 	
 }
 
-function get_yt(x){
+function get_Xyt(x){
     k = 0;
-	while(x<xt[++k]);
+	while(x<Xxt[++k]);
     j = k+1;
-	#######print xt[j], xt[i]
-	return exp( log(xt[j]/x) / log(xt[j]/xt[k]) * log(yt[k]) + log(x/xt[k]) / log(xt[j]/xt[k]) * log(yt[j]));
+
+	return exp( log(Xxt[j]/x) / log(Xxt[j]/Xxt[k]) * log(Xyt[k]) + log(x/Xxt[k]) / log(Xxt[j]/Xxt[k]) * log(Xyt[j]));
+}
+
+function get_Yyt(x){
+    k = 0;
+	while(x<Yxt[++k]);
+    j = k+1;
+	return exp( log(Yxt[j]/x) / log(Yxt[j]/Yxt[k]) * log(Yyt[k]) + log(x/Yxt[k]) / log(Yxt[j]/Yxt[k]) * log(Yyt[j]));
+}
+
+function get_Zyt(x){
+    k = 0;
+	while(x<Zxt[++k]);
+    j = k+1;
+	return exp( log(Zxt[j]/x) / log(Zxt[j]/Zxt[k]) * log(Zyt[k]) + log(x/Zxt[k]) / log(Zxt[j]/Zxt[k]) * log(Zyt[j]));
 }
