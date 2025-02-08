@@ -34,7 +34,35 @@ int main(int argc, char** argv)
 		if (strcmp("-j",argv[i]) == 0) method = 4;
 		if (strcmp("-krylov",argv[i]) == 0) method = 5;
 		if (strcmp("-laguer",argv[i]) == 0) method = 6;
+		if (strcmp("-hessenberg",argv[i]) == 0) method = 7;
 	}
+        if (method == 7) {
+            double a[16] = { -5.509882, 1.870086, 0.422908, 0.008814,
+                              0.287865,-11.811654, 5.71190, 0.058717,
+                             0.049099, 4.308033, -12.970687, 0.229326,
+                             0.006235, 0.269851, 1.397369, -17.596207};
+            int n = 4;
+        
+        printf("\ninit matrix:\n");
+        for(int i = 0; i<n; ++i){
+            for(int j = 0; j < n; ++j)
+                printf("%f,", a[i*n+j]);
+            printf("\n");
+        }
+        elmhes(a, n);
+        printf("\nhessenberg matrix:\n");
+        for(int i = 0; i<n; ++i){
+            for(int j = 0; j < n; ++j)
+                printf("%f,", a[i*n+j]);
+            printf("\n");
+        }
+        double wr[MAXM];
+        double wi[MAXM];    
+        hqr(a, n, wr, wi);
+        printf("\nEigenvalues:\n");
+        for(int i = 0; i < n; ++i)
+           printf("(%f, %f)\n", wr[i], wi[i]);
+        }
         if (method == 6) {
            int deg = 2;
            fcomplex a[MAXM] = {{1., 0.}, {2.,0.}, {1., 0.}}; 

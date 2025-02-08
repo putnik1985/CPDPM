@@ -76,12 +76,11 @@ void hqr(double *a, int n, double *wr, double *wi)
 {
      int nn, m, l, k, j, its, i, mmin;
      double z, y, x, w, v, u, t, s, r, q, p, anorm;
-
+     
      anorm = 0.;
      for (i=1; i<=n; i++)
           for(j=IMAX(i-1,1); j<=n; j++)
               anorm+=fabs(a[(i-1) * n + j-1]);
-
      nn = n;
      t = 0.;
      while (nn >= 1) {
@@ -90,13 +89,14 @@ void hqr(double *a, int n, double *wr, double *wi)
              for (l=nn; l>=2; l--) {
                   s=fabs(a[(l-1-1)*n + l-1-1])+fabs(a[(l-1) * n + l-1]);
                   if (s==0.) s = anorm;
-                  if ((double)fabs(a[(l-1) * n + l-1-1] + s) == s) break;
+                  if ((double)(fabs(a[(l-1) * n + l-1-1]) + s) == s) break;
              }
              x = a[(nn-1) * n + nn-1];
              if (l == nn) {
                  int nn1 = nn - 1;
                  wr[nn1]=x+t;
-                 wi[nn1--]=0.;
+                 wi[nn1-1]=0.;
+                 nn--;
              } else {
                  y = a[(nn-1-1) * n + nn-1-1];
                  w = a[(nn-1) * n + nn-1-1]*a[(nn-1-1) * n + nn-1];
@@ -116,7 +116,7 @@ void hqr(double *a, int n, double *wr, double *wi)
                       }
                       nn -= 2;
                   } else {
-                         if (its == 30) nerror("Too many iterations in hqr");
+                         if (its == 30) {printf("Too many iterations in hqr\n"); exit(1); }
                          if (its == 10 || its == 20) {
                              t += x;
                              for (i=1; i<=nn; i++) a[(i-1) * n + i-1] -= x;
