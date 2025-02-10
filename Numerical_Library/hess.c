@@ -70,6 +70,9 @@ void elmhes(double* a, int n){
                 }
            }
       }
+      for(int j=1; j<=n; ++j)
+       for(int i = j + 2; i <= n; ++i)
+         a[ (i-1)*n + j - 1] =0.;
 }
 
 void hqr(double *a, int n, double *wr, double *wi)
@@ -194,4 +197,75 @@ void hqr(double *a, int n, double *wr, double *wi)
                        }
                     } while (l < nn-1);
              }
+}
+
+int hessenberg(double *a, double *H, double *Z, int n){
+
+    for(int i = 0; i<n; ++i)
+        for(int j=0; j<n; ++j){
+            H[i*n+j] = 0.;
+            Z[i*n+j] = 0.;
+        }
+
+    for(int i=0; i<n; ++i)
+        H[(i+1)*n + i] = -1.0;
+
+    Z[0*n+0] = 1.;
+    for(int s = 0; s < n-1 ; ++s) {
+        for(int i = 0; i < s+1; ++i){
+            double sum = 0.0;
+            for(int m = 0; m < n; ++m)
+                sum += a[i*n + m] * Z[m*n+s];
+
+                 if (Z[i*n+i] == 0.0) 
+                     return -1.0;
+                 
+                 H[i*n+s] = -sum / Z[i*n+i];
+                 printf("%d,%d = %f, %f, %f\n", i, s, H[i*n+s], sum, Z[i*n + i]);
+            }
+
+         for(int i = s+1; i < n; ++i) {
+             double sum = 0.0;
+             for(int j = 0; j<s+1; ++j)
+                 sum += H[j*n+s] * Z[i*n+j];
+
+             for(int m = 0; m < n; ++m)
+                 sum += a[i*n+m] * Z[m*n+s];
+
+             Z[i*n+s+1] = sum;
+         }
+     } // for(int s = 0....
+
+     printf("-------------------------------\n");
+     for(int i=0; i<n; ++i){
+      for(int j=0; j<n; ++j)
+          printf("%f,",a[i*n+j]);
+      printf("\n");
+      } 
+
+     printf("-------------------------------\n");
+     for(int i=0; i<n; ++i){
+      for(int j=0; j<n; ++j)
+          printf("%f,",Z[i*n+j]);
+      printf("\n");
+      } 
+
+     printf("-------------------------------\n");
+     for(int i=0; i<n; ++i){
+      for(int j=0; j<n; ++j)
+          printf("%f,",H[i*n+j]);
+      printf("\n");
+      } 
+
+     for(int i=0; i<n; ++i){
+         double sum = 0.0;
+         for(int m=0; m<n; ++m)
+             sum += a[i*n+m]*Z[i*m+n-1];
+
+         if (Z[i*n + i] == 0.)
+             return -1;
+
+         H[i*n + n-1] = -sum / Z[i*n + i];
+     }
+    return 0;
 }

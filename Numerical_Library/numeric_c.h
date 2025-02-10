@@ -91,4 +91,5 @@ void balanc(double* a, int n);
 void elmhes(double* a, int n);
 void hqr(double *a, int n, double *wr, double *wi);
 
+int hessenberg(double *a, double *H, double *Z, int n);
 #endif

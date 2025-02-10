@@ -49,16 +49,23 @@ int main(int argc, char** argv)
                 printf("%f,", a[i*n+j]);
             printf("\n");
         }
-        elmhes(a, n);
+        double H[16];
+        double Z[16];
+        int err = hessenberg(a, H, Z, n);
+        if (err < 0) {
+                   printf("can not complete Hessenberg\n");
+                   exit(1);
+        }
+
         printf("\nhessenberg matrix:\n");
         for(int i = 0; i<n; ++i){
             for(int j = 0; j < n; ++j)
-                printf("%f,", a[i*n+j]);
+                printf("%f,", H[i*n+j]);
             printf("\n");
         }
+
         double wr[MAXM];
         double wi[MAXM];    
-        hqr(a, n, wr, wi);
         printf("\nEigenvalues:\n");
         for(int i = 0; i < n; ++i)
            printf("(%f, %f)\n", wr[i], wi[i]);
