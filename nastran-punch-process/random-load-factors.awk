@@ -164,7 +164,7 @@ function get_Xyt(x){
     k = 0;
 	while(x<Xxt[++k]);
     j = k+1;
-
+    ###printf("x: %f,%f\n", Xxt[k], Xxt[j]);
 	return exp( log(Xxt[j]/x) / log(Xxt[j]/Xxt[k]) * log(Xyt[k]) + log(x/Xxt[k]) / log(Xxt[j]/Xxt[k]) * log(Xyt[j]));
 }
 
@@ -172,6 +172,7 @@ function get_Yyt(x){
     k = 0;
 	while(x<Yxt[++k]);
     j = k+1;
+	##printf("y: %f,%f\n", Yxt[k], Yxt[j]);
 	return exp( log(Yxt[j]/x) / log(Yxt[j]/Yxt[k]) * log(Yyt[k]) + log(x/Yxt[k]) / log(Yxt[j]/Yxt[k]) * log(Yyt[j]));
 }
 
@@ -179,5 +180,6 @@ function get_Zyt(x){
     k = 0;
 	while(x<Zxt[++k]);
     j = k+1;
+	##printf("z: %f,%f\n", Zxt[k], Zxt[j]);
 	return exp( log(Zxt[j]/x) / log(Zxt[j]/Zxt[k]) * log(Zyt[k]) + log(x/Zxt[k]) / log(Zxt[j]/Zxt[k]) * log(Zyt[j]));
 }
