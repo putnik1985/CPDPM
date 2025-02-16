@@ -41,8 +41,11 @@ int main(int argc, char** argv)
                               0.287865,-11.811654, 5.71190, 0.058717,
                              0.049099, 4.308033, -12.970687, 0.229326,
                              0.006235, 0.269851, 1.397369, -17.596207};
+            double b[16] = { 1., 0., 0. ,0.,
+                             0., 1., 0., 0.,
+                             0., 0., 2., 0.,
+                             0., 0., 0., 2.};
             int n = 4;
-        
         printf("\ninit matrix:\n");
         for(int i = 0; i<n; ++i){
             for(int j = 0; j < n; ++j)
@@ -57,12 +60,25 @@ int main(int argc, char** argv)
                    exit(1);
         }
 
-        printf("\nhessenberg matrix:\n");
+        printf("\n\nhessenberg matrix:\n");
         for(int i = 0; i<n; ++i){
             for(int j = 0; j < n; ++j)
                 printf("%f,", H[i*n+j]);
             printf("\n");
         }
+            for(int i = 0; i<n; ++i)
+                for(int j=0; j<n; ++j)
+                    H[i*n+j] = -H[i*n+j];
+
+            double* p = krylov(H, n);
+            if (p == NULL) {
+                           printf("no solution\n");
+                           return -1;
+            }
+            printf("\nkrylov solution:\n");
+            for(int i = 0; i<n; ++i)
+                printf("p[%d] = %f,", i+1, p[i]);
+            printf("\n");
 
         double wr[MAXM];
         double wi[MAXM];    
@@ -97,8 +113,8 @@ int main(int argc, char** argv)
                             3., 14., -24.,
                             3., 15., -25.};
             
-            n = 3;
-            double* p = krylov(b, n);
+            n = 4;
+            double* p = krylov(a, n);
             if (p == NULL) {
                            printf("no solution\n");
                            return -1;

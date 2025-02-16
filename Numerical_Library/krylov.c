@@ -19,14 +19,14 @@ double* B = calloc(n*n, sizeof(double));
                 for(int s=0; s<n; ++s)
                     B[i*n+j] += a[i*n+s] * B[s*n + j-1];
             }
-
+/*************************************************
         printf("Calculations steps:\n");
         for(int i = 0; i<n; ++i){
             for(int j = 0; j<n; ++j)
                 printf("%12.6f", B[i*n+j]);
             printf("\n");
         }
-
+***********************************************/
         double* b = calloc(n, sizeof(double));
 
         if (b == NULL){

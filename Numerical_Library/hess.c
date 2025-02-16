@@ -202,26 +202,28 @@ void hqr(double *a, int n, double *wr, double *wi)
 int hessenberg(double *a, double *H, double *Z, int n){
 
     for(int i = 0; i<n; ++i)
-        for(int j=0; j<n; ++j){
+        for(int j=0; j<n; ++j)
             H[i*n+j] = 0.;
-            Z[i*n+j] = 0.;
-        }
 
-    for(int i=0; i<n; ++i)
+    for(int i=0; i<n-1; ++i)
         H[(i+1)*n + i] = -1.0;
 
+    for(int i = 0; i<n; ++i)
+        for(int j=0; j<n; ++j)
+            Z[i*n+j] = 0.;
+   
     Z[0*n+0] = 1.;
     for(int s = 0; s < n-1 ; ++s) {
         for(int i = 0; i < s+1; ++i){
             double sum = 0.0;
             for(int m = 0; m < n; ++m)
                 sum += a[i*n + m] * Z[m*n+s];
-
-                 if (Z[i*n+i] == 0.0) 
-                     return -1.0;
                  
-                 H[i*n+s] = -sum / Z[i*n+i];
-                 printf("%d,%d = %f, %f, %f\n", i, s, H[i*n+s], sum, Z[i*n + i]);
+            double denom = 0.0;
+            for(int m=0; m<i; ++m)
+                denom += H[m*n+s] * Z[i*n+m];
+
+                 H[i*n+s] = -(sum + denom) / Z[i*n+i];
             }
 
          for(int i = s+1; i < n; ++i) {
@@ -236,36 +238,35 @@ int hessenberg(double *a, double *H, double *Z, int n){
          }
      } // for(int s = 0....
 
-     printf("-------------------------------\n");
      for(int i=0; i<n; ++i){
-      for(int j=0; j<n; ++j)
-          printf("%f,",a[i*n+j]);
-      printf("\n");
-      } 
 
-     printf("-------------------------------\n");
-     for(int i=0; i<n; ++i){
-      for(int j=0; j<n; ++j)
-          printf("%f,",Z[i*n+j]);
-      printf("\n");
-      } 
-
-     printf("-------------------------------\n");
-     for(int i=0; i<n; ++i){
-      for(int j=0; j<n; ++j)
-          printf("%f,",H[i*n+j]);
-      printf("\n");
-      } 
-
-     for(int i=0; i<n; ++i){
          double sum = 0.0;
          for(int m=0; m<n; ++m)
-             sum += a[i*n+m]*Z[i*m+n-1];
+             sum += a[i*n+m] * Z[m*n + n-1];
+
+         double denom = 0.0;
+         for(int m=0; m<i; ++m)
+             denom += H[m*n + n-1] * Z[i*n + m];
 
          if (Z[i*n + i] == 0.)
              return -1;
 
-         H[i*n + n-1] = -sum / Z[i*n + i];
+         H[i*n + n-1] = -(sum + denom) / Z[i*n + i];
      }
+
+/*************************
+    printf("check\n");
+    for(int i =0; i<n; ++i){
+     for(int j = 0; j <n; ++j){
+         double s1 = 0.;
+         double s2 = 0.;
+         for(int k =0; k<n; ++k){
+             s1 += a[i*n+k] * Z[k*n+j];
+             s2 += Z[i*n+k] * H[k*n+j];
+         }
+         printf("%d,%d = %f\n", i, j, s1 + s2);
+      }
+    }
+**************************/
     return 0;
 }
