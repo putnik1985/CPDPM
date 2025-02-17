@@ -88,7 +88,7 @@ int main(int argc, char** argv)
         }
         if (method == 6) {
            int deg = 2;
-           fcomplex a[MAXM] = {{1., 0.}, {2.,0.}, {1., 0.}}; 
+           fcomplex a[MAXM] = {{3., 0.}, {-4., 0.}, {1., 0.}}; 
            fcomplex roots[MAXM] = {{0., 0.}, {0., 0.}, {0., 0.}};
            printf("equation:\n");
            for(int i=0; i<deg; ++i)
@@ -109,20 +109,45 @@ int main(int argc, char** argv)
                              0.049099, 4.308033, -12.970687, 0.229326,
                              0.006235, 0.269851, 1.397369, -17.596207};
             int n = 4;
-            double b[9] = { 5., 30., -48., 
-                            3., 14., -24.,
-                            3., 15., -25.};
+            double b[4] = { 0., 2., 
+                           -2., 0.};
             
-            n = 4;
-            double* p = krylov(a, n);
+            n = 2;
+            double* p = krylov(b, n);
             if (p == NULL) {
-                           printf("no solution\n");
+                           printf("krylov: no solution\n");
                            return -1;
             }
             printf("krylov solution:\n");
-            for(int i = 0; i<n; ++i)
+            fcomplex eq[MAXM];
+            for(int i = 0; i<n; ++i){
                 printf("p[%d] = %f,", i+1, p[i]);
+                eq[n-1-i] = complex(-p[i], 0.);
+            }
+            eq[n] = complex(1.0, 0.0);
             printf("\n");
+
+            int deg = n;
+            printf("equation:\n");
+/**********************
+            for(int i=0; i<deg; ++i){
+                char str[MAXM];
+                sprintf(str, "%%d\d", 29+i);
+                 printf("%s", str);
+            }
+            printf("\n");
+**********************************/
+
+            for(int i=0; i<deg; ++i)
+               printf("(%f,%f)x^(%d)+",eq[i].r, eq[i].i, i);
+            printf("(%f,%f)x^(%d)=0\n",eq[deg].r, eq[deg].i, deg);
+            printf("Eigenvalues:\n");
+            fcomplex roots[MAXM];
+            zroots(eq, deg, roots, 1);
+            for(int i=1; i<=deg; ++i){
+               fcomplex x = roots[i];
+               printf("x = (%.4f,%.4f)\n", x.r, x.i);  
+            }
         }
         if (method == 4) {
             double d[n];
