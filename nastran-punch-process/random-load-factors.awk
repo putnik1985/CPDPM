@@ -158,6 +158,62 @@ END {
 	G = sqrt(Pi/2 * f_zmax * Q * wz);
 	printf("%12.2f%12.2f%12.2f%12.2f%12.2f\n", f_zmax, Q, wz, G, 3*G);
 	
+	
+	print "";
+	print "Nastran Input Table";
+	print "TABLED1,XXXX,log,log,"
+	num_per_row = 8;
+	current = 0;
+	for(i=1;i<=recordx;++i){
+		if (current == 0) 
+	            printf("+,");
+
+	        freq = Xxt[i];
+	        valu = Xyt[i];	
+                printf("%.1f,%.2f,",freq, valu);
+		current+=2;
+		if (current == 8){
+			printf("+\n");
+			current = 0;
+		}
+	}
+	printf("endt\n");
+
+	print "TABLED1,YYYY,log,log,"
+	num_per_row = 8;
+	current = 0;
+	for(i=1;i<=recordy;++i){
+		if (current == 0) 
+	            printf("+,");
+
+	        freq = Yxt[i];
+	        valu = Yyt[i];	
+                printf("%.1f,%.2f,",freq, valu);
+		current+=2;
+		if (current == 8){
+			printf("+\n");
+			current = 0;
+		}
+	}
+	printf("endt\n");	  
+
+	print "TABLED1,ZZZZ,log,log,"
+	num_per_row = 8;
+	current = 0;
+	for(i=1;i<=recordz;++i){
+		if (current == 0) 
+	            printf("+,");
+
+	        freq = Zxt[i];
+	        valu = Zyt[i];	
+                printf("%.2f,%.4f,",freq, valu);
+		current+=2;
+		if (current == 8){
+			printf("+\n");
+			current = 0;
+		}
+	}
+	printf("endt\n");	
 }
 
 function get_Xyt(x){
