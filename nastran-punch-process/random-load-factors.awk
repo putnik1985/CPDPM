@@ -170,7 +170,7 @@ END {
 
 	        freq = Xxt[i];
 	        valu = Xyt[i];	
-                printf("%.1f,%.2f,",freq, valu);
+                printf("%.1f,%.4f,",freq, valu);
 		current+=2;
 		if (current == 8){
 			printf("+\n");
@@ -188,7 +188,7 @@ END {
 
 	        freq = Yxt[i];
 	        valu = Yyt[i];	
-                printf("%.1f,%.2f,",freq, valu);
+                printf("%.1f,%.4f,",freq, valu);
 		current+=2;
 		if (current == 8){
 			printf("+\n");
