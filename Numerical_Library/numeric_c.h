@@ -18,6 +18,7 @@
 #define MAXIT (MR*MT)
 #define EPS 2.0E-6
 #define MAXM 100
+#define TOLERANCE 1.E-8
 
 #define RADIX 2.0
 #define SWAP(g,h) {y=(g);(g)=(h);(h)=y;}
