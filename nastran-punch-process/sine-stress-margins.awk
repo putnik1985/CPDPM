@@ -65,8 +65,18 @@ BEGIN{
 							  syz = correct_number(syz)
 							  readline()
 							  szx = $2
-							  ##print element_id, freq, sxx, syy, szz, sxy, syz, szx
+							  ###print element_id, freq, sxx, syy, szz, sxy, syz, szx
 							  calculate_margins()
+							  #######print subcase, mos_yield_min
+						         yield[subcases] = mos_yield_min
+							  ultimate[subcases] = mos_ultimate_min
+
+								 
+								    element_yield[subcases] = eyield
+								 element_ultimate[subcases] = eultimate
+									
+									   fyield[subcases] = freq_yield
+									fultimate[subcases] = freq_ultimate							  
 						  }
 						  
 						}
@@ -94,7 +104,7 @@ BEGIN{
 							  syz = correct_number(syz)
 							  readline()
 							  szx = $2
-							  ###print element_id, freq, sxx, syy, szz, sxy, syz, szx
+							  #####print element_id, freq, sxx, syy, szz, sxy, syz, szx
 							  calculate_margins()
 							    
 						         yield[subcases] = mos_yield_min
