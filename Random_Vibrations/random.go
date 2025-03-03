@@ -49,7 +49,9 @@ func main() {
 	input := bufio.NewScanner(f)
 	/////fmt.Printf("%T\n", input)
 	for input.Scan() {
-            line, fields := readline(input) 
+	    line := input.Text()
+	    fields := strings.Fields(line) 
+            /////line, fields := readline(input) 
 	    if strings.Contains(line, "$EIGENVALUE") {
 	       ////fields := strings.Fields(line)
 	       /*****************************************************************
@@ -64,8 +66,30 @@ func main() {
 		       return
 	       }
                eigenvalues = append(eigenvalues, value)
+	       for input.Scan() {
+                  line := input.Text()
+		  if strings.Contains(line, "$TITLE"){
+		      break
+		   }
+
+		  fields := strings.Fields(line)
+		  grid, _ := strconv.ParseInt(fields[0], 10, 64)
+		    tx, _ := strconv.ParseFloat(fields[2], 64)
+		    ty, _ := strconv.ParseFloat(fields[3], 64)
+		    tz, _ := strconv.ParseFloat(fields[4], 64)
+
+		    if input.Scan(){
+                       line := input.Text()
+		       fields := strings.Fields(line)
+		       rx, _ := strconv.ParseFloat(fields[1], 64)
+		       ry, _ := strconv.ParseFloat(fields[2], 64)
+		       rz, _ := strconv.ParseFloat(fields[3], 64)
+	               fmt.Printf("%12d%24g%24g%24g%24g%24g%24g%24g\n", grid, value, tx, ty, tz, rx, ry, rz)
+	            }
+
+	       }
+	       fmt.Println("Next Eigenvalue")
             }
-	    fmt.Printf("\n")
 	}
         f.Close()
 	fmt.Printf("Frequencies:\n");
@@ -73,9 +97,4 @@ func main() {
 	    fmt.Printf("#%d = %g\n", index, math.Sqrt(value) / (2. * math.Pi))
 	}
 	return
-}
-
-func readline(s *bufio.Scanner) (string, []string) {
-	line := s.Text()
-	return line, strings.Fields(line)
 }
