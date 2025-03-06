@@ -9,6 +9,11 @@ import(
 	"math"
 )
 
+var line string
+var fields []string
+var input *bufio.Scanner
+var filename string
+
 func main() {
 
 	if (len(os.Args) < 2) {
@@ -38,7 +43,7 @@ func main() {
 	}
 	*******************************************************/
 
-	filename := data["file"]
+	filename = data["file"]
 	////fmt.Printf("Input file: %s\n", filename)
 
 	f, err := os.Open(filename)//f becomes *os.File
@@ -46,12 +51,15 @@ func main() {
 		  fmt.Fprintf(os.Stderr, "random: %v\n", err)
 	}
         var eigenvalues []float64
-	input := bufio.NewScanner(f)
+	////var F []float64 //Mode shapes
+
+	input = bufio.NewScanner(f)
 	/////fmt.Printf("%T\n", input)
 	for input.Scan() {
-	    line := input.Text()
-	    fields := strings.Fields(line) 
+	    ///line = input.Text()
+	    ///fields = strings.Fields(line) 
             /////line, fields := readline(input) 
+	    readline()
 	    if strings.Contains(line, "$EIGENVALUE") {
 	       ////fields := strings.Fields(line)
 	       /*****************************************************************
@@ -67,20 +75,22 @@ func main() {
 	       }
                eigenvalues = append(eigenvalues, value)
 	       for input.Scan() {
-                  line := input.Text()
+		  readline()
+                  //line = input.Text()
 		  if strings.Contains(line, "$TITLE"){
 		      break
 		   }
 
-		  fields := strings.Fields(line)
+		  //fields = strings.Fields(line)
 		  grid, _ := strconv.ParseInt(fields[0], 10, 64)
 		    tx, _ := strconv.ParseFloat(fields[2], 64)
 		    ty, _ := strconv.ParseFloat(fields[3], 64)
 		    tz, _ := strconv.ParseFloat(fields[4], 64)
 
 		    if input.Scan(){
-                       line := input.Text()
-		       fields := strings.Fields(line)
+                       //line = input.Text()
+		       //fields = strings.Fields(line)
+		       readline()
 		       rx, _ := strconv.ParseFloat(fields[1], 64)
 		       ry, _ := strconv.ParseFloat(fields[2], 64)
 		       rz, _ := strconv.ParseFloat(fields[3], 64)
@@ -97,4 +107,9 @@ func main() {
 	    fmt.Printf("#%d = %g\n", index, math.Sqrt(value) / (2. * math.Pi))
 	}
 	return
+}
+
+func readline(){
+    line = input.Text()
+    fields = strings.Fields(line)
 }
