@@ -9,6 +9,16 @@ import(
 	"math"
 )
 
+type InputData struct{
+     r float64 // radius
+     q float64 // pressure
+     D float64 // stiffness
+    nu float64 // Poisson 
+   rho float64 // density
+     h float64 // thickness
+     E float64 // Young
+}
+
 func main(){
 	//fmt.Println(os.Args[1:])
 	data := make(map[string]string)
@@ -30,7 +40,7 @@ func main(){
 	     input := "moment"
 	     boundary[input](0.1)
          } else {
-	    fmt.Println("usage: ./static.. moment[shear,angle,disp]")
+	    fmt.Println("usage: ./static.. file=input.txt")
 	    return
          }
 
