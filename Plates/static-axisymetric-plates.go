@@ -22,7 +22,7 @@ type InputData struct{
 func main(){
 	//fmt.Println(os.Args[1:])
 	data := make(map[string]string)
-	boundary := make(map[string](func(r float64) (float64, float64, float64, float64)))
+	boundary := make(map[string](func(data InputData) (float64, float64, float64, float64)))
 
 	boundary["moment"] = moment
 	 boundary["angle"] = angle
@@ -37,8 +37,6 @@ func main(){
 		         data[parts[0]] = parts[1]
 	             }
 	     }
-	     input := "moment"
-	     boundary[input](0.1)
          } else {
 	    fmt.Println("usage: ./static.. file=input.txt")
 	    return
@@ -65,50 +63,64 @@ func main(){
 
 	  fmt.Printf("\nInput Data:\n")
 	  fmt.Printf("E = %g, h = %f, rho = %g, nu = %f, q = %f\n", E, h, rho, nu, q)
+	  var input InputData
+	  input.r = -1.
+	  input.q = q
+	  input.D = E * h * h * h / (12. * (1. - nu*nu)) 
+	  input.nu = nu
+	  input.rho = rho
+	  input.h = h
+	  input.E = E
 
 }
 
-func moment(r float64) (float64, float64, float64, float64) {
+func moment(data InputData) (float64, float64, float64, float64) {
 	fmt.Println("calculate moment")
 	//q := float64(1.0)
-	D := float64(1.0)
-        nu := float64(1.0)
-        c1, c2, c3, b := dangle_over_dr(r)
-	d1, d2, d3, c :=   angle_over_r(r)
+	D := data.D
+        nu := data.nu
+
+        c1, c2, c3, b := dangle_over_dr(data)
+	d1, d2, d3, c :=   angle_over_r(data)
 	return D*(c1 + nu*d1), D*(c2 + nu*d2), D*(c3 + nu*d3), D*(b + nu*c) 
 }
 
-func shear(r float64) (float64, float64, float64, float64) {
+func shear(data InputData) (float64, float64, float64, float64) {
 	fmt.Println("calculate share")
-	q := float64(1.0)
+	q := data.q 
 	//D := float64(1.0)
+	r := data.r
 	return 0., 0., 0., q*r/2.
 }
 
-func angle(r float64) (float64, float64, float64, float64) {
+func angle(data InputData) (float64, float64, float64, float64) {
 	fmt.Println("calculate angle")
-	q := float64(1.0)
-	D := float64(1.0)
+	q := data.q
+	D := data.D
+	r := data.r
 	return -r/2., -1/r, 0., -q*r*r*r/(16.*D)
 }
 
-func disp(r float64) (float64, float64, float64, float64) {
+func disp(data InputData) (float64, float64, float64, float64) {
 	fmt.Println("calculate displacement")
-	q := float64(1.0)
-	D := float64(1.0)
+	q := data.q
+	D := data.D
+	r := data.r
 	return r * r / 4., math.Log(r), 1., q*r*r*r*r/(64.*D)
 }
 
-func dangle_over_dr(r float64) (float64, float64, float64, float64) {
+func dangle_over_dr(data InputData) (float64, float64, float64, float64) {
 	fmt.Println("calculate angle")
-	q := float64(1.0)
-	D := float64(1.0)
+	q := data.q
+	D := data.D
+	r := data.r
 	return -1./2., 1./(r*r), 0., -3.*q*r*r/(16.*D)
 }
 
-func angle_over_r(r float64) (float64, float64, float64, float64) {
+func angle_over_r(data InputData) (float64, float64, float64, float64) {
 	fmt.Println("calculate angle")
-	q := float64(1.0)
-	D := float64(1.0)
+	q := data.q
+	D := data.D
+	r := data.r
 	return -1/2., -1./(r*r), 0., -q*r*r/(16.*D)
 }
