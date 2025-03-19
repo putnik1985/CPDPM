@@ -1,0 +1,14 @@
+#input data
+h,5.,mm,
+E,20387.35984,kgs/mm2,
+nu,0.3,
+rho,7.95107E-10,kgs.s2/mm4,
+q,0.010,kgs/mm2,
+
+#boundary conditions
+disp=0.,r=300.,
+
+r,0.,300.,
+angle=0.,r=300.,
+angle=0.,r=0.,
+

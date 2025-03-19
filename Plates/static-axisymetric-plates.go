@@ -20,8 +20,9 @@ type InputData struct{
 }
 
 const (
-       rtolerance = 1.E-5
-       N = 100
+       rtolerance =  1.E-5
+        rmaxnumber = 1.E+16
+                N =    100
        )
 
 func main(){
@@ -77,7 +78,7 @@ func main(){
 		     rmax, _ = strconv.ParseFloat(parts[2], 64)
 	     }
 
-	     if (strings.Contains(parts[0], "angle") || strings.Contains(parts[0], "disp")) {
+	     if (strings.Contains(parts[0], "angle") || strings.Contains(parts[0], "disp") || strings.Contains(parts[0], "moment")) {
 		     //fmt.Println("Found Range")
 		     //fmt.Println(parts)
 		     current_bc++
@@ -130,7 +131,7 @@ func main(){
 		  input.r, _ = strconv.ParseFloat(values[1], 64)
 		  ///fmt.Printf("name = %s, value = %f\n", values[0], input.r)
 
-		  input.r += rtolerance
+		  //input.r += rtolerance
 		  var number float64
 		  A[i][0], A[i][1], A[i][2], number = boundary[name](input)
 		  B[i] = value - number 
@@ -139,7 +140,7 @@ func main(){
 	  }
 
 	  var C [3]float64
-	  if A[0][2] == 0. && A[1][2] == 0. {//no boundary conditions defined by displacement
+	  /*********************************************
 		  var a [2][2]float64
                   var det [3]float64
 
@@ -156,7 +157,7 @@ func main(){
 		  det[2] = det2(a)
 
 		  if det[0] == 0. {
-			  fmt.Println("Can not find solution")
+			  fmt.Println("Coefficient: Can not find solution")
 			  return
 		  }
 
@@ -164,18 +165,26 @@ func main(){
 		  C[1] = det[2] / det[0]
 
 		  C[2] = (B[2] - A[2][0] * C[0] - A[2][1] * C[1]) / A[2][2]
+	  ****************************************************/
 
+                  C = gauss(A,B)
+                  if math.Abs(C[1]) < rtolerance {
+			  C[1] = 0.
+		  }
 		  //fmt.Println("\nSolution:")
-		  //fmt.Printf("%12.f%12.f%12.f\n",C[0], C[1], C[2])
+		  //fmt.Printf("%12f,%12f,%12f,\n",C[0], C[1], C[2])
+		  //fmt.Printf("\n")
 		  fmt.Printf("\n%12s,%12s,%12s,%12s,%12s,%12s,%12s\n","radius(mm)","Disp(mm)","Angle(rad)","Moment_r(kgs.mm)","Moment_t(kgs.mm)","Sr(kgs/mm2)","St(kgs/mm2)")
 		  dr := (rmax - rmin) / N
 		  var max_d, max_a, max_mr, max_mt, max_sr, max_st float64
 		  for r:=rmin; r<=rmax; r+=dr {
-			  input.r = r + rtolerance
+			  input.r = r
 			  d1, d2, d3, d4 := boundary["disp"](input)
 			  a1, a2, a3, a4 := boundary["angle"](input)
 			  m1, m2, m3, m4 := boundary["moment"](input)
 
+                          //fmt.Printf("%12f,%12f,%12f,%12f\n", m1, m2, m3, m4)
+		          //fmt.Printf("%12f,%12g,%12f,%12f,=,%12f\n\n", C[0], C[1], C[2], 1., mvalue)
 
 			  dvalue := C[0] * d1 + C[1] * d2 + C[2] * d3 + d4
 			  avalue := C[0] * a1 + C[1] * a2 + C[2] * a3 + a4
@@ -214,9 +223,6 @@ func main(){
 		          fmt.Printf("\n\n")
 			  fmt.Printf("%12s,%12.3f,%12.6f,%12.2f,%12.2f,%12.2f,%12.2f\n", "Maximum:", max_d, max_a, max_mr, max_mt, max_sr, max_st)
 
-	  } else {
-		  fmt.Println("Can not find the solution")
-	  }
 
 }
 
@@ -259,6 +265,9 @@ func angle(data InputData) (float64, float64, float64, float64) {
 	q := data.q
 	D := data.D
 	r := data.r
+	if r < rtolerance {
+	   return -r/2., -rmaxnumber, 0., -q*r*r*r/(16.*D)
+        }
 	return -r/2., -1/r, 0., -q*r*r*r/(16.*D)
 }
 
@@ -267,6 +276,9 @@ func disp(data InputData) (float64, float64, float64, float64) {
 	q := data.q
 	D := data.D
 	r := data.r
+	if r < rtolerance {
+	   return r * r / 4., -rmaxnumber, 1., q*r*r*r*r/(64.*D)
+        }
 	return r * r / 4., math.Log(r), 1., q*r*r*r*r/(64.*D)
 }
 
@@ -275,6 +287,9 @@ func dangle_over_dr(data InputData) (float64, float64, float64, float64) {
 	q := data.q
 	D := data.D
 	r := data.r
+	if r < rtolerance {
+	    return -1./2., rmaxnumber, 0., -3.*q*r*r/(16.*D)
+        }
 	return -1./2., 1./(r*r), 0., -3.*q*r*r/(16.*D)
 }
 
@@ -283,5 +298,33 @@ func angle_over_r(data InputData) (float64, float64, float64, float64) {
 	q := data.q
 	D := data.D
 	r := data.r
+	if r < rtolerance {
+	   return -1/2., -rmaxnumber, 0., -q*r*r/(16.*D)
+        }
 	return -1/2., -1./(r*r), 0., -q*r*r/(16.*D)
+}
+
+func gauss(A [3][3]float64, B [3]float64) [3]float64 {
+	 n := 3
+	 // solver for 3x3 equations
+	 for i:=0; i<n-1; i++{
+		 for j:=i+1; j<n; j++{
+			 factor := A[j][i] / A[i][i]
+			 for k:=i; k<n; k++ {
+				 A[j][k] -= factor * A[i][k]
+			 }
+			 B[j] -= factor * B[i]
+		 }
+	 }
+
+	 var x [3]float64
+
+	 for k:=n-1; k>=0; k--{
+		 s := float64(0.0)
+		 for j:=k+1; j<n; j++{
+			 s += A[k][j] * x[j]
+		 }
+		 x[k] = (B[k] - s) / A[k][k]
+	 }
+	 return x
 }

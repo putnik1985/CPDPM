@@ -7,6 +7,6 @@ q,0.010,kgs/mm2,
 
 #boundary conditions
 r,0.,300.,
-angle=0.,r=300.,
-angle=0.,r=0.,
 disp=0.,r=300.,
+moment=0.,r=300.,
+angle=0.,r=0.,
