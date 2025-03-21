@@ -14,6 +14,10 @@ var fields []string
 var input *bufio.Scanner
 var filename string
 
+const (
+	dofs = 6 
+)
+
 func main() {
 
 	if (len(os.Args) < 2) {
@@ -61,7 +65,7 @@ func main() {
         /*****************************************************************
 	* Input from the console
 	******************************************************************/
-        var excitation_direction int = 1 // should read from the input
+        /////var excitation_direction int = 1 // should read from the input
 	var fmin float64 = 20. // initial frequency read from the input
 	var fmax float64 = 2000. // maximum frequency read from the input
 	var N int = 100 // number of the steps read from the input
@@ -107,7 +111,6 @@ func main() {
 		        grids = append(grids, grid)
 	          }
 
-		  dofs := 6 
 		  grids_per_mode[fields[0]] = int64(dofs)
 		    tx, _ := strconv.ParseFloat(fields[2], 64)
 		    ty, _ := strconv.ParseFloat(fields[3], 64)
@@ -120,23 +123,13 @@ func main() {
 		       rx, _ := strconv.ParseFloat(fields[1], 64)
 		       ry, _ := strconv.ParseFloat(fields[2], 64)
 		       rz, _ := strconv.ParseFloat(fields[3], 64)
-	               /////fmt.Printf("%12d%24g%24g%24g%24g%24g%24g%24g\n", grid, value, tx, ty, tz, rx, ry, rz)
+	               ///fmt.Printf("%12d%24g%24g%24g%24g%24g%24g%24g\n", grid, value, tx, ty, tz, rx, ry, rz)
 		       sF = append(sF, tx, ty, tz, rx, ry, rz)
 
-		       var vec [6]float64
-		       if excitation_direction == 1 {
-			       vec[0] = 1.
-		       } 
+		       var vec [dofs]float64 
+		       vec[0] = 1.; vec[1] = 1.; vec[2] = 1.;
 
-		       if excitation_direction == 2 {
-			       vec[1] = 1.
-		       } 
-
-		       if excitation_direction == 3 {
-			       vec[2] = 1.
-		       } 
-
-		       for i:=0; i<6; i++ {
+		       for i:=0; i<dofs; i++ {
 		           excitation = append(excitation, vec[i])
 		       }
 	            }
@@ -159,7 +152,7 @@ func main() {
 *****/
 	fmt.Printf("\n\nModes:\n");
 	for _, value := range eigenvalues {
-		out := fmt.Sprintf("%12.2fHz,", math.Sqrt(value) / (2. * math.Pi))
+		out := fmt.Sprintf("%.2fHz,", math.Sqrt(value) / (2. * math.Pi))
 		fmt.Printf("%12s",out)
 	}
 	fmt.Printf("\n")
@@ -185,16 +178,19 @@ func main() {
 
 	    for i:=0; i<int(n); i++ {
 		    for j:=0; j<int(m); j++ {
-			    fmt.Printf("%12.6f,",F[int(m)*i+j])
+			    out := fmt.Sprintf("%.6f,",F[int(m)*i+j])
+			    fmt.Printf("%12s",out)
 		    }
 		    fmt.Printf("\n")
 	    }
 	    fmt.Printf("\nSummary:\n");
 	    fmt.Printf("#Modes = %d, #DOFs = %d\n\n", m, n)
+	    /*************************************
 	    fmt.Println("\nExcitation")
 	    for i:=0; i<int(n); i++ {
 		    fmt.Println(excitation[i])
 	    }
+	    **************************************/
 
 /******************************************************************************
 	    A := []float64{2., 1., 1., 1., 1., 1., 1., 4., 1.}
@@ -228,8 +224,11 @@ func main() {
 		    fmt.Printf("\n")
 	    }
 ******************************************************************************/
-fmt.Println("\nDisplacement Spectrum Density:")
         mFTFinvFT := FTFinvFT(int(m),int(n),F) // output is matrix m x n
+	//fmt.Println(max_elem(int(n), int(m), F))
+	//fmt.Println(max_elem(int(m), int(n), mFTFinvFT))
+
+        fmt.Println("\nDisplacement Spectrum Density:")
 	var a []float64
 	for i:=0; i<int(m); i++ {
 		var s float64 = 0.
@@ -242,13 +241,13 @@ fmt.Println("\nDisplacement Spectrum Density:")
 	for freq := fmin; freq <= fmax; freq += df {
 	       w := 2. * math.Pi * freq
 	       fmt.Printf("%12f,",freq)
-	       fmt.Printf("%12.6f,",DSpectrum(w))
+	       fmt.Printf("%12.6g,",DSpectrum(w))
 	       for k:=0; k<int(n); k++{ // calculate for each DOF
 	           var Sx float64 = 0.
 	           for mode, eig := range eigenvalues{
 		       w0 := math.Sqrt(eig) 
 		       Sq := DSpectrum(w) * a[mode] * a[mode] / (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
-		       ////fmt.Println(a[mode],Sq,w0,w,ksi[mode])
+		       ///fmt.Println(a[mode],Sq,w0,w,ksi[mode])
                        Sx += F[k*int(m)+mode] * F[k*int(m)+mode] * Sq
 	            }
 	            fmt.Printf("%12.6f,",Sx)
@@ -265,14 +264,26 @@ func readline(){
 
 func gauss(A []float64, B []float64) []float64 {
 	 // A[i][j] = A[i*n+j]
+
 	 n := len(B) // define number of equations assume A is square
+	 var cA []float64
+	 var cB []float64
+
+	 for _, value := range A {
+		 cA = append(cA, value)
+	 }
+
+	 for _, value := range B {
+		 cB = append(cB, value)
+	 }
+
 	 for i:=0; i<n-1; i++{
 		 for j:=i+1; j<n; j++{
-			 factor := A[j*n+i] / A[i*n+i]
+			 factor := cA[j*n+i] / cA[i*n+i]
 			 for k:=i; k<n; k++ {
-				 A[j*n+k] -= factor * A[i*n+k]
+				 cA[j*n+k] -= factor * cA[i*n+k]
 			 }
-			 B[j] -= factor * B[i]
+			 cB[j] -= factor * cB[i]
 		 }
 	 }
 
@@ -284,10 +295,28 @@ func gauss(A []float64, B []float64) []float64 {
 	 for k:=n-1; k>=0; k--{
 		 s := float64(0.0)
 		 for j:=k+1; j<n; j++{
-			 s += A[k*n+j] * x[j]
+			 s += cA[k*n+j] * x[j]
 		 }
-		 x[k] = (B[k] - s) / A[k*n+k]
+		 x[k] = (cB[k] - s) / cA[k*n+k]
 	 }
+
+/*****************************************************************************************
+	 var check []float64
+         for i:=0; i<n; i++ {
+		 var s float64 = 0.
+		 for j:=0; j<n; j++ {
+			 s += A[i*n + j] * x[j]
+		 }
+		 check = append(check, s)
+	 }
+	 fmt.Printf("\nGauss Check:\n")
+	 var sum float64 = 0.
+	 for i:=0; i<n; i++{
+		 sum = math.Pow(B[i] - check[i], 2.)
+	 }
+	 fmt.Printf("Norm: %.4f\n", math.Sqrt(sum))
+/*****************************************************************************************/
+
 	 return x
 }
 
@@ -295,7 +324,8 @@ func inverse(A []float64) []float64 {
 	nxn := len(A)
         n := math.Sqrt(float64(nxn))
         dim := int(n)	
-	////fmt.Printf("inverse: %d\n", int(n))
+	///////////////////fmt.Printf("inverse: %d\n", int(n))
+
 	var inv []float64
         for i:=0; i<nxn; i++ {
 		inv = append(inv, 0.)
@@ -306,7 +336,16 @@ func inverse(A []float64) []float64 {
 		    x = append(x, 0.)
 		}
 		x[k] = 1.
+
+		/*****************************************
+		for i:=0; i<dim; i++ {
+			fmt.Printf("%f",x[i])
+		}
+		fmt.Printf("\n")
+		*****************************************/
 		column := gauss(A, x)
+
+
 		for j:=0; j<dim; j++{
 			inv[j*dim+k] = column[j]
 		}
@@ -339,8 +378,36 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 	// m - number of modes - columns
 	// n - number of DOFs - rows
         var output []float64
+
             A := FTF(m, n, F)
+	   //**************************************************
+           //fmt.Printf("FTF Max:\n")
+	   //fmt.Println(max_elem(int(m), int(m), A))
+           /****************************************************/
+
 	   iA := inverse(A) // m x m matrix
+	   ///**************************************************
+           //fmt.Printf("FTFinv Max:\n")
+	   //fmt.Println(max_elem(int(m), int(m), iA))
+           //****************************************************/
+  
+	    fmt.Printf("\nMultiplication Inverse Check:\n")
+       	    var sum float64 = 0.
+	    for i:=0; i<m; i++{
+		    for j:=0; j<m; j++{
+
+			    var s float64 = 0.
+			    for k:=0; k<m; k++{
+				    s += A[i*m+k] * iA[k*m+j]
+			    }
+
+			    if (i != j){
+				    sum += math.Abs(s)
+			    }
+		    }
+	    }
+	    fmt.Printf("Sum of off Diagonal Elements(must be zero): %f,\n", sum)
+
 	   for i:=0; i<m; i++ {
 		   for j:=0; j<n; j++ {
 			   output = append(output, 0.)
@@ -364,5 +431,17 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 }
 
 func DSpectrum(w float64) float64 {
-	return 0.008
+	return 1.E-3
+}
+
+func max_elem(n, m int, A []float64) float64 {
+	var maxel float64
+	for i:=0; i<n; i++{
+		for j:=0; j<m; j++ {
+			if math.Abs(A[i*m+j]) > maxel {
+				maxel = math.Abs(A[i*m+j])
+			}
+		}
+	}
+	return maxel
 }

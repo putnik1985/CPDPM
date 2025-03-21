@@ -1,19 +1,19 @@
 
 
 Grid and DOFs:
-grid:         15630395, dofs:            6
-grid:         16192171, dofs:            6
-grid:         26203125, dofs:            6
 grid:         26203127, dofs:            6
-grid:         16047874, dofs:            6
-grid:         16125753, dofs:            6
-grid:         26203121, dofs:            6
-grid:         15630394, dofs:            6
-grid:         15630396, dofs:            6
+grid:         15630395, dofs:            6
 grid:         16156145, dofs:            6
-grid:         15630407, dofs:            6
 grid:         26203118, dofs:            6
 grid:         26203119, dofs:            6
+grid:         15630394, dofs:            6
+grid:         26203125, dofs:            6
+grid:         15630407, dofs:            6
+grid:         16047874, dofs:            6
+grid:         16192171, dofs:            6
+grid:         26203121, dofs:            6
+grid:         15630396, dofs:            6
+grid:         16125753, dofs:            6
 grid:         26203123, dofs:            6
 grid:         26203126, dofs:            6
 
