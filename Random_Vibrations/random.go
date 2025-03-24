@@ -63,7 +63,7 @@ func main() {
 
 
         /*****************************************************************
-	* Input from the console
+	* Define as the Input from the console
 	******************************************************************/
         /////var excitation_direction int = 1 // should read from the input
 	var fmin float64 = 20. // initial frequency read from the input
@@ -123,7 +123,7 @@ func main() {
 		       rx, _ := strconv.ParseFloat(fields[1], 64)
 		       ry, _ := strconv.ParseFloat(fields[2], 64)
 		       rz, _ := strconv.ParseFloat(fields[3], 64)
-	               ///fmt.Printf("%12d%24g%24g%24g%24g%24g%24g%24g\n", grid, value, tx, ty, tz, rx, ry, rz)
+	               ////fmt.Printf("%12d%24g%24g%24g%24g%24g%24g%24g\n", grid, value, tx, ty, tz, rx, ry, rz)
 		       sF = append(sF, tx, ty, tz, rx, ry, rz)
 
 		       var vec [dofs]float64 
@@ -141,8 +141,9 @@ func main() {
         f.Close()
 	
 	fmt.Printf("\n\nGrid and DOFs:\n")
-	for name, value := range grids_per_mode {
-		fmt.Printf("grid: %16s, dofs: %12d\n", name, value)
+	for _, value := range grids {
+		svalue := fmt.Sprintf("%d",value)
+		fmt.Printf("grid: %16d, dofs: %12d\n", value, grids_per_mode[svalue])
 	}
 /***
 	fmt.Printf("\n\nFile Grid\n")
@@ -277,6 +278,7 @@ func gauss(A []float64, B []float64) []float64 {
 		 cB = append(cB, value)
 	 }
 
+
 	 for i:=0; i<n-1; i++{
 		 for j:=i+1; j<n; j++{
 			 factor := cA[j*n+i] / cA[i*n+i]
@@ -301,6 +303,13 @@ func gauss(A []float64, B []float64) []float64 {
 	 }
 
 /*****************************************************************************************
+	 for i:=0; i<n; i++ {
+		 for j:=0; j<n; j++{
+			 fmt.Printf("%12.6f,",A[i*n+j])
+		 }
+		 fmt.Printf("%16.6f,%16.6f\n", x[i], B[i])
+	 }
+	 ///panic("Matrix written")
 	 var check []float64
          for i:=0; i<n; i++ {
 		 var s float64 = 0.
@@ -315,8 +324,8 @@ func gauss(A []float64, B []float64) []float64 {
 		 sum = math.Pow(B[i] - check[i], 2.)
 	 }
 	 fmt.Printf("Norm: %.4f\n", math.Sqrt(sum))
-/*****************************************************************************************/
-
+//*****************************************************************************************/
+         ///panic("Check Gauss")
 	 return x
 }
 
@@ -324,7 +333,6 @@ func inverse(A []float64) []float64 {
 	nxn := len(A)
         n := math.Sqrt(float64(nxn))
         dim := int(n)	
-	///////////////////fmt.Printf("inverse: %d\n", int(n))
 
 	var inv []float64
         for i:=0; i<nxn; i++ {
@@ -336,15 +344,7 @@ func inverse(A []float64) []float64 {
 		    x = append(x, 0.)
 		}
 		x[k] = 1.
-
-		/*****************************************
-		for i:=0; i<dim; i++ {
-			fmt.Printf("%f",x[i])
-		}
-		fmt.Printf("\n")
-		*****************************************/
 		column := gauss(A, x)
-
 
 		for j:=0; j<dim; j++{
 			inv[j*dim+k] = column[j]
@@ -380,16 +380,25 @@ func FTFinvFT(m, n int, F []float64) []float64 {
         var output []float64
 
             A := FTF(m, n, F)
-	   //**************************************************
-           //fmt.Printf("FTF Max:\n")
-	   //fmt.Println(max_elem(int(m), int(m), A))
-           /****************************************************/
+	    fmt.Printf("\n\nMatrix to Inverse:\n")
+	    for i:=0; i<m; i++ {
+		    for j:=0; j<m; j++{
+			    s := fmt.Sprintf("%.6f", A[i*n+j])
+			    A[i*n+j], _ = strconv.ParseFloat(s, 64)
+			    fmt.Printf("%24f", A[i*n+j])
+		    }
+		    fmt.Printf("\n")
+	    }
+
 
 	   iA := inverse(A) // m x m matrix
-	   ///**************************************************
-           //fmt.Printf("FTFinv Max:\n")
-	   //fmt.Println(max_elem(int(m), int(m), iA))
-           //****************************************************/
+	    fmt.Printf("\n\nInversed Matrix:\n")
+	    for i:=0; i<m; i++ {
+		    for j:=0; j<m; j++{
+			    fmt.Printf("%24.6f", iA[i*n+j])
+		    }
+		    fmt.Printf("\n")
+	    }
   
 	    fmt.Printf("\nMultiplication Inverse Check:\n")
        	    var sum float64 = 0.
@@ -405,8 +414,8 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 				    sum += math.Abs(s)
 			    }
 		    }
-	    }
-	    fmt.Printf("Sum of off Diagonal Elements(must be zero): %f,\n", sum)
+	   }
+	   fmt.Printf("Sum of off Diagonal Elements(must be within tolerance): %f,\n", sum)
 
 	   for i:=0; i<m; i++ {
 		   for j:=0; j<n; j++ {
@@ -431,7 +440,7 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 }
 
 func DSpectrum(w float64) float64 {
-	return 1.E-3
+	return 1.0
 }
 
 func max_elem(n, m int, A []float64) float64 {
