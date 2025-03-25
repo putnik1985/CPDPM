@@ -74,20 +74,9 @@ func main() {
         write_grids := true 
 
 	input = bufio.NewScanner(f)
-	/////fmt.Printf("%T\n", input)
 	for input.Scan() {
-	    ///line = input.Text()
-	    ///fields = strings.Fields(line) 
-            /////line, fields := readline(input) 
 	    readline()
 	    if strings.Contains(line, "$EIGENVALUE") {
-	       ////fields := strings.Fields(line)
-	       /*****************************************************************
-	       for index, value := range fields {
-	           fmt.Printf("%d = %s, ", index, value)
-	       }
-	       fmt.Printf("\n");
-	       ******************************************************************/
 	       value, err := strconv.ParseFloat(fields[2], 64)
 	       if err != nil {
 		       fmt.Fprintf(os.Stderr, "random: %v\n", err)
@@ -98,15 +87,11 @@ func main() {
 
 	       for input.Scan() {
 		  readline()
-                  //line = input.Text()
 		  if strings.Contains(line, "$TITLE"){
 	              write_grids = false
 		      break
 		   }
-
-		  //fields = strings.Fields(line)
 		  grid, _ := strconv.ParseInt(fields[0], 10, 64)
-
 		  if write_grids {
 		        grids = append(grids, grid)
 	          }
@@ -117,8 +102,6 @@ func main() {
 		    tz, _ := strconv.ParseFloat(fields[4], 64)
 
 		    if input.Scan(){
-                       //line = input.Text()
-		       //fields = strings.Fields(line)
 		       readline()
 		       rx, _ := strconv.ParseFloat(fields[1], 64)
 		       ry, _ := strconv.ParseFloat(fields[2], 64)
@@ -133,9 +116,7 @@ func main() {
 		           excitation = append(excitation, vec[i])
 		       }
 	            }
-
 	       }
-	       ////fmt.Println("Next Eigenvalue")
             }
 	}
         f.Close()
@@ -225,6 +206,7 @@ func main() {
 		    fmt.Printf("\n")
 	    }
 ******************************************************************************/
+
         mFTFinvFT := FTFinvFT(int(m),int(n),F) // output is matrix m x n
 	//fmt.Println(max_elem(int(n), int(m), F))
 	//fmt.Println(max_elem(int(m), int(n), mFTFinvFT))
@@ -263,6 +245,12 @@ func readline(){
     fields = strings.Fields(line)
 }
 
+func change_precision(in float64) float64 {
+	out := fmt.Sprintf("%.6f",in)
+	number, _:= strconv.ParseFloat(out, 64)
+	return number
+}
+
 func gauss(A []float64, B []float64) []float64 {
 	 // A[i][j] = A[i*n+j]
 
@@ -278,11 +266,10 @@ func gauss(A []float64, B []float64) []float64 {
 		 cB = append(cB, value)
 	 }
 
-
 	 for i:=0; i<n-1; i++{
 		 for j:=i+1; j<n; j++{
 			 factor := cA[j*n+i] / cA[i*n+i]
-			 for k:=i; k<n; k++ {
+			 for k:=i; k<n; k++{
 				 cA[j*n+k] -= factor * cA[i*n+k]
 			 }
 			 cB[j] -= factor * cB[i]
@@ -301,31 +288,6 @@ func gauss(A []float64, B []float64) []float64 {
 		 }
 		 x[k] = (cB[k] - s) / cA[k*n+k]
 	 }
-
-/*****************************************************************************************
-	 for i:=0; i<n; i++ {
-		 for j:=0; j<n; j++{
-			 fmt.Printf("%12.6f,",A[i*n+j])
-		 }
-		 fmt.Printf("%16.6f,%16.6f\n", x[i], B[i])
-	 }
-	 ///panic("Matrix written")
-	 var check []float64
-         for i:=0; i<n; i++ {
-		 var s float64 = 0.
-		 for j:=0; j<n; j++ {
-			 s += A[i*n + j] * x[j]
-		 }
-		 check = append(check, s)
-	 }
-	 fmt.Printf("\nGauss Check:\n")
-	 var sum float64 = 0.
-	 for i:=0; i<n; i++{
-		 sum = math.Pow(B[i] - check[i], 2.)
-	 }
-	 fmt.Printf("Norm: %.4f\n", math.Sqrt(sum))
-//*****************************************************************************************/
-         ///panic("Check Gauss")
 	 return x
 }
 
@@ -383,8 +345,6 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 	    fmt.Printf("\n\nMatrix to Inverse:\n")
 	    for i:=0; i<m; i++ {
 		    for j:=0; j<m; j++{
-			    s := fmt.Sprintf("%.6f", A[i*n+j])
-			    A[i*n+j], _ = strconv.ParseFloat(s, 64)
 			    fmt.Printf("%24f", A[i*n+j])
 		    }
 		    fmt.Printf("\n")

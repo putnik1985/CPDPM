@@ -1752,7 +1752,7 @@ sub grid_create_rbe2_from_list {
 	my $last = @grids;
     
 
-	$output_str = sprintf "GRID,%d,0,%g,%g,%g,0\n",$next_grid,$x0,$y0,$z0;
+	$output_str = sprintf "GRID,%d,0,%f,%f,%f,0\n",$next_grid,$x0,$y0,$z0;
 	push(@file_lines, $output_str);
 	
 	$output_str = sprintf "RBE2,%d,%d,123456,",$next_element,$next_grid;
