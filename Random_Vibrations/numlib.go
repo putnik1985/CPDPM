@@ -56,7 +56,6 @@ func main() {
 	}
 
 	var A []float64
-	var B []float64
 
 	input = bufio.NewScanner(f)
 	if input.Scan() {
@@ -70,13 +69,11 @@ func main() {
 		for j:=0; j<n; j++{
 			A = append(A, 0.)
 		}
-		B = append(B, 0.)
 	}
 
 	for j:=0; j<n; j++{
 		A[0 * n + j], _ = strconv.ParseFloat(fields[j], 64)
 	}
-	B[0] = 1.
 
 	i := 1
 	for input.Scan() {
@@ -90,28 +87,13 @@ func main() {
 	}
         f.Close()
 
-        x := gauss(A, B)
-	for i:=0; i<n; i++{
-		for j:=0; j<n; j++{
-			fmt.Printf("%12.6f,",A[i*n+j])
-		}
-		fmt.Printf("%24.6f, %16.6f\n", x[i], B[i])
-	}
-
-	 var check []float64
-         for i:=0; i<n; i++ {
-		 var s float64 = 0.
-		 for j:=0; j<n; j++ {
-			 s += A[i*n + j] * x[j]
+	 fmt.Printf("\nInput Matrix:\n")
+         for i:=0; i<n; i++{
+		 for j:=0; j<n; j++{
+			 fmt.Printf("%24.6f,", A[i*n+j])
 		 }
-		 check = append(check, s)
+		 fmt.Printf("\n")
 	 }
-	 fmt.Printf("\nGauss Check:\n")
-	 var sum float64 = 0.
-	 for i:=0; i<n; i++{
-		 sum = math.Pow(B[i] - check[i], 2.)
-	 }
-	 fmt.Printf("Norm: %.4f\n", math.Sqrt(sum))
 
 	 iA := inverse(A)
 	 fmt.Printf("\nInverse Matrix:\n")
@@ -121,6 +103,23 @@ func main() {
 		 }
 		 fmt.Printf("\n")
 	 }
+
+	    fmt.Printf("\nMultiplication Inverse Check:\n")
+       	    var sum float64 = 0.
+	    for i:=0; i<n; i++{
+		    for j:=0; j<n; j++{
+			    var s float64 = 0.
+			    for k:=0; k<n; k++{
+				    s += A[i*n+k] * iA[k*n+j]
+			    }
+			    fmt.Printf("%24.6f,", s)
+			    if (i != j){
+				    sum += math.Abs(s)
+			    }
+		    }
+		    fmt.Printf("\n")
+	   }
+	   fmt.Printf("Sum of off Diagonal Elements(must be within tolerance): %f,\n", sum)
 }
 
 func inverse(A []float64) []float64 {

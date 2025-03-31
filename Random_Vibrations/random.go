@@ -131,13 +131,13 @@ func main() {
 	for _, value := range grids {
 		fmt.Printf("%d\n", value)
 	}
-*****/
 	fmt.Printf("\n\nModes:\n");
 	for _, value := range eigenvalues {
 		out := fmt.Sprintf("%.2fHz,", math.Sqrt(value) / (2. * math.Pi))
 		fmt.Printf("%12s",out)
 	}
 	fmt.Printf("\n")
+*****/
 	var n int64
 	var m int64
 	    for _, dof := range grids_per_mode {
@@ -157,7 +157,7 @@ func main() {
 			    F[i*int(m)+j] = sF[j*int(n)+i]
 		    }
 	    }
-
+/*******************************************************
 	    for i:=0; i<int(n); i++ {
 		    for j:=0; j<int(m); j++ {
 			    out := fmt.Sprintf("%.6f,",F[int(m)*i+j])
@@ -165,6 +165,7 @@ func main() {
 		    }
 		    fmt.Printf("\n")
 	    }
+	    ****************************************/
 	    fmt.Printf("\nSummary:\n");
 	    fmt.Printf("#Modes = %d, #DOFs = %d\n\n", m, n)
 	    /*************************************
@@ -208,10 +209,8 @@ func main() {
 ******************************************************************************/
 
         mFTFinvFT := FTFinvFT(int(m),int(n),F) // output is matrix m x n
-	//fmt.Println(max_elem(int(n), int(m), F))
-	//fmt.Println(max_elem(int(m), int(n), mFTFinvFT))
 
-        fmt.Println("\nDisplacement Spectrum Density:")
+        fmt.Println("\nDisplacement Velocity Acceleration Spectrum Density:")
 	var a []float64
 	for i:=0; i<int(m); i++ {
 		var s float64 = 0.
@@ -265,6 +264,7 @@ func gauss(A []float64, B []float64) []float64 {
 	 for _, value := range B {
 		 cB = append(cB, value)
 	 }
+	 fmt.Printf("Gauss: cA symmetry: %t\n", symmetry(cA))
 
 	 for i:=0; i<n-1; i++{
 		 for j:=i+1; j<n; j++{
@@ -295,7 +295,7 @@ func inverse(A []float64) []float64 {
 	nxn := len(A)
         n := math.Sqrt(float64(nxn))
         dim := int(n)	
-
+	//////fmt.Printf("A symmetry: %t\n", symmetry(A))
 	var inv []float64
         for i:=0; i<nxn; i++ {
 		inv = append(inv, 0.)
@@ -340,42 +340,49 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 	// m - number of modes - columns
 	// n - number of DOFs - rows
         var output []float64
-
             A := FTF(m, n, F)
+	    /**************************************************************************
 	    fmt.Printf("\n\nMatrix to Inverse:\n")
 	    for i:=0; i<m; i++ {
 		    for j:=0; j<m; j++{
-			    fmt.Printf("%24f", A[i*n+j])
+			    fmt.Printf("%24.6f", A[i*m+j])
 		    }
 		    fmt.Printf("\n")
 	    }
+            ***********************************************************************/
 
+	    iA := inverse(A) // m x m matrix
 
-	   iA := inverse(A) // m x m matrix
+	    /**************************************************************************
 	    fmt.Printf("\n\nInversed Matrix:\n")
 	    for i:=0; i<m; i++ {
 		    for j:=0; j<m; j++{
-			    fmt.Printf("%24.6f", iA[i*n+j])
+			    fmt.Printf("%24.6f", iA[i*m+j])
 		    }
 		    fmt.Printf("\n")
 	    }
   
-	    fmt.Printf("\nMultiplication Inverse Check:\n")
+            ***********************************************************************/
+
+	    /////fmt.Printf("\nMultiplication Inverse Check:\n")
        	    var sum float64 = 0.
 	    for i:=0; i<m; i++{
 		    for j:=0; j<m; j++{
-
 			    var s float64 = 0.
 			    for k:=0; k<m; k++{
 				    s += A[i*m+k] * iA[k*m+j]
 			    }
-
 			    if (i != j){
 				    sum += math.Abs(s)
 			    }
 		    }
 	   }
-	   fmt.Printf("Sum of off Diagonal Elements(must be within tolerance): %f,\n", sum)
+	    fmt.Printf("\nSymmetry Check Summary:\n");
+	    fmt.Printf("   Direct Matrix: %t\n", symmetry(A))
+	    fmt.Printf("  Inverse Matrix: %t\n", symmetry(iA))
+
+	    fmt.Printf("\nMatrix Product Check Summary:\n");
+	    fmt.Printf("Off Diagonal Sum: %t\n\n", sum < 1.E-6)
 
 	   for i:=0; i<m; i++ {
 		   for j:=0; j<n; j++ {
@@ -413,4 +420,17 @@ func max_elem(n, m int, A []float64) float64 {
 		}
 	}
 	return maxel
+}
+
+func symmetry(A []float64) bool {
+	nxn := len(A)
+	n := int(math.Sqrt(float64(nxn)))
+	for i:=0; i<n; i++{
+		for j:=i+1; j<n; j++ {
+			if math.Abs(A[i*n+j] - A[j*n+i]) > 1.E-6 {
+				return false
+			}
+		}
+	}
+	return true
 }
