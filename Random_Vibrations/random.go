@@ -264,7 +264,7 @@ func gauss(A []float64, B []float64) []float64 {
 	 for _, value := range B {
 		 cB = append(cB, value)
 	 }
-	 fmt.Printf("Gauss: cA symmetry: %t\n", symmetry(cA))
+	 ////fmt.Printf("Gauss: cA symmetry: %t\n", symmetry(cA))
 
 	 for i:=0; i<n-1; i++{
 		 for j:=i+1; j<n; j++{
@@ -295,7 +295,7 @@ func inverse(A []float64) []float64 {
 	nxn := len(A)
         n := math.Sqrt(float64(nxn))
         dim := int(n)	
-	//////fmt.Printf("A symmetry: %t\n", symmetry(A))
+	fmt.Printf("inverse A symmetry: %t\n", symmetry(A))
 	var inv []float64
         for i:=0; i<nxn; i++ {
 		inv = append(inv, 0.)
@@ -312,6 +312,8 @@ func inverse(A []float64) []float64 {
 			inv[j*dim+k] = column[j]
 		}
 	}
+
+	//fmt.Printf("inverse inv symmetry: %t\n", symmetry(inv))
 	return inv
 }
 
@@ -340,7 +342,9 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 	// m - number of modes - columns
 	// n - number of DOFs - rows
         var output []float64
+
             A := FTF(m, n, F)
+
 	    /**************************************************************************
 	    fmt.Printf("\n\nMatrix to Inverse:\n")
 	    for i:=0; i<m; i++ {
@@ -377,6 +381,7 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 			    }
 		    }
 	   }
+
 	    fmt.Printf("\nSymmetry Check Summary:\n");
 	    fmt.Printf("   Direct Matrix: %t\n", symmetry(A))
 	    fmt.Printf("  Inverse Matrix: %t\n", symmetry(iA))

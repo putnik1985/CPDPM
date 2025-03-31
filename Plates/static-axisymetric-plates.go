@@ -17,6 +17,8 @@ type InputData struct{
    rho float64 // density
      h float64 // thickness
      E float64 // Young
+     a float64 //minimum radius
+     b float64 //maximum radius
 }
 
 const (
@@ -111,6 +113,8 @@ func main(){
 
 	  fmt.Printf("\nRadius Range:\n")
 	  fmt.Printf("r: %f, %f\n", rmin, rmax)
+	  input.a = rmin
+	  input.b = rmax
 
 	  var A [3][3]float64
 	  var B [3]float64
@@ -265,10 +269,11 @@ func angle(data InputData) (float64, float64, float64, float64) {
 	q := data.q
 	D := data.D
 	r := data.r
+	a := data.a
 	if r < rtolerance {
 	   return -r/2., -rmaxnumber, 0., -q*r*r*r/(16.*D)
         }
-	return -r/2., -1/r, 0., -q*r*r*r/(16.*D)
+	return -r/2., -1/r, 0., -q*r*r*r/(16.*D) + q * a * a * r / (8.*D) * (2. * math.Log(r) - 1.)
 }
 
 func disp(data InputData) (float64, float64, float64, float64) {
@@ -276,10 +281,12 @@ func disp(data InputData) (float64, float64, float64, float64) {
 	q := data.q
 	D := data.D
 	r := data.r
+	a := data.a
+
 	if r < rtolerance {
 	   return r * r / 4., -rmaxnumber, 1., q*r*r*r*r/(64.*D)
         }
-	return r * r / 4., math.Log(r), 1., q*r*r*r*r/(64.*D)
+	return r * r / 4., math.Log(r), 1., q*r*r*r*r/(64.*D) + q * a * a * r * r / (8. * D) * (1. - math.Log(r))
 }
 
 func dangle_over_dr(data InputData) (float64, float64, float64, float64) {
@@ -287,10 +294,12 @@ func dangle_over_dr(data InputData) (float64, float64, float64, float64) {
 	q := data.q
 	D := data.D
 	r := data.r
+	a := data.a
+
 	if r < rtolerance {
 	    return -1./2., rmaxnumber, 0., -3.*q*r*r/(16.*D)
         }
-	return -1./2., 1./(r*r), 0., -3.*q*r*r/(16.*D)
+	return -1./2., 1./(r*r), 0., -3.*q*r*r/(16.*D) + q * a * a / (8. * D) * (2. * math.Log(r) + 1.)
 }
 
 func angle_over_r(data InputData) (float64, float64, float64, float64) {
@@ -298,15 +307,17 @@ func angle_over_r(data InputData) (float64, float64, float64, float64) {
 	q := data.q
 	D := data.D
 	r := data.r
+	a := data.a
+
 	if r < rtolerance {
 	   return -1/2., -rmaxnumber, 0., -q*r*r/(16.*D)
         }
-	return -1/2., -1./(r*r), 0., -q*r*r/(16.*D)
+	return -1/2., -1./(r*r), 0., -q*r*r/(16.*D) + q * a * a / (8. * D) * (2. * math.Log(r) -1.)
 }
 
 func gauss(A [3][3]float64, B [3]float64) [3]float64 {
-	 n := 3
 	 // solver for 3x3 equations
+	 n := 3
 	 for i:=0; i<n-1; i++{
 		 for j:=i+1; j<n; j++{
 			 factor := A[j][i] / A[i][i]
