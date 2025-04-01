@@ -16,6 +16,8 @@ var filename string
 
 const (
 	dofs = 6 
+	tolerance = 1.E-6
+	max_iter = 1.E+6
 )
 
 func main() {
@@ -120,6 +122,23 @@ func main() {
 		    fmt.Printf("\n")
 	   }
 	   fmt.Printf("Sum of off Diagonal Elements(must be within tolerance): %f,\n", sum)
+
+	   fmt.Printf("\nJacobi Eigenvalues\n");
+	   vec := jacobi(A)
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++{
+			   fmt.Printf("%12.6f", A[i*n+j])
+		   }
+		   fmt.Printf("\n")
+	   }
+
+	   fmt.Printf("\nJacobi Eigenvectors\n");
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++{
+			   fmt.Printf("%12.6f", vec[i*n+j])
+		   }
+		   fmt.Printf("\n")
+	   }
 }
 
 func inverse(A []float64) []float64 {
@@ -184,4 +203,88 @@ func gauss(A []float64, B []float64) []float64 {
 		 x[k] = (cB[k] - s) / cA[k*n+k]
 	 }
 	 return x
+}
+
+
+func jacobi(A []float64) []float64 {
+
+     var eigenvectors []float64
+
+     nxn := len(A)
+     n := int(math.Sqrt(float64(nxn)))
+     var iter int64
+
+     for i:=0; i<n; i++ {
+	     for j:=0; j<n; j++ {
+	         eigenvectors = append(eigenvectors, 0.)
+             }
+	     eigenvectors[i*n + i] = 1.
+     }
+
+     a, i, j := max_off_diagonal(A)
+     for a>tolerance && iter<max_iter {
+	     aii := A[i*n+i]
+	     ajj := A[j*n+j]
+	     aij := A[i*n+j]
+	       ///fmt.Printf("aii=%f\n", (aii-ajj)*aij)
+
+	       d := math.Sqrt((aii-ajj)*(aii-ajj) + 4. * aij * aij)
+	       c := math.Sqrt(1./2. * (1. + math.Abs(aii-ajj)/d))
+	       s := sign(aij * (aii - ajj)) * math.Sqrt(1./2. * (1. - math.Abs(aii - ajj) / d))
+	       ///fmt.Printf("c=%f, s=%f,\n", c, s)
+
+	       A[i*n+i] = c*c*aii + 2.*c*s*aij + s*s*ajj
+	       A[j*n+j] = s*s*aii - 2.*c*s*aij + c*c*ajj
+
+	       A[i*n+j] = 0.
+	       A[j*n+i] = 0.
+
+	       for k:=0; k<n; k++ {
+		       aki := A[k*n+i]
+		       akj := A[k*n+j]
+
+		       if (k != i && k != j) {
+                           A[k*n+i] =  c*aki + s*akj
+			   A[k*n+j] = -s*aki + c*akj
+
+                           A[i*n+k] = A[k*n+i]
+			   A[j*n+k] = A[k*n+j]
+		       }
+
+		       eki := eigenvectors[k*n+i]
+		       ekj := eigenvectors[k*n+j]
+		       eigenvectors[k*n+i] =  c*eki + s*ekj
+		       eigenvectors[k*n+j] = -s*eki + c*ekj
+	       }
+	       iter++
+               a, i, j = max_off_diagonal(A)
+     }
+
+    return eigenvectors
+}
+
+func max_off_diagonal(A []float64) (float64, int, int) {
+	nxn := len(A)
+	n := int(math.Sqrt(float64(nxn)))
+	var maximum float64 = 0.
+        var row, col int
+
+  	for i:=0; i<n; i++{
+		for j:=i+1; j<n; j++ {
+			if math.Abs(A[i*n+j]) > maximum {
+				maximum = math.Abs(A[i*n+j])
+				row = i
+				col = j
+			}
+		}
+	}
+	return maximum, row, col
+}
+
+func sign(x float64) float64 {
+	if x>=0 {
+		return  1.
+	} else {
+		return -1. 
+	}
 }

@@ -8,5 +8,5 @@ q,0.010,kgs/mm2,
 #boundary conditions
 r,10.,300.,
 disp=0.,r=300.,
+disp=0.,r=10.,
 moment=0.,r=10.,
-moment=0.,r=300.,
