@@ -16,7 +16,7 @@ var filename string
 
 const (
 	dofs = 6 
-	tolerance = 1.E-6
+	tolerance = 1.E-18
 	max_iter = 1.E+6
 )
 
