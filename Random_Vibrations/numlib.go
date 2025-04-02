@@ -121,21 +121,75 @@ func main() {
 		    }
 		    fmt.Printf("\n")
 	   }
-	   fmt.Printf("Sum of off Diagonal Elements(must be within tolerance): %f,\n", sum)
 
-	   fmt.Printf("\nJacobi Eigenvalues\n");
-	   vec := jacobi(A)
+	   fmt.Printf("\nSum of off Diagonal Elements(must be within tolerance): %f,\n", sum)
+           var jA []float64
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++ {
+			   jA = append(jA, A[i*n+j])
+		   }
+	   }
+
+	   fmt.Printf("\nJacobi Eigenvalues:\n");
+	   vec := jacobi(jA)
 	   for i:=0; i<n; i++ {
 		   for j:=0; j<n; j++{
-			   fmt.Printf("%12.6f", A[i*n+j])
+			   fmt.Printf("%24.6f,", jA[i*n+j])
 		   }
 		   fmt.Printf("\n")
 	   }
 
-	   fmt.Printf("\nJacobi Eigenvectors\n");
+	   fmt.Printf("\nJacobi Eigenvectors:\n");
 	   for i:=0; i<n; i++ {
 		   for j:=0; j<n; j++{
-			   fmt.Printf("%12.6f", vec[i*n+j])
+			   fmt.Printf("%24.6f,", vec[i*n+j])
+		   }
+		   fmt.Printf("\n")
+	   }
+
+	   fmt.Printf("\nJacobi Check Vector Orthogonality:\n")
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++ {
+			   var s float64
+			   for k:=0; k<n; k++ {
+				   s += vec[k*n+i]*vec[k*n+j]
+			   }
+			   fmt.Printf("%24.6f,",s)
+		   }
+		   fmt.Printf("\n")
+	   }
+
+	   fmt.Printf("\nJacobi Check XT.A.X:\n")
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++ {
+			   var s float64
+			   for k:=0; k<n; k++ {
+				   for t:=0; t<n; t++ {
+				       s += vec[k*n+i] * A[k*n+t] * vec[t*n+j]
+			           }
+			   }
+			   fmt.Printf("%24.6f,",s)
+		   }
+		   fmt.Printf("\n")
+	   }
+	   fmt.Printf("\nJacobi Invesre Calculation:\n")
+           var invjA []float64
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++ {
+			   invjA = append(invjA, 0.)
+		   }
+		   invjA[i*n+i] = 1. / jA[i*n+i]
+	   }
+
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++ {
+			   var s float64
+			   for k:=0; k<n; k++ {
+				   for t:=0; t<n; t++ {
+				       s += vec[i*n+k] * invjA[k*n+t] * vec[j*n+t]
+			           }
+			   }
+			   fmt.Printf("%24.6f,",s)
 		   }
 		   fmt.Printf("\n")
 	   }
