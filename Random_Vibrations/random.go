@@ -16,6 +16,8 @@ var filename string
 
 const (
 	dofs = 6 
+	tolerance = 1.E-18
+	max_iter = 1.E+6
 )
 
 func main() {
@@ -355,7 +357,8 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 	    }
             ***********************************************************************/
 
-	    iA := inverse(A) // m x m matrix
+	    //iA := inverse(A) // m x m matrix
+	    iA := jacobi_inverse(A) // m x m matrix
 
 	    /**************************************************************************
 	    fmt.Printf("\n\nInversed Matrix:\n")
@@ -438,4 +441,130 @@ func symmetry(A []float64) bool {
 		}
 	}
 	return true
+}
+
+type Matrix []float64
+func (A Matrix) jacobi() []float64 {
+
+     var eigenvectors []float64
+     nxn := len(A)
+     n := int(math.Sqrt(float64(nxn)))
+     var iter int64
+
+     for i:=0; i<n; i++ {
+	     for j:=0; j<n; j++ {
+	         eigenvectors = append(eigenvectors, 0.)
+             }
+	     eigenvectors[i*n + i] = 1.
+     }
+
+     a, i, j := max_off_diagonal(A)
+     for a>tolerance && iter<max_iter {
+	     aii := A[i*n+i]
+	     ajj := A[j*n+j]
+	     aij := A[i*n+j]
+	       ///fmt.Printf("aii=%f\n", (aii-ajj)*aij)
+
+	       d := math.Sqrt((aii-ajj)*(aii-ajj) + 4. * aij * aij)
+	       c := math.Sqrt(1./2. * (1. + math.Abs(aii-ajj)/d))
+	       s := sign(aij * (aii - ajj)) * math.Sqrt(1./2. * (1. - math.Abs(aii - ajj) / d))
+	       ///fmt.Printf("c=%f, s=%f,\n", c, s)
+
+	       A[i*n+i] = c*c*aii + 2.*c*s*aij + s*s*ajj
+	       A[j*n+j] = s*s*aii - 2.*c*s*aij + c*c*ajj
+
+	       A[i*n+j] = 0.
+	       A[j*n+i] = 0.
+
+	       for k:=0; k<n; k++ {
+		       aki := A[k*n+i]
+		       akj := A[k*n+j]
+
+		       if (k != i && k != j) {
+                           A[k*n+i] =  c*aki + s*akj
+			   A[k*n+j] = -s*aki + c*akj
+
+                           A[i*n+k] = A[k*n+i]
+			   A[j*n+k] = A[k*n+j]
+		       }
+
+		       eki := eigenvectors[k*n+i]
+		       ekj := eigenvectors[k*n+j]
+		       eigenvectors[k*n+i] =  c*eki + s*ekj
+		       eigenvectors[k*n+j] = -s*eki + c*ekj
+	       }
+	       iter++
+               a, i, j = max_off_diagonal(A)
+     }
+
+    return eigenvectors
+}
+
+func max_off_diagonal(A []float64) (float64, int, int) {
+	nxn := len(A)
+	n := int(math.Sqrt(float64(nxn)))
+	var maximum float64 = 0.
+        var row, col int
+
+  	for i:=0; i<n; i++{
+		for j:=i+1; j<n; j++ {
+			if math.Abs(A[i*n+j]) > maximum {
+				maximum = math.Abs(A[i*n+j])
+				row = i
+				col = j
+			}
+		}
+	}
+	return maximum, row, col
+}
+
+func sign(x float64) float64 {
+	if x>=0 {
+		return  1.
+	} else {
+		return -1. 
+	}
+}
+
+func jacobi_inverse(A []float64) []float64 {
+
+    nxn := len(A)
+    dim := math.Sqrt(float64(nxn))
+    n := int(dim)	
+
+	var inv []float64
+        for i:=0; i<nxn; i++ {
+		inv = append(inv, 0.)
+	}
+
+       var jA Matrix
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++ {
+			   jA = append(jA, A[i*n+j])
+		   }
+	   }
+
+       vec:=jA.jacobi() //calculate eigenvectors and eigenvalues
+
+       var invjA Matrix
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++ {
+			   invjA = append(invjA, 0.)
+		   }
+		   invjA[i*n+i] = 1. / jA[i*n+i]
+	   }
+
+
+	   for i:=0; i<n; i++ {
+		   for j:=0; j<n; j++ {
+			   var s float64
+			   for k:=0; k<n; k++ {
+				   for t:=0; t<n; t++ {
+				       s+= vec[i*n+k] * invjA[k*n+t] * vec[j*n+t]
+			           }
+			   }
+			   inv[i*n+j] = s
+		   }
+	   }
+	return inv
 }
