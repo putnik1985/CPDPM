@@ -16,7 +16,7 @@ var filename string
 
 const (
 	dofs = 6 
-	tolerance = 1.E-18
+	tolerance = 1.E-24
 	max_iter = 1.E+6
 )
 
@@ -297,7 +297,7 @@ func inverse(A []float64) []float64 {
 	nxn := len(A)
         n := math.Sqrt(float64(nxn))
         dim := int(n)	
-	fmt.Printf("inverse A symmetry: %t\n", symmetry(A))
+	//fmt.Printf("inverse A symmetry: %t\n", symmetry(A))
 	var inv []float64
         for i:=0; i<nxn; i++ {
 		inv = append(inv, 0.)
@@ -314,7 +314,6 @@ func inverse(A []float64) []float64 {
 			inv[j*dim+k] = column[j]
 		}
 	}
-
 	//fmt.Printf("inverse inv symmetry: %t\n", symmetry(inv))
 	return inv
 }
@@ -347,7 +346,6 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 
             A := FTF(m, n, F)
 
-	    /**************************************************************************
 	    fmt.Printf("\n\nMatrix to Inverse:\n")
 	    for i:=0; i<m; i++ {
 		    for j:=0; j<m; j++{
@@ -355,13 +353,19 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 		    }
 		    fmt.Printf("\n")
 	    }
-            ***********************************************************************/
 
-	    //iA := inverse(A) // m x m matrix
+	    iA1 := inverse(A) // m x m matrix
 	    iA := jacobi_inverse(A) // m x m matrix
 
-	    /**************************************************************************
-	    fmt.Printf("\n\nInversed Matrix:\n")
+	    fmt.Printf("\n\nInversed Matrix Gauss:\n")
+	    for i:=0; i<m; i++ {
+		    for j:=0; j<m; j++{
+			    fmt.Printf("%24.6f", iA1[i*m+j])
+		    }
+		    fmt.Printf("\n")
+	    }
+
+	    fmt.Printf("\n\nInversed Matrix Jacobi:\n")
 	    for i:=0; i<m; i++ {
 		    for j:=0; j<m; j++{
 			    fmt.Printf("%24.6f", iA[i*m+j])
@@ -369,28 +373,33 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 		    fmt.Printf("\n")
 	    }
   
-            ***********************************************************************/
 
 	    /////fmt.Printf("\nMultiplication Inverse Check:\n")
        	    var sum float64 = 0.
+       	    var sum1 float64 = 0.
 	    for i:=0; i<m; i++{
 		    for j:=0; j<m; j++{
 			    var s float64 = 0.
+			    var s1 float64 = 0.
 			    for k:=0; k<m; k++{
 				    s += A[i*m+k] * iA[k*m+j]
+				    s1 += A[i*m+k] * iA1[k*m+j]
 			    }
 			    if (i != j){
 				    sum += math.Abs(s)
+				    sum1 += math.Abs(s1)
 			    }
 		    }
 	   }
 
 	    fmt.Printf("\nSymmetry Check Summary:\n");
 	    fmt.Printf("   Direct Matrix: %t\n", symmetry(A))
-	    fmt.Printf("  Inverse Matrix: %t\n", symmetry(iA))
+	    fmt.Printf("  Inverse Matrix  (Gauss): %t\n", symmetry(iA1))
+	    fmt.Printf("  Inverse Matrix (Jacobi): %t\n", symmetry(iA))
 
 	    fmt.Printf("\nMatrix Product Check Summary:\n");
-	    fmt.Printf("Off Diagonal Sum: %t\n\n", sum < 1.E-6)
+	    fmt.Printf("Off Diagonal Sum  (Gauss): %.6f\n", sum1)
+	    fmt.Printf("Off Diagonal Sum (Jacobi): %.6f\n\n", sum)
 
 	   for i:=0; i<m; i++ {
 		   for j:=0; j<n; j++ {
