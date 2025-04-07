@@ -226,6 +226,7 @@ func main() {
 	       w := 2. * math.Pi * freq
 	       fmt.Printf("%12f,",freq)
 	       fmt.Printf("%12.6g,",DSpectrum(w))
+	       dofflag := 0
 	       for k:=0; k<int(n); k++{ // calculate for each DOF
 	           var Sx float64 = 0.
 	           for mode, eig := range eigenvalues{
@@ -234,7 +235,20 @@ func main() {
 		       ///fmt.Println(a[mode],Sq,w0,w,ksi[mode])
                        Sx += F[k*int(m)+mode] * F[k*int(m)+mode] * Sq
 	            }
-	            fmt.Printf("%12.6f,",Sx)
+		       var sw float64
+		       if ( dofflag < 3) {
+		            sw = DSpectrum(w)
+		       } else {
+			    sw = 0.
+		       }
+
+		       if (dofflag < 5){
+                           dofflag++
+	               } else {
+		           dofflag = 0
+	               }
+
+	            fmt.Printf("%12.6f,",Sx+sw)
                }
 	       fmt.Printf("\n")
 	}
