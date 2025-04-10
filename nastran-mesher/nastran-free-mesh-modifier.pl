@@ -404,6 +404,12 @@ use Cwd qw(getcwd);
            print "\$_grid_to_ground completed\n";		   
        }		   
 
+	   if ($words[0] =~ /^_bolt_joint$/) {
+		   ###print $_;
+	       bolt_joint($_); 
+           print "\$_bolt_joint completed\n";		   
+       }		   
+
 	}
 	close(fh);
 
@@ -430,7 +436,121 @@ use Cwd qw(getcwd);
 		     print $_;
 		}
     }
+
+sub bolt_joint {
 	
+	       my @words = split /,/,@_[0];
+		   my $bolt_nodes = $words[1];
+		   my $bolt_normal = $words[2];
+		   my $bolt_d = $words[3];
+
+		   my $scale_d = $words[4];
+		   my $E = $words[5];
+		   my $nu = $words[6];
+
+		   my $rho = $words[7];
+		   my $cte = $words[8];
+		   my $tref = $words[9];
+		   my $spread = $words[10];
+		   
+
+     
+           ###print $bolt_nodes, $bolt_normal, $bolt_d, $scale_d, $E, $nu, $rho, $cte, $tref
+		   my @grids = &read_labels($bolt_nodes);
+		   ###print "$grids[0], $grids[1]\n"
+		   my @node1 = split /,/,$file_grids{$grids[0]};
+		   my @node2 = split /,/,$file_grids{$grids[1]};
+
+		   my $first  = $grids[0];
+		   my $second = $grids[1];		   
+
+		   my ($x1, $y1, $z1) = ($node1[3], $node1[4], $node1[5]);
+		   my ($x2, $y2, $z2) = ($node2[3], $node2[4], $node2[5]);
+		   ####print "$x1, $y1, $z1\n$x2, $y2, $z2\n"
+		   
+		   @grids = &read_labels($bolt_normal);
+		   my @node1 = split /,/,$file_grids{$grids[0]};
+		   my @node2 = split /,/,$file_grids{$grids[1]};
+		   my @node3 = split /,/,$file_grids{$grids[2]};
+		   
+		   my ($r1x, $r1y, $r1z);
+		   my ($r2x, $r2y, $r2z);
+
+		   $r1x = $node2[3] - $node1[3];
+		   $r1y = $node2[4] - $node1[4];
+		   $r1z = $node2[5] - $node1[5];
+
+		   $r2x = $node3[3] - $node1[3];
+		   $r2y = $node3[4] - $node1[4];
+		   $r2z = $node3[5] - $node1[5];
+		   
+		   my ($nx, $ny, $nz) = &cross_product("$r1x,$r1y,$r1z","$r2x,$r2y,$r2z");	
+           ($nx, $ny, $nz) = &unit_vector("$nx,$ny,$nz");
+		   ####print "$nx, $ny, $nz\n"
+		   
+            my $radius = 2. * $scale_d * $bolt_d / 2.; ##spreader radius
+		    my $rad = $spread * $scale_d * $bolt_d / 2.; ##spreader length
+            
+
+			my $output_str = "\$_bolt_joint\n";
+			push(@file_lines, $output_str);
+			
+			
+			my @spreader_grids = grids_plane("$x1, $y1, $z1, $nx, $ny, $nz, $rad");
+			for(@spreader_grids){
+				  my $grid_1 = $_;
+				  
+				  if ($grid_1 != $first){
+		              my @node = split /,/,$file_grids{$grid_1};
+  		              my ($x, $y, $z) = ($node[3], $node[4], $node[5]);
+                      my $dx = $x - $x1;
+					  my $dy = $y - $y1;
+					  my $dz = $z - $z1;
+					  my ($rx, $ry, $rz) = &vector_normal($dx, $dy, $dz);
+			          $output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first,$grid_1,$rx,$ry,$rz;
+                      push(@file_lines, $output_str);
+					  $next_element++;
+				  }
+            }
+			
+			
+			$output_str = sprintf "PBARL,$next_property,$next_material,MSCBML0,ROD,,,,,+\n+,$radius,0.0,\n";
+	        push(@file_lines, $output_str);
+	        $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4f,%.4e,%.4f,\n",$next_material,$E,$nu,$rho,$cte,$tref;
+	        push(@file_lines, $output_str);	
+			$next_property++;
+			$next_material++;
+			$file_update = 1;
+}
+
+sub grids_plane{
+	 my @x = split /,/,@_[0]; ## grid
+
+	 my $x0 = $x[0];
+	 my $y0 = $x[1];
+	 my $z0 = $x[2];
+
+	 my $nx = $x[3];
+	 my $ny = $x[4];
+	 my $nz = $x[5];
+	 
+	 my $rad = $x[6];
+	 
+	 my @grids;
+	 
+		   	while (my ($key, $value) = each %file_grids){
+			       my @coord = split/,/,$value;
+			       my ($x, $y, $z) = ($coord[3], $coord[4], $coord[5]);
+		           my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
+				   my $point = "$x,$y,$z,";
+                   my $plane = "$x0,$y0,$z0,$nx,$ny,$nz,"; 
+                   if ( ($distance <= $rad) && (within_plane($point, $plane))){
+                       push(@grids, $key)      
+                   }				
+		    }
+	 @grids;
+}
+
 sub cbar_modify_properties {
 	
 	       my @words = split /,/,@_[0];
@@ -3883,3 +4003,12 @@ sub within_plane{
 	##print "$x,$y,$z,$x0,$y0,$z0,$nx,$ny,$nz,$d\n";
 	abs( ($x-$x0) * $nx + ($y-$y0) * $ny +($z-$z0) * $nz ) < $error;
 }
+
+sub unit_vector{
+	my @r = split /,/,@_[0];
+	my $mag = sqrt($r[0]**2 + $r[1]**2 + $r[2]**2);
+	$r[0] /= $mag;
+	$r[1] /= $mag;
+	$r[2] /= $mag;
+    ($r[0], $r[1], $r[2])
+}	
