@@ -466,6 +466,8 @@ sub bolt_joint {
 
 		   my ($x1, $y1, $z1) = ($node1[3], $node1[4], $node1[5]);
 		   my ($x2, $y2, $z2) = ($node2[3], $node2[4], $node2[5]);
+		   my ($bolt_nx, $bolt_ny, $bolt_nz) = ($x2-$x1, $y2-$y1, $z2-$z1);
+		   
 		   ####print "$x1, $y1, $z1\n$x2, $y2, $z2\n"
 		   
 		   @grids = &read_labels($bolt_normal);
@@ -495,7 +497,7 @@ sub bolt_joint {
 			my $output_str = "\$_bolt_joint\n";
 			push(@file_lines, $output_str);
 			
-			
+			### create spreaders for the 1st node
 			my @spreader_grids = grids_plane("$x1, $y1, $z1, $nx, $ny, $nz, $rad");
 			for(@spreader_grids){
 				  my $grid_1 = $_;
@@ -513,13 +515,50 @@ sub bolt_joint {
 				  }
             }
 			
+			### create spreaders for the 2nd node
+			my @spreader_grids = grids_plane("$x2, $y2, $z2, $nx, $ny, $nz, $rad");
+			for(@spreader_grids){
+				  my $grid_1 = $_;
+				  
+				  if ($grid_1 != $second){
+		              my @node = split /,/,$file_grids{$grid_1};
+  		              my ($x, $y, $z) = ($node[3], $node[4], $node[5]);
+                      my $dx = $x - $x1;
+					  my $dy = $y - $y1;
+					  my $dz = $z - $z1;
+					  my ($rx, $ry, $rz) = &vector_normal($dx, $dy, $dz);
+			          $output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$second,$grid_1,$rx,$ry,$rz;
+                      push(@file_lines, $output_str);
+					  $next_element++;
+				  }
+            }
+
 			
 			$output_str = sprintf "PBARL,$next_property,$next_material,MSCBML0,ROD,,,,,+\n+,$radius,0.0,\n";
+	        push(@file_lines, $output_str);
+		    $output_str = sprintf "\$*  Material: Bolt Joint::Cone Compression::Mesher\n";
+	        push(@file_lines, $output_str);
+	        $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4f,%.4e,%.4f,\n",$next_material,$E,$nu,0.0,$cte,$tref;
+	        push(@file_lines, $output_str);	
+			$next_property++;
+			$next_material++;
+
+            ## create bolt
+			my ($rx, $ry, $rz) = &vector_normal($bolt_nx, $bolt_ny, $bolt_nz);
+			$output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first,$second,$rx,$ry,$rz;
+            push(@file_lines, $output_str);			
+			$next_element++;
+            $radius = 3. * $scale_d * $bolt_d / 2.; ##bolt radius
+			$output_str = sprintf "PBARL,$next_property,$next_material,MSCBML0,ROD,,,,,+\n+,$radius,0.0,\n";
+	        push(@file_lines, $output_str);
+		    $output_str = sprintf "\$*  Material: Bolt Joint::Bolt::Mesher\n";
 	        push(@file_lines, $output_str);
 	        $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4f,%.4e,%.4f,\n",$next_material,$E,$nu,$rho,$cte,$tref;
 	        push(@file_lines, $output_str);	
 			$next_property++;
 			$next_material++;
+			
+			
 			$file_update = 1;
 }
 
