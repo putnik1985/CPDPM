@@ -1,6 +1,7 @@
 BEGIN{ 
 	type["ctetra"] = 39; ## nastran nx element type from .pch file
-
+    type["cquad4"] = 33
+	
 	if (ARGC < 5){
 		print "usage awk -f qs-stress-margins.awk file=inp.pch Fy=48. Fu=61. FSy=1.25 FSu=2.";
 		exit;
@@ -28,13 +29,14 @@ BEGIN{
 	
 	mos_yield_min = 1000.
 	mos_ultimate_min = 1000.
+	vm_max = 0.
 	
 	while (readline()){
            if ($0 ~ /SUBCASE ID/){
 		       case_number = $4;
 			   readline();
 			   if ($4 == type["ctetra"]){
-			       vm_max = 0.
+			       
 			       while(readline() && $0 !~ /TITLE/){
 
 				         id = $1
@@ -91,6 +93,87 @@ BEGIN{
 			   mos_yield = Fy / (FSy * vm_max) - 1
 			   mos_ultimate = Fu / (FSu * vm_max) - 1
 			   printf("%12d%12.2f%12.2f%12.2f\n", case_number, vm_max, mos_yield, mos_ultimate)
+			   }
+			   
+			   if ($4 == type["cquad4"]){
+			       
+			       while(readline() && $0 !~ /TITLE/){
+				         id = $1
+						 #### calculate bottom stresses
+						 sx = $3
+						 sy = $4
+						 if (NF < 5) { 
+						        s = sy; 
+								sy = substr(s, 1, length(s) - 8)
+                                ####print sy								
+						 }
+						 readline()
+						 sxy = $2
+						 vm = 1./sqrt(2) * sqrt((sx - sy) * (sx - sy) + (sx * sx) + (sy * sy) + 6 * ( sxy * sxy ))
+						 #######print case_number, id, vm, sx, sy, sxy
+						 
+						 vm /= 1000. ## convert to ksi
+						 mos_yield = Fy / (FSy * vm) - 1
+						 mos_ultimate = Fu / (FSu * vm) - 1
+						 ###print case_number, id, vm, mos_ultimate, mos_yield
+						 
+						 if (mos_ultimate < mos_ultimate_min){
+						     edf_ultimate = id
+						     mos_ultimate_min = mos_ultimate
+						 }
+						
+                         if (mos_yield < mos_yield_min){
+						     edf_yield = id
+                             mos_yield_min = mos_yield
+						 }
+						 
+						 if (vm > vm_max){
+						     vm_max = vm
+							 max_case = case_number
+						 }
+
+						 readline()
+						 
+						 readline()
+						 ##### calculate top stresses
+						 sx = $2
+						 sy = $3
+						 sxy = $4
+						 if (NF < 5) { 
+						        s = sxy; 
+								sxy = substr(s, 1, length(s) - 8)
+                                ####print sy								
+						 }
+						 vm = 1./sqrt(2) * sqrt((sx - sy) * (sx - sy) + (sx * sx) + (sy * sy) + 6 * ( sxy * sxy ))
+						 ####print case_number, id, vm, sx, sy, sxy
+
+                         vm /= 1000. ## convert to ksi
+						 mos_yield = Fy / (FSy * vm) - 1
+						 mos_ultimate = Fu / (FSu * vm) - 1
+
+						 if (mos_ultimate < mos_ultimate_min){
+						     edf_ultimate = id
+						     mos_ultimate_min = mos_ultimate
+						 }
+						
+                         if (mos_yield < mos_yield_min){
+						     edf_yield = id
+                             mos_yield_min = mos_yield
+						 }
+						 
+						 if (vm > vm_max){
+						     vm_max = vm
+							 max_case = case_number
+						 }
+						 
+						 readline()
+						 readline()
+						 
+				   }
+			   mos_yield = Fy / (FSy * vm_max) - 1
+			   mos_ultimate = Fu / (FSu * vm_max) - 1
+			   printf("%12d%12.2f%12.2f%12.2f\n", case_number, vm_max, mos_yield, mos_ultimate)
+				   
 			   }
 			   
 
