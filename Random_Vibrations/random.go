@@ -71,9 +71,9 @@ func main() {
 	var fmin float64 = 20. // initial frequency read from the input
 	var fmax float64 = 2000. // maximum frequency read from the input
 	var N int = 100 // number of the steps read from the input
-        var ksi []float64 // vector of damping ration 1/2Q read from the input for each mode
+    var ksi []float64 // vector of damping ration 1/2Q read from the input for each mode
 
-        write_grids := true 
+    write_grids := true 
 
 	input = bufio.NewScanner(f)
 	for input.Scan() {
@@ -112,22 +112,34 @@ func main() {
 		       sF = append(sF, tx, ty, tz, rx, ry, rz)
 
 		       var vec [dofs]float64 
-		       vec[0] = 1.; vec[1] = 1.; vec[2] = 1.;
-
+			   // these grids are to be input initially - think how to do it
+			   
+			   if (grid == 15630394 || grid == 15630395 || grid == 15630396 || grid == 15630407){
+		           vec[0] = 1.; vec[1] = 1.; vec[2] = 1.;
+			   }
+               ////fmt.Println(vec)
 		       for i:=0; i<dofs; i++ {
 		           excitation = append(excitation, vec[i])
+				   
 		       }
 	            }
 	       }
             }
 	}
         f.Close()
+    /***************************
+	fmt.Println("Excitation:")	
+	for _,val := range excitation {
+          fmt.Println(val)
+	}
+	****************************/
 	
 	fmt.Printf("\n\nGrid and DOFs:\n")
 	for _, value := range grids {
 		svalue := fmt.Sprintf("%d",value)
 		fmt.Printf("grid: %16d, dofs: %12d\n", value, grids_per_mode[svalue])
 	}
+	
 /***
 	fmt.Printf("\n\nFile Grid\n")
 	for _, value := range grids {
@@ -140,6 +152,7 @@ func main() {
 	}
 	fmt.Printf("\n")
 *****/
+
 	var n int64
 	var m int64
 	    for _, dof := range grids_per_mode {
@@ -210,48 +223,46 @@ func main() {
 	    }
 ******************************************************************************/
 
-        mFTFinvFT := FTFinvFT(int(m),int(n),F) // output is matrix m x n
-
-        fmt.Println("\nDisplacement Velocity Acceleration Spectrum Density:")
+        fmt.Println("\nAcceleration Spectrum Density:")
 	var a []float64
 	for i:=0; i<int(m); i++ {
 		var s float64 = 0.
 		for j:=0; j<int(n); j++{
-			s += mFTFinvFT[i*int(n)+j] * excitation[j]
+			s += F[j*int(m)+i] * excitation[j]
 		}
 		a = append(a, s)
+		/////fmt.Println(s)
+	}
+	var rms []float64
+	for i:=0; i<int(n); i++ {
+	rms = append(rms, 0.)
 	}
 	var df float64 = (fmax - fmin) / float64(N)
 	for freq := fmin; freq <= fmax; freq += df {
 	       w := 2. * math.Pi * freq
 	       fmt.Printf("%12f,",freq)
-	       fmt.Printf("%12.6g,",DSpectrum(w))
-	       dofflag := 0
+	       fmt.Printf("%12.6g,",FSpectrum(w))
 	       for k:=0; k<int(n); k++{ // calculate for each DOF
 	           var Sx float64 = 0.
 	           for mode, eig := range eigenvalues{
-		       w0 := math.Sqrt(eig) 
-		       Sq := DSpectrum(w) * a[mode] * a[mode] / (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
-		       ///fmt.Println(a[mode],Sq,w0,w,ksi[mode])
-                       Sx += F[k*int(m)+mode] * F[k*int(m)+mode] * Sq
+		       w0 := math.Sqrt(math.Abs(eig))
+               ///fmt.Println(w0) 			   
+		       Sq := FSpectrum(w) * a[mode] * a[mode] * w * w / (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
+		       //////////////////fmt.Println(a[mode], Sq)
+                       Sx += F[k*int(m) + mode] * F[k*int(m) + mode] * Sq
 	            }
-		       var sw float64
-		       if ( dofflag < 3) {
-		            sw = DSpectrum(w)
-		       } else {
-			    sw = 0.
-		       }
-
-		       if (dofflag < 5){
-                           dofflag++
-	               } else {
-		           dofflag = 0
-	               }
-
-	            fmt.Printf("%12.6f,",Sx+sw)
+	            fmt.Printf("%12.6f,",Sx)
+				rms[k] += Sx * df 
                }
 	       fmt.Printf("\n")
 	}
+	fmt.Printf("\nRMS:\n")
+	fmt.Printf("%25s,","Total:")
+	for _, val := range rms {
+	    fmt.Printf("%12.6f,", val)
+	}
+	fmt.Printf("\n")
+
 	return
 }
 
@@ -440,6 +451,11 @@ func FTFinvFT(m, n int, F []float64) []float64 {
 func DSpectrum(w float64) float64 {
 	return 1.0
 }
+
+func FSpectrum(w float64) float64 {
+	return 3090.e+8
+}
+
 
 func max_elem(n, m int, A []float64) float64 {
 	var maxel float64
