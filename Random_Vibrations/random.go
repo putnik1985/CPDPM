@@ -7,6 +7,7 @@ import(
 	"bufio"
 	"strconv"
 	"math"
+	"math/cmplx"
 )
 
 var line string
@@ -114,7 +115,7 @@ func main() {
 		       var vec [dofs]float64 
 			   // these grids are to be input initially - think how to do it
 			   
-			   if (grid == 15630394 || grid == 15630395 || grid == 15630396 || grid == 15630407){
+			   if (grid == 4000000){
 		           vec[0] = 1.; vec[1] = 1.; vec[2] = 1.;
 			   }
                ////fmt.Println(vec)
@@ -248,7 +249,6 @@ func main() {
 		       w0 := math.Sqrt(math.Abs(eig))
                ///fmt.Println(w0) 			   
 		       Sq := FSpectrum(w) * a[mode] * a[mode] * w * w / (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
-		       //////////////////fmt.Println(a[mode], Sq)
                        Sx += F[k*int(m) + mode] * F[k*int(m) + mode] * Sq
 	            }
 	            fmt.Printf("%12.6f,",Sx)
@@ -259,10 +259,26 @@ func main() {
 	fmt.Printf("\nRMS:\n")
 	fmt.Printf("%25s,","Total:")
 	for _, val := range rms {
-	    fmt.Printf("%12.6f,", val)
+	    fmt.Printf("%12.6f,", math.Sqrt(val))
 	}
 	fmt.Printf("\n")
-
+        fmt.Println("\nAcceleration Harmonic Analysis:")
+	for freq := fmin; freq <= fmax; freq += df {
+	       w := 2. * math.Pi * freq
+	       fmt.Printf("%12f,",freq)
+	       fmt.Printf("%12.6g,",Force(w))
+	       for k:=0; k<int(n); k++{ // calculate for each DOF
+	           var Sx complex128 = 0.+0i
+	           for mode, eig := range eigenvalues{
+		           w0 := math.Sqrt(math.Abs(eig))
+                   ///fmt.Println(w0) 			   
+		           Sq := complex(Force(w),0.) * complex(a[mode],0.) * complex(w, 0.) * complex(w, 0.) / complex(w0 * w0 - w * w, 2.* w0 * ksi[mode] * w)
+                   Sx += complex(F[k*int(m) + mode], 0.) * Sq
+	            }
+	            fmt.Printf("%12.6f,",cmplx.Abs(Sx))
+               }
+	       fmt.Printf("\n")
+	}
 	return
 }
 
@@ -453,9 +469,12 @@ func DSpectrum(w float64) float64 {
 }
 
 func FSpectrum(w float64) float64 {
-	return 3090.e+8
+	return 323.
 }
 
+func Force(w float64) float64 {
+	return 2.e+8
+}
 
 func max_elem(n, m int, A []float64) float64 {
 	var maxel float64
