@@ -23,7 +23,7 @@ BEGIN{
 	###print type_number;
 	####exit;
 	
-	printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq", "Elem", "MZZ-A", "MYY-A", "MZZ-B", "MYY-B", "Shear-Y", "Shear-Z", "Axial", "Torque")
+	printf("%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,\n","Subcase#", "Freq", "Elem", "MZZ-A", "MYY-A", "MZZ-B", "MYY-B", "Shear-Y", "Shear-Z", "Axial", "Torque")
 	count = 0
 	while (getline < file > 0){
 		if ($0 ~ /SUBCASE ID/){
@@ -39,11 +39,11 @@ BEGIN{
 					while (eid !~ /TITLE/){
 					
 					    mza = $2
-						mya = -$3
+						mya = $3
 						mzb = $4
 
 					if (getline < file > 0){
-						myb = -$2
+						myb = $2
 						shear_y = $3
 						shear_z = $4
 					}
@@ -76,7 +76,7 @@ BEGIN{
 					    max_torque[count] = abs(torque);
 					}
 					
-                    str = sprintf("%12d%12d%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n",case_number, 0, eid, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
+                    str = sprintf("%12d,%12d,%12d,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,\n",case_number, 0, eid, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
 					####print str
 					id = count "," eid
 					##print id
@@ -110,9 +110,9 @@ BEGIN{
 	                    
                     }		
 
-                    printf("\n%16s%16s%16s%16s%16s\n","Subcase#", "Moment, lbf.in", "Shear, lbf", "Axial, lbf", "Torque, lbf.in");	
+                    printf("\n\n%16s,%16s,%16s,%16s,%16s,\n","Subcase#", "Moment", "Shear", "Axial", "Torque");	
                     for(i=1; i<=count; ++i)
-                     	printf("%16d%16.1f%16.1f%16.1f%16.1f\n", i, max_moment[i], max_shear[i], max_axial[i], max_torque[i]);				
+                     	printf("%16d,%16.1f,%16.1f,%16.1f,%16.1f,\n", i, max_moment[i], max_shear[i], max_axial[i], max_torque[i]);				
 }
 
 function abs(x){
