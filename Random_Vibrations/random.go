@@ -469,7 +469,7 @@ func DSpectrum(w float64) float64 {
 }
 
 func FSpectrum(w float64) float64 {
-	return 323.
+	return 32.* math.Pi * 1.e+8
 }
 
 func Force(w float64) float64 {
