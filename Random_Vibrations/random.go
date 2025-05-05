@@ -469,7 +469,11 @@ func DSpectrum(w float64) float64 {
 }
 
 func FSpectrum(w float64) float64 {
-	return 32.* math.Pi * 1.e+8
+	var accel_sigma float64 = 2.
+	var M float64 = 1.e+8
+	var df float64 = 2000. - 20.
+
+	return accel_sigma * accel_sigma * M * M / df
 }
 
 func Force(w float64) float64 {
