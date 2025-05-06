@@ -111,35 +111,18 @@ func main() {
 		       rz, _ := strconv.ParseFloat(fields[3], 64)
 	               ////fmt.Printf("%12d%24g%24g%24g%24g%24g%24g%24g\n", grid, value, tx, ty, tz, rx, ry, rz)
 		       sF = append(sF, tx, ty, tz, rx, ry, rz)
-
-		       var vec [dofs]float64 
-			   // these grids are to be input initially - think how to do it
-			   
-			   if (grid == 4000000){
-		           vec[0] = 1.; vec[1] = 1.; vec[2] = 1.;
-			   }
-               ////fmt.Println(vec)
-		       for i:=0; i<dofs; i++ {
-		           excitation = append(excitation, vec[i])
-				   
 		       }
 	            }
 	       }
-            }
-	}
+        }
         f.Close()
-    /***************************
-	fmt.Println("Excitation:")	
-	for _,val := range excitation {
-          fmt.Println(val)
-	}
-	****************************/
 	
 	fmt.Printf("\n\nGrid and DOFs:\n")
 	for _, value := range grids {
 		svalue := fmt.Sprintf("%d",value)
 		fmt.Printf("grid: %16d, dofs: %12d\n", value, grids_per_mode[svalue])
 	}
+
 	
 /***
 	fmt.Printf("\n\nFile Grid\n")
@@ -181,9 +164,25 @@ func main() {
 		    }
 		    fmt.Printf("\n")
 	    }
-	    ****************************************/
+  ****************************************/
 	    fmt.Printf("\nSummary:\n");
 	    fmt.Printf("#Modes = %d, #DOFs = %d\n\n", m, n)
+
+    //***************************
+        for i:=0; i<int(n); i++{
+		excitation = append(excitation, 0.)
+	}
+/// assume that the node of the excitation is the first
+		excitation[0] = 1.
+		excitation[1] = 1.
+		excitation[2] = 1.
+		/****
+	fmt.Println("Excitation:", len(excitation))	
+	for _,val := range excitation {
+          fmt.Println(val)
+	}
+   //***************************/
+
 	    /*************************************
 	    fmt.Println("\nExcitation")
 	    for i:=0; i<int(n); i++ {
@@ -224,7 +223,8 @@ func main() {
 	    }
 ******************************************************************************/
 
-        fmt.Println("\nAcceleration Spectrum Density:")
+        fmt.Println("\nAcceleration Spectrum Density:,")
+	fmt.Println("Excitation Vector:,")
 	var a []float64
 	for i:=0; i<int(m); i++ {
 		var s float64 = 0.
@@ -232,8 +232,10 @@ func main() {
 			s += F[j*int(m)+i] * excitation[j]
 		}
 		a = append(a, s)
-		/////fmt.Println(s)
+	////////fmt.Printf("%12g,",s)
 	}
+	fmt.Printf("\n")
+        /////return
 	var rms []float64
 	for i:=0; i<int(n); i++ {
 	rms = append(rms, 0.)
@@ -247,8 +249,8 @@ func main() {
 	           var Sx float64 = 0.
 	           for mode, eig := range eigenvalues{
 		       w0 := math.Sqrt(math.Abs(eig))
-               ///fmt.Println(w0) 			   
-		       Sq := FSpectrum(w) * a[mode] * a[mode] * w * w / (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
+                       ///fmt.Println(w0) 			   
+		       Sq := FSpectrum(w) * a[mode] * a[mode] * w * w * w * w/ (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
                        Sx += F[k*int(m) + mode] * F[k*int(m) + mode] * Sq
 	            }
 	            fmt.Printf("%12.6f,",Sx)
