@@ -19,7 +19,6 @@ BEGIN{
 
     	record = 0;
 		
-
 	while (getline < file > 0){
 		if ($0 ~ /SUBCASE ID/){
 		    subcase_num = $4;
@@ -32,7 +31,10 @@ BEGIN{
 					}
                        if (found){
 					              subcase[++record]=subcase_num;
-					              printf("%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq,Hz", "Fx", "Fy", "Fz", "Mx", "My", "Mz")
+					              printf("%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,\n","Subcase#", "Freq(Hz)", "Fx", "Fy", "Fz", "Mx", "My", "Mz")
+								  fx_max = 0
+								  fy_max = 0
+								  fz_max = 0
 					              while (getline < file > 0 && $1 !~/TITLE/){
 					                     freq = $1;
                                          fx = $2
@@ -46,8 +48,9 @@ BEGIN{
 						                 if (freq ~ /^[0-9]/){
 										     if (fx > fx_max) fx_max = fx;
 											 if (fy > fy_max) fy_max = fy;
-                                             if (fz > fz_max) fz_max = fz;											
-					                         printf("%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n", subcase_num, freq, fx, fy, fz, mx, my, mz);
+                                             if (fz > fz_max) fz_max = fz;
+                                             calculate_global_max(fx, fy, fz, mx, my, mz)											 
+					                         printf("%12d,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,\n", subcase_num, freq, fx, fy, fz, mx, my, mz);
 					                     }
 
 				                  }### while (getline < file > 0 && $1 !~/TITLE/)
@@ -62,9 +65,17 @@ BEGIN{
 		} ####if ($0 ~ /SUBCASE ID/)
 	}
 	printf("\n\nTable Of The Maximum Loads For each Subcase\n");
-	printf("%12s%12s%12s%12s\n","Subcase", "Fx", "Fy", "Fz");
+	printf("%12s,%12s,%12s,%12s,\n","Subcase", "Fx", "Fy", "Fz");
 	for(i=1; i<=record;++i)
-	    printf("%12d%12.1f%12.1f%12.1f\n",subcase[i], FX_MAX[i], FY_MAX[i], FZ_MAX[i]);
+	    printf("%12d,%12.1f,%12.1f,%12.1f,\n",subcase[i], FX_MAX[i], FY_MAX[i], FZ_MAX[i]);
+
+	printf("\n\nTable Of The Maximum Sine Loads Element:,%d\n", eid);
+	printf("Fx,%.1f\n",global_fx)
+	printf("Fy,%.1f\n",global_fy)
+	printf("Fz,%.1f\n",global_fz)
+	printf("Mx,%.1f\n",global_mx)
+	printf("My,%.1f\n",global_my)
+	printf("Mz,%.1f\n",global_mz)	
 }
 
 function max(a,b){
@@ -73,3 +84,12 @@ function max(a,b){
 	else 
 	    return b;
 }
+
+function calculate_global_max(fx, fy, fz, mx, my, mz){
+   if (fx > global_fx) global_fx = fx;
+   if (fy > global_fy) global_fy = fy;
+   if (fz > global_fz) global_fz = fz;
+   if (mx > global_mx) global_mx = mx;
+   if (my > global_my) global_my = my;
+   if (mz > global_mz) global_mz = mz;
+}   
