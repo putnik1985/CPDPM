@@ -23,7 +23,7 @@ BEGIN{
 				     tid = words[2];
 					 
 				 if (words[1] ~ /_group/){
-				     ##print words[2];
+				     #####print "groups-", words[2], words[3];
 					 ###print length(words[2]);
                      group[words[2]] = words[2];
                       temp[words[2]] = words[3];
@@ -46,8 +46,9 @@ BEGIN{
 						word = a[1];
 						for(i=2;i<=n; ++i){
 						    ####print i,"-->",a[i];
-							if (a[i] ~ /[a-zA-Z ]/) word = word a[i]; ##concatenate only letters and space between
+							if (a[i] ~ /[a-zA-Z 0-9()\/-]/) word = word a[i]; ##concatenate only letters and space between
 							}
+							####print "word=", word
                       temperature = temp[word]; 
 					  #####print length(word), length(group_name);
 					  while (getline < groups_file > 0 && $0 !~ /\$\*/){
