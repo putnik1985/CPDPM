@@ -15,8 +15,14 @@ BEGIN{
 	  eid  = data["id"];
        pi = 3.14159
 	printf("Grid:, %12d,\n", eid)   
-    printf("%12s,%12s,%12s,%12s,%12s,%12s,%12s,\n","Subcase#", "Tx", "Ty", "Tz", "Rx(deg)", "Ry(deg)", "Rz(deg)")
+    printf("%24s,%12s,%12s,%12s,%12s,%12s,%12s,\n","Subcase#", "Tx", "Ty", "Tz", "Rx(deg)", "Ry(deg)", "Rz(deg)")
 	while (getline < file > 0){
+	    if ($0 ~ /^\$LABEL/) {
+		            label = ""
+		            for (i=3; i<NF; ++i)
+					     label = label " " $i
+		}
+		
 	    if ($0 !~ /^\$DISPLACEMENTS/) continue
 		readline()
 		readline()
@@ -33,7 +39,7 @@ BEGIN{
 				   ry = $3
 				   rz = $4
 				   if (id == eid){
-				       printf("%12d,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,\n", case_number, tx, ty, tz, rx * 180. / pi, ry * 180. / pi, rz * 180. / pi)
+				       printf("%24s,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,\n", label, tx, ty, tz, rx * 180. / pi, ry * 180. / pi, rz * 180. / pi)
                        accumlate_max(tx, ty, tz, rx, ry, rz)
                    }					   
 					   
@@ -42,7 +48,7 @@ BEGIN{
 	}
 	
 	printf("\n\n")
-	printf("%12s,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,\n", "Maximum:", txmax, tymax, tzmax, rxmax * 180. / pi, rymax * 180. / pi, rzmax * 180. / pi)
+	printf("%24s,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,\n", "Maximum:", txmax, tymax, tzmax, rxmax * 180. / pi, rymax * 180. / pi, rzmax * 180. / pi)
 }
 
 function abs(x){
