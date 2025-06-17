@@ -114,7 +114,6 @@ BEGIN{
 					  sxx *=  3.
 					  syy *= -3.
 					  sxy *=  3.
-						 
                                           vm_top = 1./sqrt(2) * sqrt((sxx - syy) * (sxx - syy) + sxx * sxx + syy * syy + 6 * sxy * sxy )
 
 					  sxx = $4
@@ -122,9 +121,14 @@ BEGIN{
 						        s = sxx; 
 							sxx = substr(s, 1, length(s) - 8)
 						 } 
+
 					  readline()
 					  syy = $2
 					  sxy = $3
+
+					  sxx *=  3.
+					  syy *= -3.
+					  sxy *=  3.
 					  
 					  vm_bottom = 1./sqrt(2) * sqrt((sxx - syy) * (sxx - syy) + sxx * sxx + syy * syy + 6 * sxy * sxy )
 					  vm = max(vm_top, vm_bottom)
@@ -132,6 +136,7 @@ BEGIN{
 
 					  mos_yield = Fy / (FSy * vm) - 1
 					  mos_ultimate = Fu / (FSu * vm) - 1
+                                          #######print vm_top, vm_bottom
 					  printf("%24s%12d%12.2f%12.2f%12.2f\n", "CQUADR", id, vm, mos_yield, mos_ultimate)
 					  yield[id]= mos_yield	 
                                           ultimate[id] = mos_ultimate
@@ -154,7 +159,7 @@ BEGIN{
 						 syy = $4
 						 if (NF < 5) { 
 						        s = syy; 
-								syy = substr(s, 1, length(s) - 8)
+							syy = substr(s, 1, length(s) - 8)
 						 } 
 						 
 						 readline();
@@ -163,7 +168,7 @@ BEGIN{
 						 syz = $4
 						 if (NF < 5) { 
 						        s = syz; 
-								syz = substr(s, 1, length(s) - 8)
+							syz = substr(s, 1, length(s) - 8)
 						 } 
 						 
 						 readline();
@@ -216,7 +221,7 @@ BEGIN{
                                                   mos_yield =    yield[num] 
                                                          vm =   stress[num]
 
-                                               if (vm <= 0. || mos_yield > margin_cut_off ) continue 
+                                               if (vm <= 1. || mos_yield > margin_cut_off ) continue 
 					       printf("%36d%12.2f%12.2f%12.2f\n", num, vm, mos_yield, mos_ultimate)
 
 					       if (mos_ultimate < mos_ultimate_min){
