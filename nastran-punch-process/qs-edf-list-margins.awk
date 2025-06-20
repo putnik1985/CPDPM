@@ -57,7 +57,7 @@ BEGIN{
 						 ####print case_number, id
 						 shear_force = sqrt(fy * fy + fz * fz)
 						 bending = sqrt(my * my + mz * mz)
-						 stress = bending * ymax / Jd
+						 stress = bending * ymax / Jd + abs(fx) / A
 						 
 						 mos_shear = shear_limit / (FSu * shear_force) - 1
 						 mos_yield = Fy / (FSy * stress) - 1
