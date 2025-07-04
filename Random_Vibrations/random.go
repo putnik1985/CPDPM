@@ -64,7 +64,6 @@ func main() {
 	var grids []int64
 	var excitation []float64 // excitation vector 0 for the nonexcited, 1 - excited
 
-
         /*****************************************************************
 	* Define as the Input from the console
 	******************************************************************/
