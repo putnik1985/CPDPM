@@ -6,7 +6,8 @@ program wheel
 
         real F, k, a, alpha, beta, Pi
         parameter (Pi = 3.14159)
-
+        common alpha, beta
+        real w1, w2
         write(*,*) "Wheel:"
         open(unit = 12, file = "wheel-input.dat")
         read(12,*) str, n
