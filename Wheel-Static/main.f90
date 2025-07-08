@@ -8,6 +8,10 @@ program wheel
         parameter (Pi = 3.14159)
         common alpha, beta
         real w1, w2
+
+        real, allocatable:: T(:,:)
+        real, allocatable:: b(:)
+
         write(*,*) "Wheel:"
         open(unit = 12, file = "wheel-input.dat")
         read(12,*) str, n
