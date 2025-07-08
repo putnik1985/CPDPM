@@ -7,11 +7,11 @@ program wheel
         real F, k, a, alpha, beta, Pi
         parameter (Pi = 3.14159)
         common alpha, beta
-        real w1, w2
+        real w1, w2, d1w1, d1w2, d3w1, d3w2
 
         real, allocatable:: T(:,:)
         real, allocatable:: b(:)
-
+        
         write(*,*) "Wheel:"
         open(unit = 12, file = "wheel-input.dat")
         read(12,*) str, n
@@ -31,4 +31,5 @@ program wheel
          beta = sqrt((a + 1.) / 2.)
         write(*,*) "Interstage calculations:" 
         write(*,'(A12,F12.2,A12,F12.4,A12,F12.4)') "a=",a, "alpha=", alpha, "beta=", beta
+        write(*,*) w1(Pi), w2(Pi)
 end program
