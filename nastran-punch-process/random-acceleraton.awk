@@ -1,8 +1,8 @@
 BEGIN{ 
 	type["cbush"] = 102; ## nastran nx element type from .pch file
 
-	if (ARGC < 3){
-		print "usage awk -f random-acceleration.awk file=inp.pch  point_id=15630394";
+	if (ARGC < 4){
+		print "usage awk -f random-acceleration.awk file=inp.pch  point_id=15630394 G=9.81";
 		exit;
 	}
 
@@ -15,7 +15,7 @@ BEGIN{
 
 	     file  = data["file"];
 	 point_id  = data["point_id"];
-     G = 386.1;
+     G = data["G"];
 	 
 	printf("%12s%12s%12s%12s\n","Frequency", "Ax", "Ay", "Az")
 	while (getline < file > 0){
