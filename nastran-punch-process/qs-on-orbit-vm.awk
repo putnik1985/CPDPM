@@ -73,6 +73,15 @@ BEGIN{
 						 stress[id] = vm
 						 
 				   }
+                                      for(i=1; i<=ngroup; ++i){
+                                               id =      group[i]
+                                               num = sprintf("%d",id)
+                                               vm =   stress[num]
+					                            if (vm > vm_max){
+						                            vm_max = vm
+					                            }
+                                      }
+                                          printf("%d%12.2f\n", case_number, vm_max * 1.45038E-7)
 				   
 			   }
 			   
@@ -116,9 +125,7 @@ BEGIN{
 						 readline()
 						 
 				   }
-										  
-			   }
-							  
+
                                       for(i=1; i<=ngroup; ++i){
                                                id =      group[i]
                                                num = sprintf("%d",id)
@@ -128,6 +135,9 @@ BEGIN{
 					                            }
                                       }
                                           printf("%d%12.2f\n", case_number, vm_max * 1.45038E-7)
+										  
+			   }
+							  
 
                                           ##print vm_max
 		    }## subcase cycle
