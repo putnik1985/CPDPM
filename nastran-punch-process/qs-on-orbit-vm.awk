@@ -1,7 +1,8 @@
 BEGIN{ 
-	type["ctetra"] = 39; ## nastran nx element type from .pch file
-	type["cquadr"] = 228; ## nastran nx element type for from .pch file
-    type["chexa"] = 67; ## nastran nx element type from .pch file CHEXA8
+	type["ctetra"] = 39 ## nastran nx element type from .pch file
+	type["cquadr"] = 228 ## nastran nx element type for from .pch file
+    type["chexa"] = 67 ## nastran nx element type from .pch file CHEXA8
+	type["cpenta"] = 68 ## nastran nx element type from .pch file CPENTA6
     type["cquad4"] = 33
     type["ctria3"] = 74
 	
@@ -34,11 +35,78 @@ BEGIN{
 			   readline()
 			   
            if ($0 ~ /SUBCASE ID/){
-                       vm_max = 0.
+               vm_max = 0.
 		       case_number = $4;
 			   readline();
                type_number = $4
+               ####print $4
 			   
+               if ($4 == type["cpenta"]){
+
+				   while(readline() && $0 !~ /TITLE/){
+                        id = $1
+                        if (id !~ /^[0-9]/)
+                               continue
+							   
+                        readline()
+                        sxx = $3
+					    sxy = $4
+						if (NF < 5) { 
+						    s = sxy; 
+							sxy = substr(s, 1, length(s) - 8)
+						 }
+						 
+                        readline()
+						readline()
+						readline()
+						
+                        syy = $2
+                        syz = $3
+						
+                        readline()
+						readline()
+                        szz = $2
+						szx = $3
+					    
+						
+                        vm = 1./sqrt(2) * sqrt((sxx - syy) * (sxx - syy) + (sxx - szz) * (sxx - szz) + (syy - szz) * (syy - szz) + 6 * ( sxy * sxy + szx * szx + syz * syz))
+					    stress[id] = vm
+						#######print id, sxx, syy, szz, sxy, syz, szx, vm
+                    }
+					###vm_str[++str] = calculate_vm_max() 
+               }
+			   
+			   if ($4 == type["chexa"]){
+                   ## read stresses in the middle of the element
+			       readline()
+				   while(readline() && $0 !~ /TITLE/){
+                                         id = $1
+                                         if (id !~ /^[0-9]/)
+                                             continue
+                                         readline()
+                                         sxx = $3
+					     syy = $4
+						 if (NF < 5) { 
+						    s = syy; 
+							syy = substr(s, 1, length(s) - 8)
+						 } 
+                                          readline()
+                                          szz = $2
+                                          sxy = $3
+				         syz = $4
+						 if (NF < 5) { 
+						        s = syz; 
+								syz = substr(s, 1, length(s) - 8)
+						 } 
+                                           readline()
+                                           szx = $2
+					 
+                         vm = 1./sqrt(2) * sqrt((sxx - syy) * (sxx - syy) + (sxx - szz) * (sxx - szz) + (syy - szz) * (syy - szz) + 6 * ( sxy * sxy + szx * szx + syz * syz))
+					     stress[id] = vm
+                                   }
+                            ###vm_str[++str] = calculate_vm_max() 
+                           }
+						   
 			   if ($4 == type["ctetra"]){
 			       
 			       while(readline() && $0 !~ /TITLE/){
@@ -58,8 +126,8 @@ BEGIN{
 						 
 						 readline();
 						 readline();
-						 
 						 readline();
+						 
 						 syy = $2
 						 syz = $3
 						 
@@ -73,15 +141,7 @@ BEGIN{
 						 stress[id] = vm
 						 
 				   }
-                                      for(i=1; i<=ngroup; ++i){
-                                               id =      group[i]
-                                               num = sprintf("%d",id)
-                                               vm =   stress[num]
-					                            if (vm > vm_max){
-						                            vm_max = vm
-					                            }
-                                      }
-                                          printf("%d%12.2f\n", case_number, vm_max * 1.45038E-7)
+				   ###vm_str[++str] = calculate_vm_max() 
 				   
 			   }
 			   
@@ -125,25 +185,16 @@ BEGIN{
 						 readline()
 						 
 				   }
-
-                                      for(i=1; i<=ngroup; ++i){
-                                               id =      group[i]
-                                               num = sprintf("%d",id)
-                                               vm =   stress[num]
-					                            if (vm > vm_max){
-						                            vm_max = vm
-					                            }
-                                      }
-                                          printf("%d%12.2f\n", case_number, vm_max * 1.45038E-7)
+                   ##vm_str[++str] = calculate_vm_max() 
 										  
 			   }
-							  
-
-                                          ##print vm_max
+			   calculate_vm_max()
+			   
 		    }## subcase cycle
 			}
 	}
-						  
+		    for(i=1; i <= case_number; ++i)
+                printf("%d%12.2f\n", i, case_vm[i] * 1.45038E-7)			
 }
 
 function abs(x){
@@ -168,3 +219,19 @@ function max(a, b){
  else 
      return b
 }	 
+
+function calculate_vm_max(){ 
+
+    for(i=1; i<=ngroup; ++i){
+        id =      group[i]
+        num = sprintf("%d",id)
+        vm =   stress[num]
+          if (vm > vm_max){
+            vm_max = vm
+          }
+        }
+		
+    ####printf("%d%12.2f\n", case_number, vm_max * 1.45038E-7)
+	if (case_vm[case_number] < vm_max) case_vm[case_number] = vm_max
+	return vm_max
+}

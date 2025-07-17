@@ -1,7 +1,8 @@
 BEGIN{ 
-	type["ctetra"] = 39; ## nastran nx element type from .pch file
-	type["cquadr"] = 228; ## nastran nx element type for from .pch file
-    type["chexa"] = 67; ## nastran nx element type from .pch file CHEXA8
+	type["ctetra"] = 39 ## nastran nx element type from .pch file
+	type["cquadr"] = 228 ## nastran nx element type for from .pch file
+    type["chexa"] = 67 ## nastran nx element type from .pch file CHEXA8
+	type["cpenta"] = 68 ## nastran nx element type from .pch file CPENTA6
     type["cquad4"] = 33
     type["ctria3"] = 74
 	
@@ -36,6 +37,72 @@ BEGIN{
 		       case_number = $4;
 			   readline();
                type_number = $4
+
+               if ($4 == type["cpenta"]){
+
+				   while(readline() && $0 !~ /TITLE/){
+                        id = $1
+                        if (id !~ /^[0-9]/)
+                               continue
+							   
+                        readline()
+                        sxx = $3
+					    sxy = $4
+						if (NF < 5) { 
+						    s = sxy; 
+							sxy = substr(s, 1, length(s) - 8)
+						 }
+						 
+                        readline()
+						readline()
+						readline()
+						
+                        syy = $2
+                        syz = $3
+						
+                        readline()
+						readline()
+                        szz = $2
+						szx = $3
+					    
+						
+                        vm = 1./sqrt(2) * sqrt((sxx - syy) * (sxx - syy) + (sxx - szz) * (sxx - szz) + (syy - szz) * (syy - szz) + 6 * ( sxy * sxy + szx * szx + syz * syz))
+					    stress[id] = vm
+						#######print id, sxx, syy, szz, sxy, syz, szx, vm
+                    }
+					###vm_str[++str] = calculate_vm_max() 
+               }
+
+			   if ($4 == type["chexa"]){
+                           ## read stresses in the middle of the element
+			       readline()
+				   while(readline() && $0 !~ /TITLE/){
+                                         id = $1
+                                         if (id !~ /^[0-9]/)
+                                             continue
+                                         readline()
+                                         sxx = $3
+					     syy = $4
+						 if (NF < 5) { 
+						    s = syy; 
+							syy = substr(s, 1, length(s) - 8)
+						 } 
+                                          readline()
+                                          szz = $2
+                                          sxy = $3
+				         syz = $4
+						 if (NF < 5) { 
+						        s = syz; 
+								syz = substr(s, 1, length(s) - 8)
+						 } 
+                                           readline()
+                                           szx = $2
+					 
+                         vm = 1./sqrt(2) * sqrt((sxx - syy) * (sxx - syy) + (sxx - szz) * (sxx - szz) + (syy - szz) * (syy - szz) + 6 * ( sxy * sxy + szx * szx + syz * syz))
+					     stress[id] = vm
+                                   }
+                           }
+
 			   
 			   if ($4 == type["ctetra"]){
 			       
@@ -121,9 +188,9 @@ BEGIN{
                                                id =      group[i]
                                                num = sprintf("%d",id)
                                                vm =   stress[num]
-					                            if (vm > vm_max){
-						                            vm_max = vm
-					                            }
+					                           if (vm > vm_max){
+						                           vm_max = vm
+					                           }
                                       }
 
 		    }
