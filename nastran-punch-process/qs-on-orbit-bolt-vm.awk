@@ -2,7 +2,7 @@ BEGIN{
 	type["cbush"] = 102; ## nastran nx element type from .pch file
 
 	if (ARGC < 3){
-		print "usage awk -f qs-edf-list-margins.awk file=inp.pch dia=0.625 elements=list.txt";
+		print "usage awk -f qs-on-orbit-bolt-vm.awk file=inp.pch dia=0.625 elements=list.txt";
 		exit;
 	}
 
@@ -30,6 +30,7 @@ BEGIN{
 	while (readline()){
            if ($0 ~ /SUBCASE ID/){
 		       vm_max = 0.
+			   elem = 0
 		       case_number = $4;
 			   readline();
 			   if ($4 == type["cbush"]){
@@ -58,9 +59,10 @@ BEGIN{
 									   
 					                   if (vm > vm_max){
 						                   vm_max = vm
+										   elem = id
 					                   }
                                    }
-								   printf("%d%12.2f\n", case_number, vm_max * 1.45038E-7)
+								   printf("%d%12.2f%12d\n", case_number, vm_max * 1.45038E-7, elem)
 			   }
 		    }
 	}
