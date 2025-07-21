@@ -1,6 +1,9 @@
 BEGIN{ 
 	type["ctetra"] = 39; ## nastran nx element type from .pch file
+	type["cquadr"] = 228; ## nastran nx element type for from .pch file
+    type["chexa"] = 67; ## nastran nx element type from .pch file CHEXA8
     type["cquad4"] = 33
+    type["ctria3"] = 74
 	
 	if (ARGC < 6){
 		print "usage awk -f qs-stress-margins.awk file=inp.pch Fy=48. Fu=61. FSy=1.25 FSu=2. elements=elements.dat";
@@ -35,9 +38,8 @@ BEGIN{
 	
     printf("\n\n%12s%12s%12s%12s\n", "Subcase", "VM, ksi", "MOS Yield", "MOS Ultimate")
 	
-	mos_yield_min = 1.e+32
-	mos_ultimate_min = 1.E+32
-	vm_max = 0.
+       	       mos_yield_min = 1.e+32
+	           mos_ultimate_min = 1.E+32
 	
 	while (readline()){
 	       
@@ -49,6 +51,8 @@ BEGIN{
 		       case_number = $4;
 			   readline();
                type_number = $4
+
+	           vm_max = 0.
 			   
 			   if ($4 == type["ctetra"]){
 			       
@@ -172,7 +176,7 @@ BEGIN{
 									if (vm_max > 0.){  
 			                            mos_yield = Fy / (FSy * vm_max) - 1
 			                            mos_ultimate = Fu / (FSu * vm_max) - 1
-			                            if (type_number == type["cquad4"] || type_number == type["ctetra"]) 
+			                            if (type_number == type["cquad4"] || type_number == type["ctetra"] || type_number == type["cquadr"]) 
 										    printf("%12d%12.2f%12.2f%12.2f\n", case_number, vm_max, mos_yield, mos_ultimate)
 									}
 
