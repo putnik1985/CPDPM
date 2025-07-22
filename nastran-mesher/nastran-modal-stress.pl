@@ -16,7 +16,7 @@ use Math::Complex;
     while(<>){
 		push(@lines, $_); 
     }
-	
+        my $current_frequency = 0.;	
 	for(my $str = 0; $str < @lines; ++$str){
 		####print $lines[$str];
 		if ($lines[$str] =~ /\$ELEMENT STRESSES/){
@@ -31,7 +31,10 @@ use Math::Complex;
 			my $frequency = sqrt($w2) / (2*pi);	
             ###print "$type $frequency\n";
 			
-			
+		        if ($current_frequency != $frequency) {
+				$current_frequency = $frequency; 
+				printf "%34s%30.2f\n", "Frequency:", $current_frequency
+			}
             if ($type == $types{"chexa8"} || $type == $types{"penta6"}){
 				$str += 1;
 				while($str < @lines && $lines[$str] !~ /\$TITLE/){
@@ -54,7 +57,7 @@ use Math::Complex;
 						my $szz = $fields[1];
 						my $szx = $fields[2];
 						
-						print "$frequency $element $sxx $sxy $syy $syz $szz $szx\n";
+						printf "%30d-SXX%30.6E\n%30d-SYY%30.6E\n%30d-SZZ%30.6E\n%30d-SXY%30.6E\n%30d-SYZ%30.6E\n%30d-SZX%30.6E\n", $element, $sxx, $element, $syy, $element, $szz, $element, $sxy, $element, $syz, $element, $szx;
 						
 						
 					    $str += 1;
@@ -71,7 +74,6 @@ use Math::Complex;
 					if ($element =~ /^[0-9]/){
 					    ###print "$frequency $element\n";	
 						
-						
 						my $sxx = $fields[2];
 						my $syy = $fields[3];
 						
@@ -81,7 +83,8 @@ use Math::Complex;
 						my $syz = 0.0;
 						my $szx = 0.0;
 						my $szz = 0.0;
-						print "$frequency $element $sxx $syy $sxy $syz $szz $szx\n";
+						#### top stresses
+						printf "%30d-SXX%30.6E\n%30d-SYY%30.6E\n%30d-SZZ%30.6E\n%30d-SXY%30.6E\n%30d-SYZ%30.6E\n%30d-SZX%30.6E\n", $element, $sxx, $element, $syy, $element, $szz, $element, $sxy, $element, $syz, $element, $szx;
 						
 						$str += 2;
 						@fields = split/\s+/,&trim($lines[$str]);
@@ -91,8 +94,8 @@ use Math::Complex;
 						my $syz = 0.0;
 						my $szx = 0.0;
 						my $szz = 0.0;
-						print "$frequency $element $sxx $syy $sxy $syz $szz $szx\n";
-						
+						#### bottom stresses
+						printf "%30d-SXX%30.6E\n%30d-SYY%30.6E\n%30d-SZZ%30.6E\n%30d-SXY%30.6E\n%30d-SYZ%30.6E\n%30d-SZX%30.6E\n", $element, $sxx, $element, $syy, $element, $szz, $element, $sxy, $element, $syz, $element, $szx;
 						
 					    $str += 1;
 					}
