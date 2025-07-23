@@ -33,7 +33,7 @@ use Math::Complex;
 			
 		        if ($current_frequency != $frequency) {
 				$current_frequency = $frequency; 
-				printf "%34s%30.2f\n", "Frequency:", $current_frequency
+				printf "%38s%30.2f\n", "Frequency:", $current_frequency
 			}
             if ($type == $types{"chexa8"} || $type == $types{"penta6"}){
 				$str += 1;
@@ -57,7 +57,7 @@ use Math::Complex;
 						my $szz = $fields[1];
 						my $szx = $fields[2];
 						
-						printf "%30d-SXX%30.6E\n%30d-SYY%30.6E\n%30d-SZZ%30.6E\n%30d-SXY%30.6E\n%30d-SYZ%30.6E\n%30d-SZX%30.6E\n", $element, $sxx, $element, $syy, $element, $szz, $element, $sxy, $element, $syz, $element, $szx;
+						printf "%30d-MID-SXX%30.6E\n%30d-MID-SYY%30.6E\n%30d-MID-SZZ%30.6E\n%30d-MID-SXY%30.6E\n%30d-MID-SYZ%30.6E\n%30d-MID-SZX%30.6E\n", $element, $sxx, $element, $syy, $element, $szz, $element, $sxy, $element, $syz, $element, $szx;
 						
 						
 					    $str += 1;
@@ -84,7 +84,7 @@ use Math::Complex;
 						my $szx = 0.0;
 						my $szz = 0.0;
 						#### top stresses
-						printf "%30d-SXX%30.6E\n%30d-SYY%30.6E\n%30d-SZZ%30.6E\n%30d-SXY%30.6E\n%30d-SYZ%30.6E\n%30d-SZX%30.6E\n", $element, $sxx, $element, $syy, $element, $szz, $element, $sxy, $element, $syz, $element, $szx;
+						printf "%30d-TOP-SXX%30.6E\n%30d-TOP-SYY%30.6E\n%30d-TOP-SZZ%30.6E\n%30d-TOP-SXY%30.6E\n%30d-TOP-SYZ%30.6E\n%30d-TOP-SZX%30.6E\n", $element, $sxx, $element, $syy, $element, $szz, $element, $sxy, $element, $syz, $element, $szx;
 						
 						$str += 2;
 						@fields = split/\s+/,&trim($lines[$str]);
@@ -95,7 +95,7 @@ use Math::Complex;
 						my $szx = 0.0;
 						my $szz = 0.0;
 						#### bottom stresses
-						printf "%30d-SXX%30.6E\n%30d-SYY%30.6E\n%30d-SZZ%30.6E\n%30d-SXY%30.6E\n%30d-SYZ%30.6E\n%30d-SZX%30.6E\n", $element, $sxx, $element, $syy, $element, $szz, $element, $sxy, $element, $syz, $element, $szx;
+						printf "%30d-BOT-SXX%30.6E\n%30d-BOT-SYY%30.6E\n%30d-BOT-SZZ%30.6E\n%30d-BOT-SXY%30.6E\n%30d-BOT-SYZ%30.6E\n%30d-BOT-SZX%30.6E\n", $element, $sxx, $element, $syy, $element, $szz, $element, $sxy, $element, $syz, $element, $szx;
 						
 					    $str += 1;
 					}
