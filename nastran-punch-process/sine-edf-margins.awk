@@ -1,6 +1,6 @@
 BEGIN{
       if (ARGC < 7){
-	       print "usage: awk -f sine-edf-margins.awk file=input.pch dia=0.625 Fy=145. Fu=155. Fsu=97. FSy=1.25 FSu=2.";
+	       print "usage: awk -f sine-edf-margins.awk file=input.pch dia=0.625 Fy=145. Fu=155. Fsu=97. FSy=1.25 FSu=2. edf_list=list.txt";
 	       exit;
        }
 
@@ -24,6 +24,12 @@ BEGIN{
 		 
          record = 0;
 	current_subcase = 0;
+
+       edf_list = data["edf_list"]
+        while(getline < edf_list > 0){
+          edf[++nedf] = $1
+        }
+
 
     pi = 3.14159
 	A = pi * dia * dia / 4
@@ -96,8 +102,8 @@ BEGIN{
 							  printf("%12d,%12.2f,%12.2f,%12.2f,%12.2f,%12.2f,%12.2f,%12.2f,",point_id, freq, fx, fy, fz, mx, my, mz)
 							  
 						      shear_force = sqrt(fy * fy + fz * fz)
-						      bending = sqrt(my * my + mz * mz) / 1000. ### convert to ksi
-						      stress = bending * ymax / Jd
+						      bending = sqrt(my * my + mz * mz) 
+						      stress = bending * ymax / Jd + fx / A
 
 						      mos_shear = shear_limit / (FSu * shear_force) - 1
 						      mos_yield = Fy / (FSy * stress) - 1
