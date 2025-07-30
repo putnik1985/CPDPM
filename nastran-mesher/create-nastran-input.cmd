@@ -1,1 +1,0 @@
-perl nastran-free-mesh-modifier.pl GERI-LPGF-Structural-Test-Rig-FEM-CONSTRAINED.dat free-mesh-commands.txt

@@ -21,7 +21,7 @@ BEGIN{
         ######print file, label, eid
 	type_number = type[label];
 	####print type_number;
-					      printf("%12s,%12s,%12s,%12s,%12s,%12s,%12s,\n","Subcase#", "Fx", "Fy", "Fz", "Rx", "Ry", "Rz")
+					      printf("%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,\n","Subcase#", "Fx", "Fy", "Fz", "Rx", "Ry", "Rz", "FResultant", "MResultant" )
 	while (getline < file > 0){
 		if ($0 ~ /SUBCASE ID/){
 			case_number = $4;
@@ -45,10 +45,10 @@ BEGIN{
 						      my = $3
 						      mz = $4
 					      }
-					      printf("%12d,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,\n",case_number, fx, fy, fz, mx, my, mz)
+					      printf("%12d,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,\n",case_number, fx, fy, fz, mx, my, mz, sqrt(fx*fx+fy*fy+fz*fz), sqrt(mx*mx+my*my+mz*mz))
 						  
 						  ### in case if to calculate relative deflections
-						  ###printf("%12d,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,\n",case_number, fx, fy, fz, mx * 180 / pi, my * 180. /pi, mz * 180. / pi)
+						  ###printf("%12d,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,%12.6f,\n",case_number, fx, fy, fz, mx * 180 /:wq pi, my * 180. /pi, mz * 180. / pi)
 						  if (abs(fx) > fx_max) fx_max = abs(fx);
 						  if (abs(fy) > fy_max) fy_max = abs(fy);
 						  if (abs(fz) > fz_max) fz_max = abs(fz);

@@ -31,7 +31,7 @@ BEGIN{
 	A = pi * dia * dia / 4
 	Jd = pi * dia * dia * dia * dia / 64
 	ymax = dia / 2
-	shear_limit = Fsu * 2.* A * 1000.
+	shear_limit = Fsu * 2.* A 
 	mos_shear_min = 1000.
 	mos_yield_min = 1000.
 	mos_ultimate_min = 1000.
@@ -53,8 +53,8 @@ BEGIN{
 						 mz = $4
 						 ####print case_number, id
 						 shear_force = sqrt(fy * fy + fz * fz)
-						 bending = sqrt(my * my + mz * mz) / 1000. ### convert to ksi
-						 stress = bending * ymax / Jd
+						 bending = sqrt(my * my + mz * mz) ### convert to ksi
+						 stress = bending * ymax / Jd + fx / A
 						 
 						 mos_shear = shear_limit / (FSu * shear_force) - 1
 						 mos_yield = Fy / (FSy * stress) - 1

@@ -25,6 +25,7 @@ BEGIN{
 	FSu  = data["FSu"];
 
 	elements = data["elements"]
+	######print "Elements To Work With"
 	while(getline < elements > 0){
 	  group[++ngroup] = $1
 	  #####print group[ngroup]
@@ -155,7 +156,7 @@ BEGIN{
                                                mos_ultimate = ultimate[num]
                                                mos_yield =    yield[num] 
                                                vm =   stress[num]
-                                              
+                                               
                                               if (vm <= 1. || mos_yield > margin_cut_off ) continue 
 
 					                          if (mos_ultimate < mos_ultimate_min){
