@@ -1,1 +1,0 @@
-C:\plmapps\NX2000\NXNASTRAN\bin\nastranw mesh-sol103.nas old=no news=no

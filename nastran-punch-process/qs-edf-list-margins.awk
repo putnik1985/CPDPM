@@ -54,7 +54,7 @@ BEGIN{
 						 mx = $2
 						 my = $3
 						 mz = $4
-						 ####print case_number, id
+						 ###print case_number, id, fx, fy, fz, mx, my, mz
 						 shear_force = sqrt(fy * fy + fz * fz)
 						 bending = sqrt(my * my + mz * mz)
 						 stress = bending * ymax / Jd + abs(fx) / A
@@ -62,16 +62,18 @@ BEGIN{
 						 mos_shear = shear_limit / (FSu * shear_force) - 1
 						 mos_yield = Fy / (FSy * stress) - 1
 						 mos_ultimate = Fu / (FSu * stress) - 1
-
+                         
 						 cbush_shear[id] = mos_shear
                                                  cbush_ultimate[id] = mos_ultimate
                                                  cbush_yield[id] = mos_yield
- 
-							 
+                         ####print id, cbush_yield[id], cbush_ultimate[id], cbush_ultimate[id]
+						  
 						 
 				   }   
-                                   for(i=1; i<=nedf; ++i){
-                                       num = edf[i]
+                                   
+								   for(i=1; i<=nedf; ++i){
+                                       id = edf[i]
+									   num = sprintf("%d",id)
                                        printf("%12d%12d%12.2f%12.2f%12.2f\n", case_number, num, cbush_yield[num], cbush_ultimate[num], cbush_shear[num])
                                        mos_shear = cbush_shear[num]
                                        mos_ultimate = cbush_ultimate[num]
