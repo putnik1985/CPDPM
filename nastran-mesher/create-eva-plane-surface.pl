@@ -4,7 +4,7 @@ use Math::Trig;
 use Cwd qw(getcwd);
 
     print "\n";
-###usage: perl nastran-free-mesh-modifier.pl file=file_where_mesh surface_grid=66114774 r=0.03 h=0.001 origin_grid=66203118 cone_grid=66115037 dcs=2 rcs=0
+###usage: perl nastran-free-mesh-modifier.pl file=file_where_mesh surface_grid=66114774 r=0.03 dcs=0 rcs=0
 #
         my %data;
         for(@ARGV){
@@ -16,10 +16,7 @@ use Cwd qw(getcwd);
 
 	my $mesh_file = $data{"file"};
 	my $r = $data{"r"};
-	my $h = $data{"h"};
 	my $grid = $data{"surface_grid"};
-	my $origin_grid = $data{"origin_grid"};
-	my $cone_grid = $data{"cone_grid"};
 	my $dcs = $data{"dcs"};
 	my $rcs = $data{"rcs"};
 	
@@ -39,6 +36,7 @@ use Cwd qw(getcwd);
 	my $next_property = -$unreal_number;
 	my $next_material = -$unreal_number;
 	my $next_spc = 1;
+        my $error = 1.E-12;
 	
         my @fields;
 	
@@ -95,18 +93,9 @@ use Cwd qw(getcwd);
 	$next_property++;
 	$next_spc++;
 
-        &fields($file_grids{$origin_grid});	
-        my ($x1, $y1, $z1) = ($fields[3], $fields[4], $fields[5]);
-
         &fields($file_grids{$grid});	
         my ($x0, $y0, $z0) = ($fields[3], $fields[4], $fields[5]);
-        my $R0 = sqrt(($x0-$x1)**2 + ($z0-$z1)**2);
 
-        &fields($file_grids{$cone_grid});	
-        my ($x2, $y2, $z2) = ($fields[3], $fields[4], $fields[5]);
-        my $R2 = sqrt(($x2-$x1)**2 + ($z2-$z1)**2);
-
-        ####print "$cone_grid, $x2, $y2, $z2 \n";
         my @rbe3_grids;
 
         while ( my ($key, $value) = each %file_grids) {
@@ -114,17 +103,13 @@ use Cwd qw(getcwd);
             &fields($value);
             my ($x, $y, $z) = ($fields[3], $fields[4], $fields[5]);
             ####print "$key, $x, $y, $z\n";
-            my $from_axis = sqrt(($x-$x1)**2 + ($z-$z1)**2);  
-            my $R = $R0 + ($R2 - $R0) / ($y2 - $y0) * ($y - $y0);
-
-            if ($from_axis >= ($R - $h) && $from_axis <= ($R + $h)) {
-                    my $distance = sqrt(($x-$x0)**2 + ($y-$y0)**2 + ($z-$z0)**2);
-                    if ($distance < $r) {
-                        ####print "$key\n";
-                            push(@rbe3_grids, $key);
-                    }
-                } 
-        }
+            my $distance = sqrt(($x-$x0)**2 + ($z-$z0)**2); ### distance in place y=const
+            ####print "$key, $distance, $r\n";
+                if ($distance < $r && abs($y-$y0) < $error) {
+                   #####print "$key,$x,$y,$z\n";
+                   push(@rbe3_grids, $key);
+                }
+        } 
        
         #
         ###print @rbe3_grids;
@@ -134,6 +119,7 @@ use Cwd qw(getcwd);
         #}
 
         my ($xc, $yc, $zc) = &cg(@rbe3_grids);
+        #####my ($xc, $yc, $zc) = ($x0, $y0, $z0);
         &nastran_grid($next_grid, $xc, $yc, $zc);     
         &nastran_rbe3($next_grid, $next_element, @rbe3_grids);
         $next_grid++;
@@ -179,6 +165,7 @@ sub nastran_rbe3 {
 }
 
 sub cg {
+
     my @grids;
     my $xc;
     my $yc;
