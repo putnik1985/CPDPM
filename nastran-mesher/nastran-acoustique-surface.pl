@@ -65,3 +65,27 @@ sub grids { ## input is the nastran QUAD card
 	}
 	
 }
+
+sub dot_product{
+	my @x = split /,/,@_[0];
+	my @y = split /,/,@_[1];
+	$x[0] * $y[0] + $x[1] * $y[1] + $x[2] * $y[2];
+}
+
+sub cross_product{
+	my @x = split /,/,@_[0];
+	my @y = split /,/,@_[1];
+	
+	( $x[1] * $y[2] - $x[2] * $y[1], 
+	  $x[2] * $y[0] - $x[0] * $y[2],
+	  $x[0] * $y[1] - $x[1] * $y[0]);
+}
+
+sub scalar_vector_product{
+		my @x = split /,/,@_[0];
+		my $scalar = @_[1];
+		
+        ( $scalar * $x[0],
+		  $scalar * $x[1],
+		  $scalar * $x[2]);
+}
