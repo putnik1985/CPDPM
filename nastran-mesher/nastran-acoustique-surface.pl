@@ -39,7 +39,24 @@ use Math::Complex;
   
     while (my ($key, $value) = each %shells) {
                my @nodes = &grids($value);
-			   print "$key, $nodes[0], $nodes[1], $nodes[2], $nodes[3]\n";
+			   my ($x0, $y0, $z0) = &coordinates($grids{$nodes[0]});
+			   my ($x1, $y1, $z1) = &coordinates($grids{$nodes[1]});
+			   my ($x2, $y2, $z2) = &coordinates($grids{$nodes[2]});
+			   
+			   my ($ax, $ay, $az) = ($x1 - $x0, $y1 - $y0, $z1 - $z0);
+			   my ($bx, $by, $bz) = ($x2 - $x0, $y2 - $y0, $z2 - $z0);
+			   
+			   my ($nx, $ny, $nz) = &cross_product("$ax,$ay,$az", "$bx,$by,$bz");
+			   my $mag = sqrt($nx**2 + $ny**2 + $nz**2);
+			   if ($mag < 0.0001) {
+				   print "element: $key has zero normal\n";
+				   exit
+			   }
+			   
+			   $nx /= $mag;
+			   $ny /= $mag;
+			   $nz /= $mag;
+			   print "$key, $nx, $ny, $nz\n";
 	}		
 
 sub trim{

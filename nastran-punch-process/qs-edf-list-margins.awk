@@ -50,10 +50,24 @@ BEGIN{
 						 fx = $2
 						 fy = $3
 						 fz = $4
+						 
+						 if (NF < 5) { 
+						        s = fz; 
+								fz = substr(s, 1, length(s) - 8)
+                                ####print sxy								
+						 } 
+						 
 						 readline();
 						 mx = $2
 						 my = $3
 						 mz = $4
+
+						 if (NF < 5) { 
+						        s = mz; 
+								mz = substr(s, 1, length(s) - 8)
+                                ####print sxy								
+						 } 
+
 						 ###print case_number, id, fx, fy, fz, mx, my, mz
 						 shear_force = sqrt(fy * fy + fz * fz)
 						 bending = sqrt(my * my + mz * mz)
