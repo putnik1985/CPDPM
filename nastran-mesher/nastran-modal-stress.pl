@@ -12,6 +12,8 @@ use Math::Complex;
 	$types{"penta6"} = 68;
     $types{"cquad4"} = 33;
     $types{"cquadr"} = 228;	
+	$types{"ctriar"} = 227;
+	$types{"ctria3"} = 74;
 	
     while(<>){
 		push(@lines, $_); 
@@ -66,7 +68,7 @@ use Math::Complex;
 				}
             } ### if ($type == $types{"chexa8"} || $type == $types{"penta6"})
 
-            if ($type == $types{"cquad4"} || $type == $types{"cquadr"}){
+            if ($type == $types{"cquad4"} || $type == $types{"cquadr"} || $type == $types{"ctriar"} || $type == $types{"ctria3"}){
 				$str += 1;
 				while($str < @lines && $lines[$str] !~ /\$TITLE/){
 					@fields = split/\s+/,&trim($lines[$str]);

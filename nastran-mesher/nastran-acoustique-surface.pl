@@ -58,12 +58,14 @@ use Math::Complex;
 			   $nz /= $mag;
 			   ### need to check if the element triangle or square to have proper area = 0.5 * mag or mag
                my $area;
-			   if (@grids == 3) {
+			   if (@nodes == 3) {
 			        $area = $mag / 2.;
+					printf "%12d,%12d,%12d,%12d,%12.8f,%12.8f,%12.8f,%12.8f,\n", $key, $nodes[0], $nodes[1], $nodes[2], $area, $nx, $ny, $nz;
 			   } else {
 				    $area = $mag;
+					printf "%12d,%12d,%12d,%12d,%12d,%12.8f,%12.8f,%12.8f,%12.8f,\n", $key, $nodes[0], $nodes[1], $nodes[2], $nodes[3], $area, $nx, $ny, $nz;
                }					
-			   print "$key, $mag, $nx, $ny, $nz\n";
+			   
 	}		
 
 sub trim{
@@ -79,6 +81,7 @@ sub coordinates { ## input is the nastran GRID card
 }
 
 sub grids { ## input is the nastran QUAD card
+    ####chomp(@_[0]);
 	my @words = split/,/,@_[0];
 	if ($words[0] =~ /CTRIA/) {
 		return ($words[3], $words[4], $words[5]);
