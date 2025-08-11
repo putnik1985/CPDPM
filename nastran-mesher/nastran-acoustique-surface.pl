@@ -56,7 +56,14 @@ use Math::Complex;
 			   $nx /= $mag;
 			   $ny /= $mag;
 			   $nz /= $mag;
-			   print "$key, $nx, $ny, $nz\n";
+			   ### need to check if the element triangle or square to have proper area = 0.5 * mag or mag
+               my $area;
+			   if (@grids == 3) {
+			        $area = $mag / 2.;
+			   } else {
+				    $area = $mag;
+               }					
+			   print "$key, $mag, $nx, $ny, $nz\n";
 	}		
 
 sub trim{
