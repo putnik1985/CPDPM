@@ -60,10 +60,10 @@ use Math::Complex;
                my $area;
 			   if (@nodes == 3) {
 			        $area = $mag / 2.;
-					printf "%12d,%12d,%12d,%12d,%12.8f,%12.8f,%12.8f,%12.8f,\n", $key, $nodes[0], $nodes[1], $nodes[2], $area, $nx, $ny, $nz;
+					printf "%12d          3%12d%12d%12d           0%12.8f%12.8f%12.8f%12.8f\n", $key, $nodes[0], $nodes[1], $nodes[2], $area, $nx, $ny, $nz;
 			   } else {
 				    $area = $mag;
-					printf "%12d,%12d,%12d,%12d,%12d,%12.8f,%12.8f,%12.8f,%12.8f,\n", $key, $nodes[0], $nodes[1], $nodes[2], $nodes[3], $area, $nx, $ny, $nz;
+					printf "%12d          4%12d%12d%12d%12d%12.8f%12.8f%12.8f%12.8f\n", $key, $nodes[0], $nodes[1], $nodes[2], $nodes[3], $area, $nx, $ny, $nz;
                }					
 			   
 	}		

@@ -24,7 +24,7 @@ const (
 func main() {
 
 	if (len(os.Args) < 4) {
-		fmt.Println("usage: ./random modes=input stress=stressfile command=command-file")
+		fmt.Println("usage: ./random modes=input stress=stressfile acoustique=perl-output")
 		return
 	}
 
@@ -82,14 +82,9 @@ func main() {
 		fmt.Println(stress_labels[stress_output[i]])
 	    }
 
-	var excitation []float64    
-	m = len(F)
-	n = len(F[0])
-
-        for i:=0; i< n; i++ {
-		excitation = append(excitation, 0.)
-	}
-		excitation[disp_labels[direction]] = 1.
+	    m = len(F)
+	    n = len(F[0])
+	    excitation := read_acoustique(data["acoustique"], n, disp_labels)   
 
 	    fmt.Println("\nExcitation")
 	    fmt.Println(len(excitation))
@@ -106,11 +101,11 @@ func main() {
 	////////fmt.Printf("%12g,",s)
 	}
 	fmt.Printf("\n")
-        /////return
 	fmt.Println("Excitation Vector:,")
 	fmt.Println(p)
 	fmt.Println(len(p))
 
+        return
 	var rms []float64
 	for i:=0; i<int(n); i++ {
 	rms = append(rms, 0.)
@@ -381,4 +376,46 @@ func  read_frequencies(filename string) []float64 {
 	fmt.Println(frequencies)
 	*********************************/
 	return frequencies 
+}
+
+func read_acoustique(filename string, n int, labels map[string]int ) []float64 {
+	f, err := os.Open(filename)//f becomes *os.File
+	if err != nil {
+		  fmt.Fprintf(os.Stderr, "acoustique: %v\n", err)
+	}
+
+	var excitation[]float64 //result excitation vector
+        for i:=0; i<n; i++ {
+		excitation = append(excitation, 0.)
+	}
+
+	input = bufio.NewScanner(f)
+	for input.Scan() {
+	    readline()
+	    ///fmt.Println(line, fields)
+	     N, _:= strconv.Atoi(fields[1])
+	     var node [4]int
+	     var norm [3]float64
+
+	    node[0], _= strconv.Atoi(fields[2])
+	    node[1], _= strconv.Atoi(fields[3])
+	    node[2], _= strconv.Atoi(fields[4])
+	    node[3], _= strconv.Atoi(fields[5])
+	     S, _:= strconv.ParseFloat(fields[6], 64)
+	    norm[0], _= strconv.ParseFloat(fields[7], 64)
+	    norm[1], _= strconv.ParseFloat(fields[8], 64)
+	    norm[2], _= strconv.ParseFloat(fields[9], 64)
+
+                for i:=0; i<4; i++ { 
+			nx := labels[fmt.Sprintf("%d-DISPX",node[i])]
+			ny := labels[fmt.Sprintf("%d-DISPY",node[i])]
+			nz := labels[fmt.Sprintf("%d-DISPZ",node[i])]
+			excitation[nx] += -S * norm[0] / float64(N)
+			excitation[ny] += -S * norm[1] / float64(N)
+			excitation[nz] += -S * norm[2] / float64(N)
+		}
+
+        }
+        f.Close()
+	return excitation;
 }
