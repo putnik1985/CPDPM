@@ -105,7 +105,6 @@ func main() {
 	fmt.Println(p)
 	fmt.Println(len(p))
 
-        return
 	var rms []float64
 	for i:=0; i<int(n); i++ {
 	rms = append(rms, 0.)
@@ -114,21 +113,29 @@ func main() {
 	var input_rms float64 = 0.
         // input from the command file
 	var G float64 = 9.81
-	var M float64 = 1.e+8
+	/////////////////////var M float64 = 1.e+8
 	var Gstress float64 = 1.E+6 // convert to MPa
 	fmin := 20.
-	fmax := 2000.
-	N := 1980
+	fmax := 1000.
+	N := 980
+
 	var df float64 = (fmax - fmin) / float64(N)
 	var ksi []float64 // input from the command file
 	for i:=0; i < m; i++ {
 		ksi = append(ksi, 0.05)
 	}
 
-	var Sx []float64
+	var Sx []float64 // spectral densities
 	for i:=0; i<n; i++ {
 		Sx = append(Sx, 0.)
 	}
+
+/*****************************************
+	for freq:=fmin; freq<=fmax; freq+=df {
+		fmt.Println(freq, spl(freq), psd(freq))
+	}
+	return
+*****************************************/
 
         fmt.Println("\nAcceleration Spectrum Density(g^2/Hz):,")
 	fmt.Printf("%16s,%16s,","Freq(Hz)", "Input")
@@ -138,19 +145,18 @@ func main() {
 	           fmt.Printf("%16s,", channel)
 	       }
                fmt.Printf("\n")
-
 	for freq := fmin; freq <= fmax; freq += df {
 	       w := 2. * math.Pi * freq
 	       fmt.Printf("%16f,",freq)
-	       fmt.Printf("%16.6g,",FSpectrum(w) / (M * M))
-	       input_rms += FSpectrum(w) / (M*M) * df 
+	       fmt.Printf("%16.6g,",psd(freq) / (Gstress * Gstress))
+	       input_rms += psd(freq) / (Gstress * Gstress) * df 
 	       for k:=0; k<n; k++{ // calculate for each DOF only densities on the main diagonal, cross densities Sij = Fsi Sqs Fsj should be added
 		   Sx[k] = 0.
-	           for mode, freq := range frequencies{
-		       w0 := 2. * math.Pi * freq
+	           for mode, _ := range frequencies{
+		       w0 := 2. * math.Pi * frequencies[mode]
 
                        ///fmt.Println(w0) 			   
-		       Sq := FSpectrum(w) * p[mode] * p[mode] / (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
+		       Sq := psd(freq) * p[mode] * p[mode] / (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
                        Sx[k] += w * w * w * w * F[mode][k] * F[mode][k] * Sq
 	            }
 	            //fmt.Printf("%12.6f,",Sx)
@@ -166,7 +172,7 @@ func main() {
 	}
 
 	fmt.Printf("\nRMS:\n")
-	fmt.Printf("%16s,%16.6f,","Total:", math.Sqrt(input_rms) / G)
+	fmt.Printf("%16s,%16.6f,","Total:", math.Sqrt(input_rms) / Gstress)
 	for i:=0; i<len(accel_output); i++ {
 	    k := disp_labels[accel_output[i]]
 	    val := rms[k]
@@ -187,7 +193,7 @@ func main() {
 	}
 
         fmt.Println("\nStress Spectrum Density(MPa^2/Hz):,")
-	fmt.Printf("%16s,%16s,","Freq(Hz)", "Input(g^2/Hz)")
+	fmt.Printf("%16s,%16s,","Freq(Hz)", "Input(MPa^2/Hz)")
 
 	       for i:=0; i<len(stress_output); i++ {
 		   channel := stress_output[i]
@@ -200,15 +206,15 @@ func main() {
 	for freq := fmin; freq <= fmax; freq += df {
 	       w := 2. * math.Pi * freq
 	       fmt.Printf("%16f,",freq)
-	       fmt.Printf("%16.6g,",FSpectrum(w) / (M * M))
-	       input_rms += FSpectrum(w) / (M*M) * df 
+	       fmt.Printf("%16.6g,",psd(freq) / (Gstress * Gstress))
+	       input_rms += psd(freq) / (Gstress*Gstress) * df 
 	       for k:=0; k<n; k++{ // calculate for each DOF only densities on the main diagonal, cross densities Sij = Fsi Sqs Fsj should be added
 		   Sx[k] = 0.
-	           for mode, freq := range frequencies{
-		       w0 := 2. * math.Pi * freq
+	           for mode, _ := range frequencies{
+		       w0 := 2. * math.Pi * frequencies[mode]
 
                        ///fmt.Println(w0) 			   
-		       Sq := FSpectrum(w) * p[mode] * p[mode] / (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
+		       Sq := psd(freq) * p[mode] * p[mode] / (math.Pow(w0 * w0 - w * w, 2.) + 4. * w0 * w0 * ksi[mode] * ksi[mode] * w * w)
                        Sx[k] += S[mode][k] * S[mode][k] * Sq
 	            }
 	            //fmt.Printf("%12.6f,",Sx)
@@ -224,7 +230,7 @@ func main() {
 	}
 
 	fmt.Printf("\nRMS:\n")
-	fmt.Printf("%16s,%16.6f,","Total:", math.Sqrt(input_rms) / G)
+	fmt.Printf("%16s,%16.6f,","Total:", math.Sqrt(input_rms) / Gstress)
 	for i:=0; i<len(stress_output); i++ {
 	    k := stress_labels[stress_output[i]]
 	    val := rms[k]
@@ -418,4 +424,19 @@ func read_acoustique(filename string, n int, labels map[string]int ) []float64 {
         }
         f.Close()
 	return excitation;
+}
+
+func spl(f float64) float64 {// sound pressure levels
+	return 120.-0.000625 * (f - 20.) * (f - 1000.)
+}
+
+func psd(f float64) float64{
+	var prms float64;
+	var df float64;
+	var x float64 = 1./3.; // 1/3 octave band f2/f1 = 2^x
+	var pref float64 = 2.e-5 // for Pa^2/Hz
+	df = f * ( math.Pow(2., x/2.) - math.Pow(2., -x/2.))
+	prms = pref * math.Pow(10., spl(f) / 20.)
+	//////fmt.Println(x, f, df, prms)
+	return prms*prms / df
 }
