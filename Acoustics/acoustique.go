@@ -66,18 +66,18 @@ func main() {
 	    disp_labels := read_labels(data["modes"])
         // input from the command file
         var direction string = "100-DISPZ"
-	stress_output := []string{"41835-TOP-SXX", "41835-TOP-SYY", "41835-TOP-SXY"}
+	stress_output := []string{"1062-TOP-SXX", "1062-TOP-SYY", "1062-TOP-SXY"}
 	 accel_output := []string{"33772-DISPX", "33772-DISPY", "33772-DISPZ"}
 
 	    fmt.Println("Excitation Grid:")
             fmt.Println(disp_labels[direction])
-            fmt.Println("Output Accelerations:")
+            fmt.Println("Output Accelerations DOF:")
 	    for i:=0; i<len(accel_output); i++ {
 		fmt.Println(disp_labels[accel_output[i]])
 	    }
 	    stress_labels := read_labels(data["stress"])
 
-            fmt.Println("Output Stresses:")
+            fmt.Println("Output Stresses DOF:")
 	    for i:=0; i<len(stress_output); i++ {
 		fmt.Println(stress_labels[stress_output[i]])
 	    }
@@ -149,7 +149,7 @@ func main() {
 	       w := 2. * math.Pi * freq
 	       fmt.Printf("%16f,",freq)
 	       fmt.Printf("%16.6g,",psd(freq) / (Gstress * Gstress))
-	       input_rms += psd(freq) / (Gstress * Gstress) * df 
+	       input_rms += psd(freq) * df 
 	       for k:=0; k<n; k++{ // calculate for each DOF only densities on the main diagonal, cross densities Sij = Fsi Sqs Fsj should be added
 		   Sx[k] = 0.
 	           for mode, _ := range frequencies{
@@ -206,8 +206,8 @@ func main() {
 	for freq := fmin; freq <= fmax; freq += df {
 	       w := 2. * math.Pi * freq
 	       fmt.Printf("%16f,",freq)
-	       fmt.Printf("%16.6g,",psd(freq) / (Gstress * Gstress))
-	       input_rms += psd(freq) / (Gstress*Gstress) * df 
+	       fmt.Printf("%16.6g,", psd(freq) / (Gstress * Gstress))
+	       input_rms += psd(freq) * df 
 	       for k:=0; k<n; k++{ // calculate for each DOF only densities on the main diagonal, cross densities Sij = Fsi Sqs Fsj should be added
 		   Sx[k] = 0.
 	           for mode, _ := range frequencies{
@@ -407,18 +407,23 @@ func read_acoustique(filename string, n int, labels map[string]int ) []float64 {
 	    node[1], _= strconv.Atoi(fields[3])
 	    node[2], _= strconv.Atoi(fields[4])
 	    node[3], _= strconv.Atoi(fields[5])
+
 	     S, _:= strconv.ParseFloat(fields[6], 64)
+
 	    norm[0], _= strconv.ParseFloat(fields[7], 64)
 	    norm[1], _= strconv.ParseFloat(fields[8], 64)
 	    norm[2], _= strconv.ParseFloat(fields[9], 64)
 
                 for i:=0; i<4; i++ { 
-			nx := labels[fmt.Sprintf("%d-DISPX",node[i])]
-			ny := labels[fmt.Sprintf("%d-DISPY",node[i])]
-			nz := labels[fmt.Sprintf("%d-DISPZ",node[i])]
-			excitation[nx] += -S * norm[0] / float64(N)
-			excitation[ny] += -S * norm[1] / float64(N)
-			excitation[nz] += -S * norm[2] / float64(N)
+			if (node[i] > 0) {
+			    nx := labels[fmt.Sprintf("%d-DISPX",node[i])]
+			    ny := labels[fmt.Sprintf("%d-DISPY",node[i])]
+			    nz := labels[fmt.Sprintf("%d-DISPZ",node[i])]
+			    excitation[nx] += -S * norm[0] / float64(N)
+			    excitation[ny] += -S * norm[1] / float64(N)
+			    excitation[nz] += -S * norm[2] / float64(N)
+		        }
+
 		}
 
         }
@@ -427,7 +432,7 @@ func read_acoustique(filename string, n int, labels map[string]int ) []float64 {
 }
 
 func spl(f float64) float64 {// sound pressure levels
-	return 120.-0.000625 * (f - 20.) * (f - 1000.)
+	return 120.-0.0004 * (f - 20.) * (f - 1000.)
 }
 
 func psd(f float64) float64{
