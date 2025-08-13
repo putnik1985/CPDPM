@@ -86,11 +86,16 @@ int main(int argc, char** argv){
     receptance alpha(m/g, k, c);
    
     double df = fmax / N;
-        for(auto i = 0.; i <= N; ++i){
+        for(auto i = 1.; i <= N; ++i){
             double w = 2 * M_PI * df * i;
             auto value = alpha(w);
             cout << setw(12) << fixed << setprecision(4) << df * i
                  << setw(12) << fixed << setprecision(4) << abs(value)
+                 << setw(12) << fixed << setprecision(4) << real(value)
+                 << setw(12) << fixed << setprecision(4) << imag(value)
+                 << setw(12) << fixed << setprecision(4) << arg(value) * 180. / M_PI
+                 << setw(12) << fixed << setprecision(4) << 1. / k 
+                 << setw(12) << fixed << setprecision(4) << 1. / (w*w*m/g)
                  << endl;
         } 
     return 0;
