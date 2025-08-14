@@ -6,29 +6,66 @@
 #include <cmath>
 #include <iomanip>
 
+const double M_PI = 3.14159;
+
 using namespace std;
 
 class receptance {
   public:
-  complex<double> operator()(double w);
-  receptance(double m1, double k1, double c1);
+  virtual complex<double> operator()(double w) = 0;
+  receptance(double m1, double k1);
 
-  private:
+  protected:
   double m;
   double k;
-  double c;
   double w0;
-
 };
 
-complex<double> receptance::operator()(double w){
+class viscous_damping: protected receptance {
+  public:
+  complex<double> operator()(double w);
+  viscous_damping(double m1, double k1, double c1);
+  using receptance::receptance;
+
+  private:
+  double c;
+};
+
+class structural_damping: protected receptance {
+  public:
+  complex<double> operator()(double w);
+  structural_damping(double m1, double k1, double h1);
+  using receptance::receptance;
+
+  private:
+  double h;
+};
+
+receptance::receptance(double m1, double k1):
+m(m1), k(k1)
+{
+       cout << "receptance constructor:\n";	 
+       w0 = sqrt(k/m);
+}
+
+complex<double> viscous_damping::operator()(double w){
                 return 1. / ( k - w*w * m + 1.i * w * c);
 }
 
-receptance::receptance(double m1, double k1, double c1):
-m(m1), k(k1), c(c1) 
+viscous_damping::viscous_damping(double m1, double k1, double c1):
+receptance(m1,k1), c(c1) 
 {
-       w0 = sqrt(k/m);
+	cout << "viscous constructor:\n"; 
+}
+
+structural_damping::structural_damping(double m1, double k1, double h1):
+receptance(m1,k1), h(h1) 
+{
+	cout << "structural constructor:\n"; 
+}
+
+complex<double> structural_damping::operator()(double w){
+                return 1. / ( k - w*w * m + 1.i * h);
 }
 
 int main(int argc, char** argv){
@@ -74,6 +111,7 @@ int main(int argc, char** argv){
          ///cout << record.first << record.second << endl; 
     }
     auto ksi = model["ksi"];
+    auto eta = model["eta"];
     auto k = model["k"];
     auto g = model["g"];
     auto f = model["f"];
@@ -83,8 +121,15 @@ int main(int argc, char** argv){
     auto m = k * g / (4 * M_PI * M_PI * f * f );
     //cout << "mass(kgs/g) = " << m/g << endl;
     auto c = ksi * 2. * sqrt(m * k / g );
-    receptance alpha(m/g, k, c);
-   
+    viscous_damping alpha(m/g, k, c);
+    string format_string;
+    //create format string for titles
+    for(auto i = 0; i<7; ++i)
+	    format_string += "%12s";
+
+    ////cout << format_string << endl; 
+    printf(format_string.c_str(),"Frequency", "Mag(Visc)", "Real(Visc)", "Imag(Visc)", "Phase(Visc)", "1/k", "1./(wwm)"); 
+    printf("\n");
     double df = fmax / N;
         for(auto i = 1.; i <= N; ++i){
             double w = 2 * M_PI * df * i;
