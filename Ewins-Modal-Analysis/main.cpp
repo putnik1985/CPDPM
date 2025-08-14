@@ -1,72 +1,4 @@
-#include <iostream>
-#include <string>
-#include <complex>
-#include <map>
-#include <fstream>
-#include <cmath>
-#include <iomanip>
-
-const double M_PI = 3.14159;
-
-using namespace std;
-
-class receptance {
-  public:
-  virtual complex<double> operator()(double w) = 0;
-  receptance(double m1, double k1);
-
-  protected:
-  double m;
-  double k;
-  double w0;
-};
-
-class viscous_damping: protected receptance {
-  public:
-  complex<double> operator()(double w);
-  viscous_damping(double m1, double k1, double c1);
-  using receptance::receptance;
-
-  private:
-  double c;
-};
-
-class structural_damping: protected receptance {
-  public:
-  complex<double> operator()(double w);
-  structural_damping(double m1, double k1, double h1);
-  using receptance::receptance;
-
-  private:
-  double h;
-};
-
-receptance::receptance(double m1, double k1):
-m(m1), k(k1)
-{
-       cout << "receptance constructor:\n";	 
-       w0 = sqrt(k/m);
-}
-
-complex<double> viscous_damping::operator()(double w){
-                return 1. / ( k - w*w * m + 1.i * w * c);
-}
-
-viscous_damping::viscous_damping(double m1, double k1, double c1):
-receptance(m1,k1), c(c1) 
-{
-	cout << "viscous constructor:\n"; 
-}
-
-structural_damping::structural_damping(double m1, double k1, double h1):
-receptance(m1,k1), h(h1) 
-{
-	cout << "structural constructor:\n"; 
-}
-
-complex<double> structural_damping::operator()(double w){
-                return 1. / ( k - w*w * m + 1.i * h);
-}
+#include "receptance.h"
 
 int main(int argc, char** argv){
 
@@ -107,41 +39,50 @@ int main(int argc, char** argv){
            model[key] = stod(value);
     }
     in.close();
-    for( auto& record : model){
-         ///cout << record.first << record.second << endl; 
-    }
+
+
     auto ksi = model["ksi"];
     auto eta = model["eta"];
     auto k = model["k"];
     auto g = model["g"];
     auto f = model["f"];
     auto fmax = model["fmax"];
-    ////cout << ksi << k << g << f << fmax << endl;
+	
+
+    
+	if ((k <= 0.) || (g <= 0.) || (f <= 0.) || (fmax <= 0.)) {
+		fprintf(stderr, "k, g, f, fmax - all should be defined into the input file:%s\n", filename.c_str());
+		cout << "ksi = " << ksi << " k = " << k << " g = " << g << " f = " << f << " fmax = " << fmax << endl;
+		return -1;
+	}
+	
     int N = int(fmax);
     auto m = k * g / (4 * M_PI * M_PI * f * f );
     //cout << "mass(kgs/g) = " << m/g << endl;
+
     auto c = ksi * 2. * sqrt(m * k / g );
     viscous_damping alpha(m/g, k, c);
+	
+	auto h = eta * k;
+	structural_damping beta(m/g, k, h);
+	
     string format_string;
     //create format string for titles
-    for(auto i = 0; i<7; ++i)
+    for(auto i = 0; i<5; ++i)
 	    format_string += "%12s";
 
     ////cout << format_string << endl; 
-    printf(format_string.c_str(),"Frequency", "Mag(Visc)", "Real(Visc)", "Imag(Visc)", "Phase(Visc)", "1/k", "1./(wwm)"); 
+    printf("\n\nReceptance Viscous Damping Model (ksi = %.2f)\n", ksi); 
+    printf(format_string.c_str(),"Frequency", "Mag(Visc)", "Real(Visc)", "Imag(Visc)", "Phase(Visc)"); 
     printf("\n");
-    double df = fmax / N;
-        for(auto i = 1.; i <= N; ++i){
-            double w = 2 * M_PI * df * i;
-            auto value = alpha(w);
-            cout << setw(12) << fixed << setprecision(4) << df * i
-                 << setw(12) << fixed << setprecision(4) << abs(value)
-                 << setw(12) << fixed << setprecision(4) << real(value)
-                 << setw(12) << fixed << setprecision(4) << imag(value)
-                 << setw(12) << fixed << setprecision(4) << arg(value) * 180. / M_PI
-                 << setw(12) << fixed << setprecision(4) << 1. / k 
-                 << setw(12) << fixed << setprecision(4) << 1. / (w*w*m/g)
-                 << endl;
-        } 
+    mobility_plot mb1(alpha, fmax, N);
+    cout << mb1;
+
+    printf("\n\nReceptance Structural Damping Model (eta = %.2f)\n", eta); 
+    printf(format_string.c_str(),"Frequency", "Mag(Str)", "Real(Str)", "Imag(Str)", "Phase(Str)"); 
+    printf("\n");
+    mobility_plot mb2(beta, fmax, N);
+    cout << mb2;
+	 
     return 0;
 }

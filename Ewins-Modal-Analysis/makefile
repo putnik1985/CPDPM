@@ -1,7 +1,7 @@
 CLINK = g++
 FLAGS = -std=c++14
 OBJECTS = main.o
-LIB = main.cpp
+LIB = *.cpp
 TARGET = sdof
 
 TARGET: $(LIB)
