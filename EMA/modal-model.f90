@@ -74,6 +74,11 @@ program modal
 	  print*,' Modal Model'
       print*,' ------------------------------------------------------------------------ '
       print*
+		print*
+		print*,"Eigenvalues: ", N
+        Do I = 1, N
+		   print*, 1. / Eval(i) ;
+		ENDDO
 
 		print*
 		print*,"Frequencies: ", N

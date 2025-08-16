@@ -1,0 +1,3 @@
+alpha,0.,
+beta,0.05,
+modal_model,../EMA/modal-model-3-dof.dat
