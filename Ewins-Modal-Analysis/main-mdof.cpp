@@ -47,6 +47,7 @@ int main(int argc, char** argv){
     auto alpha = model["alpha"];
     auto  beta = model["beta"];
     auto input = path["modal_model"];
+    
     vector <double> eigenvalues;
     vector < vector<double> > eigenvectors; // matrix of eigenvectors 
                                             // column - eigenvector
@@ -87,17 +88,41 @@ int main(int argc, char** argv){
             }
             
       }
-    cout << "Hysteretic proportional damping:" << endl;
-    cout << "EigenValues:" << endl;
-    for(int i = 0; i < eigenvalues.size(); ++i)
-        cout << eigenvalues[i] * ( 1. + 1.i * (beta + alpha / eigenvalues[i]))<< endl;
 
-    cout << "Vectors" << endl;
-    for(int i = 0; i < eigenvectors.size(); ++i){
-        for(int j = 0; j < eigenvectors[i].size(); ++j)
-            cout << eigenvectors[i][j] << ",";
-        cout << endl;
-    }
+             for(int s = 0; s < eigenvalues.size(); ++s){
+                 for(int k = 0; k < eigenvalues.size(); ++k){
+                     printf("%12s    Mag(%d,%d)  Phase(%d,%d)", "Freq(Hz)", s,k, s,k); 
+                 }
+             }
+             cout << endl;
+
+    auto N = int(fmax);
+    auto df = fmax / N;
+
+         for(int i = 1; i<=N; ++i){
+             auto w = 2 * M_PI * df * i;
+             for(int s = 0; s < eigenvalues.size(); ++s){
+                 for(int k = 0; k < eigenvalues.size(); ++k){
+                     complex<double> value;
+                     for(int mode = 0; mode < eigenvalues.size(); ++mode) {
+                         value += eigenvectors[k][mode] * eigenvectors[s][mode] / ( eigenvalues[mode] - w*w + 1.i * (beta + alpha / eigenvalues[mode]));
+                     }
+                     printf("%12.2f%12.4f%12.2f", df * i, abs(1.i * w * value), arg(1.i * w * value) * 180. / M_PI); 
+                 }
+             }
+                 cout << endl; 
+         }
+
     is.close();
+    cout << endl;
+    cout << "Natural Frequencies:" << endl;
+    for(int i = 0; i < eigenvalues.size(); ++i)
+        cout << sqrt(eigenvalues[i]) / (2. * M_PI) << endl;
+
+    cout << endl;
+    cout << "Hysteretic proportional damping:" << endl;
+    cout << "Frequencies:" << endl;
+    for(int i = 0; i < eigenvalues.size(); ++i)
+        cout << sqrt(eigenvalues[i] * ( 1. + 1.i * (beta + alpha / eigenvalues[i]))) / (2. * M_PI)<< endl;
     return 0;
 }
