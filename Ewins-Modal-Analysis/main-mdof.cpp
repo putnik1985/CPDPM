@@ -19,7 +19,6 @@ int main(int argc, char** argv){
     if (data.size() > 0 ) {
         filename = data["file"];
     }
-    //cout << filename;
     ifstream in(filename, ios_base::in);
     if (!in) {
              cerr << "can not open file: " << filename << '\n';
@@ -31,24 +30,74 @@ int main(int argc, char** argv){
     map<string, string>  path;
 
     while (getline(in, line)){
-           ///cout << line << '\n';
            auto pos = line.find(",");
            auto key = line.substr(0, pos);
-           ////cout << key << endl; 
            auto value = line.substr(pos+1);
-           ////cout << stod(value) << endl;
 
-           model[key] = stod(value);
-            path[key] = value;
+          if (isdigit(value[0])) { 
+              model[key] = stod(value);
+          } else {
+              path[key] = value;
+          }
     }
     in.close();
 
 
+    auto fmax = model["fmax"];
     auto alpha = model["alpha"];
     auto  beta = model["beta"];
     auto input = path["modal_model"];
+    vector <double> eigenvalues;
+    vector < vector<double> > eigenvectors; // matrix of eigenvectors 
+                                            // column - eigenvector
+    ifstream is(input);
+      while(getline(is, line)){
 
-    cout << alpha << beta << input << endl; 
-	 
+            if (auto pos = line.find("Eigenvalues") != string::npos){ 
+                istringstream iss(line); 
+                string   str;
+                   int     n;
+                double value;
+                iss >> str >> n;
+
+                for(int i = 0; i < n; ++i){
+                    is >> value;
+                    eigenvalues.push_back(value);
+                } 
+            }
+
+            if (auto pos = line.find("Eigenvectors") != string::npos){ 
+                istringstream iss(line); 
+                string   str;
+                   int     n;
+                double value;
+                iss >> str >> n;
+
+                for(int i = 0; i < n; ++i){
+                    getline(is, line);
+                    istringstream iss(line); 
+                    vector<double> mode;
+                           double value;
+
+                    while (iss >> value)
+                           mode.push_back(value);
+                    
+                    eigenvectors.push_back(mode);
+                } 
+            }
+            
+      }
+    cout << "Hysteretic proportional damping:" << endl;
+    cout << "EigenValues:" << endl;
+    for(int i = 0; i < eigenvalues.size(); ++i)
+        cout << eigenvalues[i] * ( 1. + 1.i * (beta + alpha / eigenvalues[i]))<< endl;
+
+    cout << "Vectors" << endl;
+    for(int i = 0; i < eigenvectors.size(); ++i){
+        for(int j = 0; j < eigenvectors[i].size(); ++j)
+            cout << eigenvectors[i][j] << ",";
+        cout << endl;
+    }
+    is.close();
     return 0;
 }
