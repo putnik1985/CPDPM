@@ -3,7 +3,7 @@
 #define RECEPTANCE_H
 #include "std-lib.h"
 
-const double M_PI = 3.14159;
+
 class receptance {
   public:
   virtual complex<double> operator()(double w) = 0;

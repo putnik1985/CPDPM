@@ -1,10 +1,13 @@
 CLINK = g++
 FLAGS = -std=c++14
-OBJECTS = main.o
 LIB = *.cpp
-TARGET = sdof
+SDOF = sdof
+MDOF = mdof
 
-TARGET: $(LIB)
-	$(CLINK) $(FLAGS) -o $(TARGET) $(LIB) 
+MDOF: receptance.cpp
+	$(CLINK) $(FLAGS) -o $(MDOF) main-mdof.cpp receptance.cpp 
+SDOF: receptance.cpp
+	$(CLINK) $(FLAGS) -o $(SDOF) main-sdof.cpp receptance.cpp 
+
 clean:
 	rm -f *.o $(TARGET)
