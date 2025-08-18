@@ -63,11 +63,11 @@ int main(int argc, char** argv){
     auto c = ksi * 2. * sqrt(m * k / g );
     viscous_damping alpha(m/g, k, c);
 	
-	auto h = eta * k;
-	structural_damping beta(m/g, k, h);
+    auto h = eta * k;
+    structural_damping beta(m/g, k, h);
 	
     string format_string;
-    //create format string for titles
+    //create format string for titles of 5 names
     for(auto i = 0; i<5; ++i)
 	    format_string += "%12s";
 
