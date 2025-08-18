@@ -1,0 +1,6 @@
+L=2.
+r=0.3
+set parametric
+set urange [0:L]
+set vrange [0:2*pi]
+splot u, r*cos(v), r*sin(v)

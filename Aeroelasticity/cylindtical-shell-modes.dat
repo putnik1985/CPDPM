@@ -1,0 +1,13 @@
+L=2.
+r=0.3
+n = 1 
+m = 2 
+
+A=0.1
+set parametric
+set urange [0:L]
+set vrange [0:2*pi]
+
+w(u,v)=A*sin(pi*n*u/L)*cos(m*v)
+set hidden3d
+splot u, r*cos(v) + w(u,v) * cos(v), r*sin(v) + w(u,v) * sin(v)
