@@ -1,7 +1,8 @@
 L=2.
 r=0.3
-n = 1 
-m = 2 
+
+m = ARGV[1] 
+n = ARGV[2] 
 
 A=0.1
 set parametric
@@ -10,4 +11,7 @@ set vrange [0:2*pi]
 
 w(u,v)=A*sin(pi*n*u/L)*cos(m*v)
 set hidden3d
-splot u, r*cos(v) + w(u,v) * cos(v), r*sin(v) + w(u,v) * sin(v)
+set term png
+set output sprintf("m=%d-n=%d-mode.png",m,n)
+set title sprintf("Cylidrical Shell Mode shapes \n m=%d (angular waves) n=%d (longitudional waves)",m,n)
+splot u, r*cos(v) + w(u,v) * cos(v), r*sin(v) + w(u,v) * sin(v) title ""
