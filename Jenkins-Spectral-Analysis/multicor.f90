@@ -23,8 +23,6 @@ program multicor
 
         allocate(ident(NS), x(N,NS), xm(NS))
         allocate(cov(0:MAXM,NS,NS))
-        read(12,*) NS, N, MAXM
-        allocate(ident(NS), x(N,NS), xm(NS))
 
         read(12,*) ident(:)
         do i=1,N
