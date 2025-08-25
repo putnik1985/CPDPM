@@ -9,6 +9,8 @@
 
 #define WRITE_PRECISION 10
 
+#define M_PI 3.14159
+
 template<typename T>
 class Matrix{ // numberig starts from the 1
 vector<T> v;
