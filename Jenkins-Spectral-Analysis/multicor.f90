@@ -13,6 +13,7 @@ program multicor
 
         print*
  !!       print*, "Input filename with series"
+        print*, "Input filename with series"
         print*
         read*, filename
 
@@ -22,6 +23,9 @@ program multicor
 
         allocate(ident(NS), x(N,NS), xm(NS))
         allocate(cov(0:MAXM,NS,NS))
+        read(12,*) NS, N, MAXM
+        allocate(ident(NS), x(N,NS), xm(NS))
+
         read(12,*) ident(:)
         do i=1,N
            read(12,*) x(i,:)
@@ -29,7 +33,7 @@ program multicor
         close(12)
 
          do i=1, N
- !!          write(*,*) x(i,:)
+           write(*,*) x(i,:)
         enddo
         
         print*
@@ -39,7 +43,7 @@ program multicor
         enddo
 
         do j=1,NS
-           do i=1,N 
+           do i=1, N
               x(i,j) = x(i,j) - xm(j)
            enddo
         enddo
@@ -69,6 +73,5 @@ program multicor
         enddo
 
         deallocate(x, ident, xm, cov)
-
 end program
 
