@@ -1,3 +1,16 @@
+      function average(n, x)
+              implicit none
+              integer n, i
+              real x(n)
+              real average
+
+              average = 0.
+                 do i=1,n
+                    average = average + x(i)
+                 enddo
+                 average = average / n
+      end function average
+
       !!! Eigen Values Ax-l*Bx=0 B is positive defined
       subroutine EigV(N,A,B,Eval,Evec)
       integer N, NL, i, j, p, r,iterations,ip,error,k,l
