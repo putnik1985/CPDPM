@@ -84,11 +84,16 @@ use Cwd qw(getcwd);
 
     my @output;
 	my @fields;
-	
+
+	     print "----------------------------------------------------\n";	
 	     print "List of commands:\n";
+         print "----------------------------------------------------\n";		 
 		 print "grid,20,25 - output grids from 20 to 25 inclusive\n";
 		 print "rbe2,inputfile - create rbe2 for the grids from input file\n";
+		 print "bolt_joint,bolt-joint.dat,grid-part-map.dat - create bolt joint based on the rbe2 connected two parts\n";
 		 print "write,outputfile - write the results of all commands into outputfile\n";
+	     print "----------------------------------------------------\n";
+		 print "\n";
 		 
          while(<STDIN>){
          my $line = $_;
@@ -117,6 +122,57 @@ use Cwd qw(getcwd);
          if ($line =~ /^rbe2/){ ## rbe2,fileofnodes
 		     my $list = $words[1];
              &nastran_rbe2("rbe2,$list,0.001,");
+		 }
+
+         if ($line =~ /^bolt_joint/){ ## bolt_joint,bolt-joint.dat,grid-part-map.dat
+		     my $rbe2_bolts = $words[1];
+			 my $grid_part = $words[2];
+			 my %grid_map;
+			 #####print $rbe2_bolts, $grid_part;
+			 
+			     open(grid_parth,'<', $grid_part);
+				      while(<grid_parth>){
+						  chomp;
+						  &fields($_);
+						  $grid_map{$fields[0]} = $fields[1];
+					  }	  						  
+				 close(grid_parth);
+				 
+				 open(jointh,'<',$rbe2_bolts);
+				      while(<jointh>){
+						  chomp;
+						  &fields($_);
+			              my %sets;
+						  for(@fields){
+							  if ($grid_map{$_}){
+						          $sets{$grid_map{$_}} = $sets{$grid_map{$_}} . "," . $_;
+							  }
+						  }
+						  my   @keys =   keys %sets;
+						  my @values = values %sets;
+						  
+						  if (@keys == 2 ){
+							  $values[0] =~ s/^,//;
+							  $values[1] =~ s/^,//;
+							  
+							  my @grids1 = split/,/,$values[0];
+							  my @grids2 = split/,/,$values[1];
+
+							  ####print @grids1, @grids2;
+							  ###my ($x1, $y1, $z1) = &cg(@grids1);
+							  ###print "$x1,$y1,$z1\n";						  
+							  ###my ($x2, $y2, $z2) = &cg(@grids2);
+							  ###print "$x2,$y2,$z2\n";
+
+							  &grid_create_rbe2_from_grids($values[0]);
+							  &grid_create_rbe2_from_grids($values[1]);
+
+							  ###############exit;
+						  } else {
+							  
+						  }
+					  }	  						  				  
+				 close(jointh);
 		 }
 		 
 		 print "\n";	   
@@ -284,5 +340,60 @@ sub grid_create_rbe2_from_list {
             }
 
     }
+
+}
+
+sub grid_create_rbe2_from_grids {
+
+	my @grids = split /,/,@_[0];
+    my ($x0, $y0, $z0) = &cg(@grids);
+	##print "$x0,$y0,$z0";
+	##exit;
+	
+	my $output_str = sprintf "\n\$_grid_create_rbe2_from_grids:\n";
+	push(@output,$output_str);
+
+    my $current_field = 5;
+	my $current = 0;
+	my $last = @grids;
+    
+
+	$output_str = sprintf "GRID,%d,0,%f,%f,%f,0\n",$next_grid,$x0,$y0,$z0;
+	push(@output, $output_str);
+	print $output_str;
+	
+	$output_str = sprintf "RBE2,%d,%d,123456,",$next_element,$next_grid;
+	push(@output, $output_str);
+	print $output_str;
+	$next_grid++;
+	$next_element++;
+	for(my $k = 0; $k < $last; $k++) {
+
+			if ($current_field <= $rbe2_fields) {
+		        $output_str = sprintf "%d,",$grids[$k];
+				push(@output, $output_str);
+				print $output_str;
+				
+				++$current_field;
+			} else {
+		        $output_str = sprintf "+\n";
+				push(@output, $output_str);
+				print $output_str;
+				
+		        $output_str = sprintf "+,";
+				push(@output, $output_str);
+				print $output_str;
+				
+		        $output_str = sprintf "%d,",$grids[$k];				
+				push(@output, $output_str);
+				print $output_str;
+				
+                $current_field = 3; 				
+            }
+
+    }
+	$output_str = sprintf "\n\n";
+	push(@output, $output_str);
+	print $output_str;
 
 }

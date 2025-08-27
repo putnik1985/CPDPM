@@ -19,6 +19,7 @@ BEGIN{
         edf_list = data["elements"]
         while(getline < edf_list > 0){
           edf[++nedf] = $1
+		  
         }
 
     pi = 3.14159;
@@ -69,7 +70,7 @@ BEGIN{
                                 ####print sxy								
 						 } 
 
-						 ###print case_number, id, fx, fy, fz, mx, my, mz
+						 ####print case_number, id, fx, fy, fz, mx, my, mz
 						 shear_force = sqrt(fy * fy + fz * fz)
 						 bending = shear_force * b / 2
 						 sigma = bending * ymax / Jd + abs(fx) / A
@@ -82,7 +83,7 @@ BEGIN{
                                        id = edf[i]
 									   num = sprintf("%d",id)
 						               vm = stress[num]
-									   
+									   ####print id, vm
 					                   if (vm > vm_max){
 						                   vm_max = vm
 										   elem = id
