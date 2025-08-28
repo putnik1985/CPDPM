@@ -62,7 +62,7 @@ use Cwd qw(getcwd);
 				    $next_material = $words[1];
 			    }				
 		    }
-		 if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP|CBEAM|CBAR/){
+		 if ($words[0] =~ /RBE|CTETRA|CHEXA|CQUAD|CELAS|CBUSH|GAP|CBEAM|CBAR|CONM/){
 			    if ($next_element < $words[1]) {
 				    $next_element = $words[1];
 			    }
@@ -164,15 +164,51 @@ use Cwd qw(getcwd);
 							  ###my ($x2, $y2, $z2) = &cg(@grids2);
 							  ###print "$x2,$y2,$z2\n";
 
-							  &grid_create_rbe2_from_grids($values[0]);
-							  &grid_create_rbe2_from_grids($values[1]);
-
-							  ###############exit;
+							  my ($first, $x1, $y1, $z1) = &grid_create_spreader_from_grids($values[0]);
+							  my ($second, $x2, $y2, $z2) = &grid_create_spreader_from_grids($values[1]);
+                              ###print "$first, $x1,$y1,$z1\n";
+                              ###print "$second, $x2,$y2,$z2\n";
+							  &grid_create_bolt($first, $x1, $y1, $z1, $second, $x2, $y2, $z2);
+							  ####exit;
 						  } else {
 							  
 						  }
 					  }	  						  				  
 				 close(jointh);
+				 
+				              my $E = 6.895E10;
+			                  my $nu = 0.33;
+							  my $bolt_dia = 0.007;
+		 	                  my $spreader_radius = 2 * $bolt_dia / 2.; 
+							  my $bolt_joint_radius = 3 * $bolt_dia / 2.;
+							  my $rho = 2711.27;
+							  my $cte = 2.237E-5;
+							  my $tref = 20.;
+                              ###### Spreader properties and material							  
+			                  my $output_str = sprintf "PBARL,$next_property,$next_material,MSCBML0,ROD,,,,,+\n+,$spreader_radius,0.0,\n";
+	                          push(@output, $output_str);
+							  print $output_str;
+		                      $output_str = sprintf "\$*  Material: Bolt Joint Spreader::Cone Compression::Mesher\n";
+	                          push(@output, $output_str);
+							  print $output_str;
+	                          $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4f,%.4e,%.4f,\n",$next_material,$E,$nu,0.0,$cte,$tref;
+	                          push(@output, $output_str);
+                              print $output_str;							  
+			                  $next_property++;
+			                  $next_material++;
+							  
+							  ###### Bolts properties and material
+			                  my $output_str = sprintf "PBARL,$next_property,$next_material,MSCBML0,ROD,,,,,+\n+,$bolt_joint_radius,0.0,\n";
+	                          push(@output, $output_str);
+							  print $output_str;
+		                      $output_str = sprintf "\$*  Material: Bolt Joint::Cone Compression::Mesher\n";
+	                          push(@output, $output_str);
+							  print $output_str;
+	                          $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4f,%.4e,%.4f,\n",$next_material,$E,$nu,$rho,$cte,$tref;
+	                          push(@output, $output_str);
+                              print $output_str;							  
+			                  $next_property++;
+			                  $next_material++;
 		 }
 		 
 		 print "\n";	   
@@ -396,4 +432,101 @@ sub grid_create_rbe2_from_grids {
 	push(@output, $output_str);
 	print $output_str;
 
+}
+
+sub grid_create_spreader_from_grids {
+
+	my @grids = split /,/,@_[0];
+    my ($x0, $y0, $z0) = &cg(@grids);
+	##print "$x0,$y0,$z0";
+	##exit;
+	
+	my $output_str = sprintf "\n\$_grid_create_spreader_from_grids:\n";
+	push(@output,$output_str);
+	print $output_str;
+    
+
+	$output_str = sprintf "GRID,%d,0,%f,%f,%f,0\n",$next_grid,$x0,$y0,$z0;
+    my $first = $next_grid;
+	$next_grid++;
+	
+	push(@output, $output_str);
+	print $output_str;
+
+	
+			for(@grids){
+				  my $grid_1 = $_;
+				  
+				  if ($grid_1 != $first){
+		              my @node = split /,/,$file_grids{$grid_1};
+  		              my ($x, $y, $z) = ($node[3], $node[4], $node[5]);
+                      my $dx = $x - $x0;
+					  my $dy = $y - $y0;
+					  my $dz = $z - $z0;
+					  my ($rx, $ry, $rz) = &vector_normal($dx, $dy, $dz);
+			          $output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first,$grid_1,$rx,$ry,$rz;
+                      push(@output, $output_str);
+					  print $output_str;
+					  $next_element++;
+				  }
+            }
+
+	$output_str = sprintf "\n\n";
+	push(@output, $output_str);
+	print $output_str;
+    return ($first, $x0, $y0, $z0);
+}
+
+sub grid_create_bolt {
+
+    my ($first, $x1, $y1, $z1) = (@_[0], @_[1], @_[2], @_[3],);
+    my ($second, $x2, $y2, $z2) = (@_[4], @_[5], @_[6], @_[7],);
+	
+    ####print "$first, $x1,$y1,$z1\n";
+    #####print "$second, $x2,$y2,$z2\n";
+
+	my $output_str = sprintf "\n\$grid_create_bolt\n";
+	push(@output,$output_str);
+	print $output_str;
+
+    my $dx = $x2 - $x1;
+    my $dy = $y2 - $y1;
+	my $dz = $z2 - $z1;
+	my ($rx, $ry, $rz) = &vector_normal($dx, $dy, $dz);
+	
+	$output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property + 1,$first,$second,$rx,$ry,$rz;
+    push(@output, $output_str);
+	print $output_str;
+	$next_element++;
+
+}
+
+sub vector_normal{
+	my $nx = @_[0];
+	my $ny = @_[1];
+	my $nz = @_[2];
+	
+	my $rx; 
+	my $ry;
+	my $rz;
+	
+	if ($nx != 0.) { 
+	    $ry = 1.0; 
+		$rz = 0.; 
+		$rx = -$ny / $nx;
+	} elsif ($ny != 0.) {
+	    $rz = 1.0; 
+		$rx = 0.; 
+		$ry = -$nz / $ny;		
+	} else {
+	    $rx = 1.0; 
+		$ry = 0.; 
+		$rz = -$nx / $nz;		
+	}
+		
+	my $mag = sqrt($rx**2 + $ry**2 + $rz**2);
+	$rx /= $mag;
+	$ry /= $mag;
+	$rz /= $mag;
+	($rx, $ry, $rz);
 }
