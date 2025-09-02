@@ -88,9 +88,10 @@ use Cwd qw(getcwd);
 	     print "----------------------------------------------------\n";	
 	     print "List of commands:\n";
          print "----------------------------------------------------\n";		 
-		 print "grid,20,25 - output grids from 20 to 25 inclusive\n";
-		 print "rbe2,inputfile - create rbe2 for the grids from input file\n";
-		 print "bolt_joint,bolt-joint.dat,grid-part-map.dat - create bolt joint based on the rbe2 connected two parts\n";
+		 print "grid,20,25       - output grids from 20 to 25 inclusive\n";
+		 print "rbe2,inputfile   - create rbe2 for the grids from input file\n";
+		 print "bolt_joint,bolt  - joint.dat,grid-part-map.dat - create bolt joint based on the rbe2 connected two parts\n";
+		 print "spreaders,bolt   - joint.dat - create spreaders from the file bolt-joit.dat\n";
 		 print "write,outputfile - write the results of all commands into outputfile\n";
 	     print "----------------------------------------------------\n";
 		 print "\n";
@@ -134,7 +135,7 @@ use Cwd qw(getcwd);
 				      while(<grid_parth>){
 						  chomp;
 						  &fields($_);
-						  $grid_map{$fields[0]} = $fields[1];
+						  $grid_map{$fields[0]} = $fields[1]; ###grid -- part
 					  }	  						  
 				 close(grid_parth);
 				 
@@ -211,6 +212,37 @@ use Cwd qw(getcwd);
 			                  $next_material++;
 		 }
 		 
+		 if ($line =~ /^spreaders/){ ## spreaders,bolt-joint.dat
+		         my $rbe2_bolts = $words[1]; ## just the name no idea
+				 open(jointh,'<',$rbe2_bolts);
+				      while(<jointh>){
+						  chomp;
+						  &grid_create_spreader_from_grids_with_first_master($_);
+						  }  						  				  
+
+				 close(jointh);	
+				 
+				              my $E = 6.895E10;
+			                  my $nu = 0.33;
+							  my $bolt_dia = 0.007;
+		 	                  my $spreader_radius = 2. * $bolt_dia / 2.; 
+							  my $cte = 2.237E-5;
+							  my $tref = 20.;
+							  
+                              ###### Spreader properties and material							  
+			                  my $output_str = sprintf "PBARL,$next_property,$next_material,MSCBML0,ROD,,,,,+\n+,$spreader_radius,0.0,\n";
+	                          push(@output, $output_str);
+							  print $output_str;
+		                      $output_str = sprintf "\$*  Material: Bolt Joint Spreader::Cone Compression::Mesher\n";
+	                          push(@output, $output_str);
+							  print $output_str;
+	                          $output_str = sprintf "MAT1,%d,%.2E,,%.4f,%.4f,%.4e,%.4f,\n",$next_material,$E,$nu,0.0,$cte,$tref;
+	                          push(@output, $output_str);
+                              print $output_str;							  
+			                  $next_property++;
+			                  $next_material++;
+
+		 }
 		 print "\n";	   
          }
 		 
@@ -529,4 +561,48 @@ sub vector_normal{
 	$ry /= $mag;
 	$rz /= $mag;
 	($rx, $ry, $rz);
+}
+
+sub grid_create_spreader_from_grids_with_first_master {
+
+	my @grids = split /,/,@_[0];
+    
+	##print "$x0,$y0,$z0";
+	##exit;
+	
+	my $output_str = sprintf "\n\$grid_create_spreader_from_grids_with_first_master:\n";
+	push(@output,$output_str);
+	print $output_str;
+    
+
+	
+    my $first = $grids[0];
+    my @node = split /,/,$file_grids{$first};
+  	my ($x0, $y0, $z0) = ($node[3], $node[4], $node[5]);
+
+	push(@output, $output_str);
+	print $output_str;
+
+	
+			for(@grids){
+				  my $grid_1 = $_;
+				  
+				  if ($grid_1 != $first){
+		              my @node = split /,/,$file_grids{$grid_1};
+  		              my ($x, $y, $z) = ($node[3], $node[4], $node[5]);
+                      my $dx = $x - $x0;
+					  my $dy = $y - $y0;
+					  my $dz = $z - $z0;
+					  my ($rx, $ry, $rz) = &vector_normal($dx, $dy, $dz);
+			          $output_str = sprintf "CBAR,%d,%d,%d,%d,%.4f,%.4f,%.4f,\n",$next_element,$next_property,$first,$grid_1,$rx,$ry,$rz;
+                      push(@output, $output_str);
+					  print $output_str;
+					  $next_element++;
+				  }
+            }
+
+	$output_str = sprintf "\n\n";
+	push(@output, $output_str);
+	print $output_str;
+    return ($first, $x0, $y0, $z0);
 }
