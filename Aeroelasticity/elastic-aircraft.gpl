@@ -1,0 +1,12 @@
+R = 1. 
+xmax = 16.
+
+f(x) = (R * x * (sinh(x) * cos(x) - sin(x) * cosh(x) ) + (1. - cosh(x) * cos(x))) / cosh(x)
+g(x) = (R * x * (1. + cosh(x) * cos(x)) + sinh(x) * cos(x) + sin(x) * cosh(x)) / cosh(x)
+set xrange [0:xmax]
+set title sprintf("Scaled Characteristic Equation \n R=%d, Xmax=%.2f\n", R, xmax)
+set xlabel "alpha"
+set ylabel "Scaled determinant"
+set grid
+
+plot f(x) with lines title "Joint", g(x) with lines title "Cantelivered", 0.  with lines title "Line of Zeros"

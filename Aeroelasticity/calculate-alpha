@@ -1,0 +1,12 @@
+echo "cantelivered nonzeros:"
+./secant -R 1. -x 2.02 -dx 0.3
+./secant -R 1. -x 4.9 -dx 0.3
+./secant -R 1. -x 8.0 -dx 0.3
+./secant -R 1. -x 11.1 -dx 0.3
+./secant -R 1. -x 14.3 -dx 0.3
+
+echo "joint nonzeros:"
+./secant -R 1. -x 3.74 -dx 0.3 -joint
+./secant -R 1. -x 7.02 -dx 0.3 -joint
+./secant -R 1. -x 10.16 -dx 0.3 -joint
+./secant -R 1. -x 13.38 -dx 0.3 -joint
