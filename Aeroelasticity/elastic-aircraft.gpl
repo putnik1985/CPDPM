@@ -1,5 +1,5 @@
-R = 1. 
-xmax = 16.
+R = ARGV[1] 
+xmax = ARGV[2]
 
 f(x) = (R * x * (sinh(x) * cos(x) - sin(x) * cosh(x) ) + (1. - cosh(x) * cos(x))) / cosh(x)
 g(x) = (R * x * (1. + cosh(x) * cos(x)) + sinh(x) * cos(x) + sin(x) * cosh(x)) / cosh(x)

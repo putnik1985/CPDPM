@@ -1,0 +1,14 @@
+R = ARGV[1] 
+y = ARGV[2]
+
+c1 = -(2./(R*y) * cosh(y) + sin(y) + sinh(y)) / (sin(y) + sinh(y) + (-2./(R*y))*cos(y))
+c2 =  (cos(y) + cosh(y)) / (sin(y) + sinh(y) + (-2./(R*y))*cos(y))
+
+set xrange [0:1.]
+set title sprintf("Modeshapes \n R=%d, Omega=%.3f\n", R, y)
+set xlabel "ksi"
+set ylabel "Deviation"
+set grid
+
+w(x) = cosh(y*x) + c1 * cos(y*x) + c2 * (sin(y*x) - sinh(y*x))
+plot w(x) with lines title sprintf("Mode: R=%d, Omega=%.3f", R, y), 0.  with lines title "Non Deformed Shape"
