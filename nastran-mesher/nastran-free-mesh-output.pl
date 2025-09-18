@@ -92,6 +92,7 @@ use Cwd qw(getcwd);
 		 print "rbe2,inputfile   - create rbe2 for the grids from input file\n";
 		 print "bolt_joint,bolt  - joint.dat,grid-part-map.dat - create bolt joint based on the rbe2 connected two parts\n";
 		 print "spreaders,bolt   - joint.dat - create spreaders from the file bolt-joit.dat\n";
+		 print "cg,grids-file   - calculate cg of the grids fromn the grids-file\n";		 
 		 print "write,outputfile - write the results of all commands into outputfile\n";
 	     print "----------------------------------------------------\n";
 		 print "\n";
@@ -102,6 +103,22 @@ use Cwd qw(getcwd);
 		 my @words = split/,/,$line;
 		 ####print $words[0], $words[1];
 		 print "\n";
+		 
+		 if ($line =~ /^cg/){ ## cg,grid-file
+		     open(grh, '<', $words[1]);
+			 my @grids;
+			      while (<grh>){
+					 ####print $_;
+					 chomp;
+					 push(@grids, $_);
+				  }
+			 close(grh);
+			 ###print @grids;
+			 
+			 my($xc, $yc, $zc) = &cg(@grids);
+			 print "$xc,$yc,$zc\n";
+		 }
+		 
 		 if ($line =~ /^grid/){ ##usage grid,20,25
 		       for (my $i=$words[1]; $i <= $words[2]; $i++) {
 				    print $file_grids{$i};
@@ -337,9 +354,11 @@ sub cg {
     for (@grids) {
          my $grid = $_;
          &fields($file_grids{$grid});
+		 
          $xc += $fields[3];
          $yc += $fields[4];
          $zc += $fields[5]; 
+         ###print "$xc, $yc, $zc\n"; 
     } 
     $xc /= @grids;
     $yc /= @grids;
