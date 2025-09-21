@@ -1,0 +1,15 @@
+a = 12.
+set grid
+set xrange [-a:a]
+fourier(k,x) = 32. * a**2 * (-1)**k /(pi**3 * (2*k+1)**3) * cos(pi * (2*k+1) * x/ (2.*a))
+
+power = 3;
+terms = 10**power;
+
+set multiplot layout 2,2
+do for [power = 0:3]{
+terms = power
+set title sprintf("terms = %d", terms)
+plot sum [k=0:terms] fourier(k,x) notitle, (a**2 - x**2)
+}
+unset multiplot
