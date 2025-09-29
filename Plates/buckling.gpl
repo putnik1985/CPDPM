@@ -1,0 +1,31 @@
+a = 1.
+b = 2.
+h = 0.01 * b
+
+E = 30.e+6
+nu = 0.25
+D = E*h**3 / (12. * (1. - nu**2))
+
+m = 1
+x0 = 10.87 ### got it from the plot
+
+alpha(x) = sqrt( (pi*m/a)**2 + sqrt(x * (pi*m/a)**2))
+ beta(x) = sqrt(-(pi*m/a)**2 + sqrt(x * (pi*m/a)**2))
+
+set xrange [ (pi*m/a)**2 : (pi*m/a)**2 + 10.]
+f(x) = -(alpha(x)**2 - nu * (pi*m/a)**2) * sinh(alpha(x) * b) *  beta(x) *  cos(beta(x)*b) * (beta(x)**2 + (2. - nu)*(pi*m/a)**2) + \
+        ( beta(x)**2 + nu * (pi*m/a)**2) *   sin(beta(x) * b) * alpha(x) * cosh(alpha(x)*b) * (alpha(x)**2 - (2. - nu)*(pi*m/a)**2)
+
+set grid
+sigma = x0 * D / h
+A1 = ( beta(x0)**2 + nu * (m*pi/a)**2) *   sin(beta(x0) * b)
+B1 = (alpha(x0)**2 - nu * (m*pi/a)**2) * sinh(alpha(x0) * b)
+
+set title sprintf("Plate Buckling (Imperial Units Plate and Shells/Timoshenko, page 317)\nSimply supported (y=0)\nFree End (y=b)\n m=%d, critical sigma = %.1f ksi, a/b = %.2f \n\n Intersection x0 = %.2f \n A = %.f B = %.2f", m, sigma * 0.001, a/b, x0, A1, B1)
+plot f(x)/cosh(x) title "Determinant" with lines, 0. title "Zero"
+
+set contour
+deflection(x,y) = sin(pi*m*x/a) * (A1 * sinh(alpha(x0)*y) + B1 * sin(beta(x0)*y))
+set xrange [0. : a]
+set yrange [0. : b]
+splot deflection(x,y)
