@@ -29,3 +29,6 @@ deflection(x,y) = sin(pi*m*x/a) * (A1 * sinh(alpha(x0)*y) + B1 * sin(beta(x0)*y)
 set xrange [0. : a]
 set yrange [0. : b]
 splot deflection(x,y)
+
+set view map
+splot deflection(x,y)
