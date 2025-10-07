@@ -1,0 +1,15 @@
+M = 1000
+fmax = 1000.
+
+WR(f) = 2*M*sin(2*pi*f*M)/(2*pi*f*M) ##### Rectangle
+WB(f) = M*(sin(pi*f*M)/(pi*f*M))**2 ##### Barlet
+WT(f) = M*sin(2*pi*f*M)/(2*pi*f*M)*(1. / (1. - (2.*f*M)**2))##### Tuki
+WP(f) = (3./4.) * M * (sin(pi*f*M/2.)/(pi*f*M/2.))**4 ##### Parsen
+
+set grid
+set xrange [0.: 7. / (2 * M)]
+set title "Spectral Windows"
+plot WR(x) with lines title sprintf("Rectangle Window (M=%d)",M),\
+     WB(x) with lines title sprintf("   Barlet Window (M=%d)",M),\
+	 WT(x) with lines title sprintf("     Tuki Window (M=%d)",M),\
+	 WP(x) with lines title sprintf("   Parsen Window (M=%d)",M)
