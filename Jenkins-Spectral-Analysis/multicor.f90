@@ -2,7 +2,7 @@ program multicor
 
         implicit none
         integer NS, N, MAXM
-        real average
+        real average, delta
 
         real, allocatable, dimension(:) :: xm
         real, allocatable, dimension(:,:) :: x
@@ -11,8 +11,12 @@ program multicor
         character*256 filename, titles
         integer i, j, k, L
 
+        common /data/ delta
+
         print*
  !!       print*, "Input filename with series"
+        print*, "Input delta"
+        read*, delta
         print*, "Input filename with series"
         print*
         read*, filename
@@ -89,9 +93,15 @@ subroutine output(unit1, MAXM, NS, cov, filename)
         integer MAXM, NS, j, L, unit1
         character*256 filename
         real, dimension(0:MAXM, NS, NS) :: cov
+        real delta
+        common /data/ delta
 
         open(unit = unit1, file = filename)
-        write(unit1,"(A12)", advance = "no") "Lug"
+        write(unit1,"(A15)") "Delta"
+        write(unit1,'(F15.6)') delta
+        write(unit1,"(A15)") "N"
+        write(unit1,'(I15)') MAXM+1
+
         do j=1,NS
            do L=1,NS
               write(unit1,"(A12I1I1A1)", advance = "no") "COV(",j,L,")"
@@ -99,7 +109,6 @@ subroutine output(unit1, MAXM, NS, cov, filename)
         enddo
         write(unit1,*) 
               do k=0,MAXM
-                 write(unit1,'(I12)', advance="no") k
                  do j=1,NS
                     do L=1,NS
                        write(unit1,'(F15.2)', advance = "no") cov(k,j,L)
