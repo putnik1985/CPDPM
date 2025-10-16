@@ -1,0 +1,24 @@
+i={0.,1.}
+set view map
+set contour
+x0 = ARGV[1] 
+y0 = ARGV[2]
+## x0 = 0.1
+## y0 = 0.5
+ 
+z(x,y)=(x + x0) + i * (y + y0)
+w(x,y) = 0.5 * (z(x,y) + 1. / z(x,y))
+
+set term png
+set output sprintf("zukovski.png")
+
+set parametric
+###set xrange [-1:1]
+set yrange [-2:2]
+set trange [0:2*pi]
+
+plot '+' using (real(w(cos(t),sin(t)))):(imag(w(cos(t),sin(t)))) with lines ,\
+     '+' using (real(z(cos(t),sin(t)))):(imag(z(cos(t),sin(t)))) with lines ##,\
+##     '+' using (t):(imag(w(cos(t),sin(t)))) with lines
+	 
+unset parametric
