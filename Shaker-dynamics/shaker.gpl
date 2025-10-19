@@ -4,7 +4,7 @@ fp = 120. ## part frequency, Hz
 Ms = 50.  ## shaker mass, kg
 Mp = 100. ## part mass, kg
 
-c = 2000. ## stiffness of the rod between shaker and part, kgs/mm
+c = 1000. ## stiffness of the rod between shaker and part, kgs/mm
 Fs = 20.  ## force generated in the shaker, kgs
 
 G = 9810. ## mm/sec2
@@ -21,6 +21,13 @@ Fp(f) = c * (xp(f) - xs(f))
 
 set title sprintf("Shaker Response \n Ms = %.4f, Mp = %.4f \n fs = %.2f, fp = %.2f \n", Ms, Mp, fs, fp)
 set xrange [0.:2.*fp]
-plot abs(xp(x)) with lines,\
-     abs(xs(x)) with lines
+
+set multiplot layout 2,2
+
+plot abs(xp(x)) with lines
+plot abs(xs(x)) with lines
+plot abs(Fp(x)) with lines
+plot abs(Fs) with lines
+
+unset multiplot
       
