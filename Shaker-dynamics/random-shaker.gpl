@@ -21,7 +21,7 @@ H(f) = (1./c) * (((4.*pi**2*fs**2-4.*pi**2*f**2)*Ms/c + 1.) * ((4.*pi**2*fp**2-4
 xp(f) = H(f) * Fs(f)
 xs(f) = (1. + (4.*pi**2*fp**2 - 4.*pi**2*f**2)*Mp/c)*H(f)*Fs(f)
 
-txp(f) = Fp(f) / ((4*pi**2*fp**2 - 4*pi**2*f**2) * Mp)
+txp(f) = Fp(f) / ((4*pi**2*fp**2 - 4*pi**2*f**2) * Mp) ## theoretical value
 
 set xrange [0.:2.*fp]
 set grid

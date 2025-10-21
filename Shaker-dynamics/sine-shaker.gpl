@@ -1,0 +1,44 @@
+fs = 4. ## shaker frequency, Hz
+fp = 120. ## part frequency, Hz
+
+Ms = 50.  ## shaker mass, kg
+Mp = 100. ## part mass, kg
+
+c = 1000. ## stiffness of the rod between shaker and part, kgs/mm
+
+G = 9810. ## mm/sec2
+
+Ms = Ms / G
+Mp = Mp / G
+
+### want to have |Fp(f)| = |c * (xs(f) - xp(f))| == 20, kgs
+Fp(f) = 20.
+
+## required Fs(f) to control
+Fs(f) = Fp(f) / (c * (H(f) * (4*pi**2*fp**2 - 4*pi**2*f**2) * Mp/c))
+
+H(f) = (1./c) * (((4.*pi**2*fs**2-4.*pi**2*f**2)*Ms/c + 1.) * ((4.*pi**2*fp**2-4.*pi**2*f**2)*Mp/c + 1.) - 1.)**(-1.)
+xp(f) = H(f) * Fs(f)
+xs(f) = (1. + (4.*pi**2*fp**2 - 4.*pi**2*f**2)*Mp/c)*H(f)*Fs(f)
+
+txp(f) = Fp(f) / ((4*pi**2*fp**2 - 4*pi**2*f**2) * Mp) ## theoretical value
+
+set xrange [0.:2.*fp]
+set grid
+
+set multiplot layout 2,1
+
+set title sprintf("Shaker Response \n Shaker Ms,kgs.s2/mm = %.4f, Part Mp, kgs.s2/mm = %.4f \n Shaker fs, Hz = %.2f, Part fp, Hz = %.2f \n", Ms, Mp, fs, fp)
+set ylabel "Deflection, mm"
+plot abs(xp(x)) with lines,\
+     abs(xs(x)) with lines,\
+     abs(txp(x)) with lines
+
+set notitle
+set ylabel "Load, kgs"
+set xlabel "Frequency, Hz"
+plot abs(Fp(x)) with lines,\
+     abs(Fs(x)) with lines
+
+unset multiplot
+      
