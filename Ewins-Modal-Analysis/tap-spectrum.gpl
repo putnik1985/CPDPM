@@ -1,0 +1,32 @@
+E = 2.e11 ## N/m2 - steel
+rho = 7800. ## kg/m3
+v0 = 5. ## m/s speed of the shock
+L = 2. ## m length of the rod
+r = 0.30
+F = pi * r**2
+
+a = sqrt(E/rho)
+lam(n) = pi / (2.*L) * (1. + 2 * n)
+
+
+
+set grid
+
+u(k,t,x) = (2.*v0)/(a*L*lam(k)) * sin(lam(k)*a*t) * cos(lam(k)*x)
+v(k,t,x) = (2.*v0)/(a*L*lam(k)) * lam(k) * a * cos(lam(k)*a*t) * cos(lam(k)*x)
+e(k,t,x) = (2.*v0)/(a*L*lam(k)) * sin(lam(k)*a*t) * sin(lam(k)*x) * (-lam(k))
+
+set xrange [0:L]
+###set yrange [-16000:16000]
+set yrange [-6.e9:6.e9]
+#terms = 1000
+#plot sum [k=0:terms] E*e(k,0.00001,x)
+
+set term gif animate delay 20
+set output("impulse-strike.gif")
+terms = 1000
+set title "Force, N"
+do for [n=0:1000:1]{
+     plot sum [k=0:terms] E*F*e(k,0.00001 * n,x)
+}
+unset output
