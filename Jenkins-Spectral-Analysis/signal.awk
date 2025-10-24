@@ -5,5 +5,5 @@ BEGIN{
 	 print delta, 1001, 1000
 	 print "cos"
      for(i=0;i<=1000;++i)
-         print cos(2*pi*24.*i*delta)
+         print cos(2*pi*24.*i*delta) + sin(2*pi*56.*i*delta)*sin(2*pi*458.*i*delta)
 }
