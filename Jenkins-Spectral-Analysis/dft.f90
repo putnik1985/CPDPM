@@ -32,7 +32,7 @@ program dft
 	     
       close(12)
       do k=0, N 
-         w(k) = 0.5 * (1. + cos(pi * k / N))
+         w(k) = (1. - cos(2 * pi * k / (N - 1)))
       enddo
 
       open(unit = 12, file = "dft_output.dat")
@@ -45,8 +45,8 @@ program dft
             cossum = cossum + cov(k) * w(k) * cos(pi * k * i / NF)
             sinsum = sinsum - cov(k) * w(k) * sin(pi * k * i / NF)
          enddo
-         ai = sqrt(2.) * delta * cossum 
-         bi = sqrt(2.) * delta * sinsum  
+         ai = delta * cossum 
+         bi = delta * sinsum  
          write(12,'(F12.4F16.8)') i*df, sqrt(ai**2 + bi**2) 
          frequency_energy = frequency_energy + (ai**2 + bi**2) * df
       enddo
