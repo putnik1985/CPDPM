@@ -1,0 +1,40 @@
+G = 9810. ## mm/sec2
+
+Eg = 2.e+11 ## Pa, gaika
+Ev = 2.e+11 ## Pa, vint
+
+Dv = 10. ## mm, vint/bolt diameter
+Dg = 15. ## mm, outer nut/gaika diameter
+
+L = 20. ## mm, thread length
+
+P = 100. ## kgf, force applied to the bolt
+k = 2000. ## kgf / mm, force per unit thread factor t = k*(uv-ug)
+
+Fg = pi * (Dg**2 - Dv**2) / 4. 
+Fv = pi * Dv**2 / 4.
+
+Eg = Eg / G ## kgf/mm2
+Ev = Ev / G ## kgf/mm2
+
+c = 1./(Ev*Fv) + 1./(Eg*Fg)
+a = k * c
+
+## bolt/vint load distro
+Nv(x) = P / c * (1./sinh(a*L)) * (sinh(a*x)/(Ev*Fv) + sinh(a*L)/(Eg*Fg) - sinh(a*(L-x))/(Eg*Fg))
+
+## bolt/gaika load distro
+Ng(x) = P - Nv(x)
+
+## load per unit thread length
+t(x) = P / c * (a/sinh(a*L)) * (cosh(a*x)/(Ev*Fv) + cosh(a*(L-x))/(Eg*Fg))
+
+set title sprintf("Bolt, Nut, Thread Loads \n Tensile Load P = %.2f ", P)
+set grid
+set ylabel "Load, kgs"
+set xlabel "Thread length, mm"
+
+set xrange [0:L]
+plot Nv(x) with lines title "Bolt/vint",\
+     Ng(x) with lines title "Nut/gaika",\
+	  t(x) with lines title "bolt/nut load per unit thread"
