@@ -24,7 +24,7 @@ i = {0., 1.}
 f0 = 1./(2.*pi) * sqrt(k*L**2/A)
 speed0 = f0 * 60.
 
-F(w) = (-w**2*A + i*w*d*L**2 + w**2*C + k*L**2)**(-1) * b*w**2*unb
+F(w) = (-w**2*A + i*w*d*L**2 + w**2*C + k*L**2)**(-1) * i * b*w**2*unb
 
 uy(w) =  L * imag(F(w))
 uz(w) = -L * real(F(w))
@@ -34,7 +34,7 @@ set xrange [0.: maxspeed]
 set xlabel "Speed, rpm"
 set grid
 
-set title sprintf("Frequency Response\n Natural Frequency,rpm = %.2f", speed0)
+set title sprintf("Frequency Response\n Natural Frequency, rpm = %.2f", speed0)
 set ylabel "Deflection, mm"
 plot uy(x*pi/30.) with lines title "Y direction",\
      uz(x*pi/30.) with lines title "Z diredction"
