@@ -8,14 +8,17 @@ L = 1000. ##mm, length of the rotor
 k = 2000. ## kgf/mm, support stiffness
 d =   0.4  ## kgf.s/mm, support damping
 
-maxspeed = 4000. ## rpm, max speed
-maxfreq = maxspeed * pi / 30.
 
 A = Jd + m * b**2
 C = Jp
 
 A = A / G
 C = C / G
+
+f0 = 1./(2.*pi) * sqrt(k*L**2/A)
+speed0 = f0 * 60.
+
+maxspeed = 1.2 * speed0
 
 re(w) = k*L**2/A + w*w*C*C/(4.*A**2) - d**2*L**4/(4.*A**2)
 im(w) = 2.*w*C*d*L**2/(4.*A**2)
@@ -38,7 +41,7 @@ f2(w) = abs(real(p2(w))) / (2.*pi)
 log1(w) = abs(imag(p1(w))) / f1(w)
 log2(w) = abs(imag(p2(w))) / f2(w)
 
-e(speed) = maxfreq * speed / maxspeed
+e(speed) = f0 * speed / speed0
 
 set xrange [0.:maxspeed]
 set xlabel "Speed, rpm"
