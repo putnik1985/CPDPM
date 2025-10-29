@@ -49,9 +49,9 @@ BEGIN {
 		             }
 		    }
                     rms = sqrt(rms)
-                    printf("%12s%24s RMS = %.2f\n","Freq(Hz)","SFF(NASA-HDBK-7004C)", rms)
+                    printf("%12s,%24s, M0=, %.2f, C=,%.2f, RMS=, %.2f,\n","Freq(Hz)","FSD(NASA-HDBK-7004C)", M0*G, c, rms)
 		    for(i=1; i<=frecord; ++i){
-			   printf("%12.2f%24.6f\n", sfreq[i], sff[i])
+			   printf("%12.2f,%24.6f,\n", sfreq[i], sff[i])
 		    }
  }
 
@@ -64,6 +64,6 @@ BEGIN {
  }
 
  function calculate_psd(y2, f1, f2, m){
-	 y1 = y2 * pow(f1/f2, (m / 10.) / log10(2));
+	 y1 = y2 * pow(f1/f2, (m / 10.) / log10(2))
 	 return y1;
  }

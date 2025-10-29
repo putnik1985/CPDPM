@@ -50,6 +50,7 @@ BEGIN {
                          }
 						 Mresidual += MFP
 				     }
+				     M0 /= G
                          Mresidual = M0 * (1. - Mresidual)
 
             segments = 10
@@ -80,8 +81,6 @@ BEGIN {
 				     }
 					     rMapp = Mresidual + M0 * rMapp
 						 iMapp =             M0 * iMapp
-						 rMapp /= G
-						 iMapp /= G
 						 sff[frecord] = (rMapp*rMapp + iMapp*iMapp) * psda
 						 
 				     rms += sff[frecord] * df
@@ -89,9 +88,9 @@ BEGIN {
 		    }
 
                     rms = sqrt(rms)
-            printf("%12s%24s RMS = %.2f\n","Freq(Hz)","SFF", rms)
+            printf("%12s,%24s, Direction=,%d, M0=,%.2f, Q=,%.2f, RMS=,%.2f\n","Freq(Hz)","FSD", dir, M0*G, Q, rms)
 		    for(i=1; i<=frecord; ++i){
-			   printf("%12.2f%24.6f\n", sfreq[i], sff[i])
+			   printf("%12.2f,%24.6f,\n", sfreq[i], sff[i])
 		    }
     
  }
