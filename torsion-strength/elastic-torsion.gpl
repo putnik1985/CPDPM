@@ -1,0 +1,19 @@
+a = 1.
+b = 2.
+
+set xrange [-a:a]
+set yrange [-b:b]
+
+unset surface
+unset key
+
+w(x,y) = x**2 + y**2
+set contour
+set view map
+set samples 25, 25
+set isosamples 26, 26
+set cntrlabel start 2 interval 20 font ",7"
+set cntrparam order 8
+set cntrparam levels 10
+set cntrparam bspline 
+splot w(x,y) title "surface"
