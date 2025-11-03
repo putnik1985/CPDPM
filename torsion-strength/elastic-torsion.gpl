@@ -16,4 +16,18 @@ set cntrlabel start 2 interval 20 font ",7"
 set cntrparam order 8
 set cntrparam levels 10
 set cntrparam bspline 
-splot w(x,y) title "surface"
+
+l(n) = 2.*b*sinh(pi*n*a/b)
+m(n) = 2.*a*sinh(pi*n*b/a)
+
+C(n) = 2. / m(n) * b*b * (1. - (-1)**n) * 2.*a/(pi*n)
+D(n) = 2. / m(n) * b*b * (1. - (-1)**n) * 2.*a/(pi*n)
+
+N = 2
+v1(x1,y1) = sum[n=1:N] A(n) * sinh(pi*n/(2*b) * (2*a - x1)) * sin(pi*n/(2.*b)*y1)
+v2(x1,y1) = sum[n=1:N] B(n) * sinh(pi*n/(2*b) * (x1)) *  sin(pi*n/(2.*b)*y1)
+v3(x1,y1) = sum[n=1:N] C(n) *  sin(pi*n/(2*b) * (x1)) * sinh(pi*n/(2.*a)*(2.*b - y1))
+v4(x1,y1) = sum[n=1:N] D(n) *  sin(pi*n/(2*b) * (x1)) * sinh(pi*n/(2.*a)*y1)
+
+ v(x1,y1) = v1(x1,y1) + v2(x1,y1) + v3(x1,y1) + v4(x1,y1)
+###splot w(x,y) title "surface"
