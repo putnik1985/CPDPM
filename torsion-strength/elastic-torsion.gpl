@@ -1,38 +1,47 @@
 a = 1.
 b = 2.
 
-set xrange [-a:a]
-set yrange [-b:b]
 
-l(n) = 2.*b*sinh(pi*n*a/b)
-m(n) = 2.*a*sinh(pi*n*b/a)
+beta(n) = pi * n / a
+B(n) = (a/(pi*n))**2 * (4./(pi*n)) * ((-1)**n - 1.)
 
+N = 54 ## can not take more, 
+w(x,y) = sum[n=1:N] B(n)/sinh(beta(n)*b) * ((1. - cosh(beta(n)*b)) * sinh(beta(n)*y) - (1. - cosh(beta(n)*y)) * sinh(beta(n)*b)) * sin(pi*n*x/a) 
+dwx(x,y) = sum[n=1:N] B(n)/sinh(beta(n)*b) * ((1. - cosh(beta(n)*b)) * sinh(beta(n)*y) - (1. - cosh(beta(n)*y)) * sinh(beta(n)*b)) * cos(pi*n*x/a) * (pi*n/a)
+dwy(x,y) = sum[n=1:N] B(n)/sinh(beta(n)*b) * beta(n) * ( cosh(beta(n)*y) - cosh(beta(n)*b)*cosh(beta(n)*y) + sinh(beta(n)*y) * sinh(beta(n)*b) ) * sin(pi*n*x/a)
 
-A(n) = 2. / l(n) * (16. * b**3 / (pi*n)**3 - 2. * b**3 / (pi*n)) *  (1. - (-1)**n)
-B(n) = 2. / l(n) * (16. * b**3 / (pi*n)**3 - 2. * b**3 / (pi*n)) *  (1. - (-1)**n)
-C(n) = 2. / m(n) * b*b * (1. - (-1)**n) * 2.*a/(pi*n)
-D(n) = 2. / m(n) * b*b * (1. - (-1)**n) * 2.*a/(pi*n)
+f(x) = sum[n=1:N] (4./(pi*n)) * ((-1)**n - 1.) * sin(pi*n*x/a)
 
-N = 100
-v1(x1,y1) = sum[n=1:N] A(n) * sinh(pi*n/(2*b) * (2*a - x1)) * sin(pi*n/(2.*b)*y1)
-v2(x1,y1) = sum[n=1:N] B(n) * sinh(pi*n/(2*b) * (x1)) *  sin(pi*n/(2.*b)*y1)
-v3(x1,y1) = sum[n=1:N] C(n) *  sin(pi*n/(2*a) * (x1)) * sinh(pi*n/(2.*a)*(2.*b - y1))
-v4(x1,y1) = sum[n=1:N] D(n) *  sin(pi*n/(2*a) * (x1)) * sinh(pi*n/(2.*a)*y1)
-
-## solution
-v(x1,y1) = v1(x1,y1) + v2(x1,y1) + v3(x1,y1) + v4(x1,y1)
-
-###unset surface
-###unset key
+unset surface
+unset key
+####set key
 set contour
-###set view map
+set view map
 set samples 25, 25
 set isosamples 26, 26
-set cntrlabel start 2 interval 20 font ",7"
+set cntrlabel start 2 interval 12 font ",7"
 set cntrparam order 8
-set cntrparam levels 10
+set cntrparam levels 8
 set cntrparam bspline 
+
+set xrange [0:a]
+set yrange [0:b]
 set xlabel "X"
 set ylabel "Y"
+set grid
 
-splot v(x + a,y + b) - y**2 title "surface"
+set multiplot layout 2,2
+
+set title "w(x,y)"
+splot w(x,y),\
+      w(x,y) with labels
+	  
+set title "dwx(x,y)"
+splot dwx(x,y),\
+      dwx(x,y) with labels
+	  
+set title "dwy(x,y)"
+splot dwy(x,y),\
+      dwy(x,y) with labels
+  
+unset multiplot
