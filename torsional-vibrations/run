@@ -1,0 +1,2 @@
+gcc -o torvib torvibs.c
+./torvib.exe
