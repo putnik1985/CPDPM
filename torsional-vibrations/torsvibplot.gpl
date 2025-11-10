@@ -1,0 +1,20 @@
+set grid
+set xrange [0.2:0.8]
+set yrange [0.0:0.1]
+plot "torsvib-0.dat" using 2:3 with lines,\
+"torsvib-1.dat" using 2:3 with lines,\
+"torsvib-2.dat" using 2:3 with lines,\
+"torsvib-3.dat" using 2:3 with lines,\
+"torsvib-4.dat" using 2:3 with lines,\
+"torsvib-5.dat" using 2:3 with lines,\
+"torsvib-6.dat" using 2:3 with lines,\
+"torsvib-7.dat" using 2:3 with lines,\
+"torsvib-8.dat" using 2:3 with lines,\
+"torsvib-9.dat" using 2:3 with lines,\
+"torsvib-10.dat" using 2:3 with lines,\
+"torsvib-11.dat" using 2:3 with lines,\
+"torsvib-12.dat" using 2:3 with lines,\
+"torsvib-13.dat" using 2:3 with lines,\
+"torsvib-14.dat" using 2:3 with lines,\
+"torsvib-15.dat" using 2:3 with lines,\
+"torsvib-16.dat" using 2:3 with lines

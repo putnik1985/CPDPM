@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#define XN 4
+#define YN 4
 
 double f(double, double);
 double g(double, double);
@@ -10,21 +12,27 @@ double df(double, double, double, double(*f)(double, double));
 
 int main(int argc, char** argv){
 	double x0, y0, dt, t0;
+	double xinit[XN] = {0.3, 0.35, 0.4, 0.6};
+	double yinit[YN] = {0., 0.025, 0.05, 0.075};
+	
 	int n;
     FILE* file;
     char input[256];
-	
-	x0 = 0.5;
-	y0 = 0.0;
-    
-	n = 1000000; // default value
+	n = 10000; // default value
+
 	for(int i=1; i<argc; ++i){
 		if (strcmp("-n",argv[i]) == 0) n = atoi(argv[i+1]);
 		if (strcmp("-x0",argv[i]) == 0) x0 = atof(argv[i+1]);
 	}
+
+	for(int j=0; j<XN; ++j)
+		for(int k=0; k<=YN; ++k){
+	    x0 = xinit[j];
+	    y0 = yinit[k];
+
         t0 = 0.;
         dt = 0.0001;
-	    sprintf(input,"torsvib-%f.dat",x0);
+	    sprintf(input,"torsvib-%d.dat", j*XN + k);
         file = fopen(input,"w");
 
 	fprintf(file, "%12.8f%12.8f%12.8f\n", t0, x0, y0);
@@ -37,6 +45,8 @@ int main(int argc, char** argv){
 		    if (x0>=0 && y0>=0) fprintf(file, "%12.8f%12.8f%12.8f\n", t0, x0, y0);
 	}
 	fclose(file);
+	} // for k
+
 return 0;
 }
 
