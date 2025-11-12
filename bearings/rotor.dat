@@ -1,0 +1,22 @@
+units: kgs, mm, kgs/g, sec 
+
+Jp,12.,
+Jd,6.,
+m,2.,
+
+b,1000.,
+L,1200.,
+
+ky,200.,0.,
+kz,200.,0.,
+
+etay,0.01,
+etaz,0.01,
+
+speed,8500.,
+
+dy,0.,0.,
+dz,0.,0.,
+
+## unb = 180 gr.cm = 6 gr . 30 cm
+unb,1.8,
