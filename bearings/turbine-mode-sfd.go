@@ -120,8 +120,8 @@ func f(t float64, x [2]complex128, dx [2]complex128) [2]complex128 {
 	 v1 := dx[0]
 	 v2 := dx[1]
 	 
-	 y[0] = cmplx.Exp(1i*complex(w*t,0.))*complex(unb*w*w*L/Jd, 0.) * 1i + complex(-1./Jd,0.) * ( complex(Jp*w,0.)*v2 + complex(dz*L*L,0.)*v1 + complex(kz*L*L,0.)*u1 + 1i*complex(etaz*kz*L*L,0.)*u1)
-	 y[1] =      cmplx.Exp(1i*complex(w*t,0.))*complex(unb*w*w*L/Jd, 0.) + complex(-1./Jd,0.) * (complex(-Jp*w,0.)*v1 + complex(dy*L*L,0.)*v2 + complex(ky*L*L,0.)*u2 + 1i*complex(etay*ky*L*L,0.)*u2)
+	 y[0] = cmplx.Exp(1i*complex(w*t,0.))*complex(unb*w*w*b/Jd, 0.) * 1i + complex(-1./Jd,0.) * ( complex(Jp*w,0.)*v2 + complex(dz*L*L,0.)*v1 + complex(kz*L*L,0.)*u1 + 1i*complex(etaz*kz*L*L,0.)*u1)
+	 y[1] =      cmplx.Exp(1i*complex(w*t,0.))*complex(unb*w*w*b/Jd, 0.) + complex(-1./Jd,0.) * (complex(-Jp*w,0.)*v1 + complex(dy*L*L,0.)*v2 + complex(ky*L*L,0.)*u2 + 1i*complex(etay*ky*L*L,0.)*u2)
 	 return y
 }
 
