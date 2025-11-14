@@ -24,6 +24,7 @@ var unb float64 // unbalance on the turbine
 var dy, dz float64 // damping in y and z direction, will be damper
 var steps int = 1000
 
+var G float64 = 9810. //mm/sec2 
 
 const (
 	dofs = 6 
@@ -67,9 +68,9 @@ func main() {
 		 }
 	}
 	//fmt.Println(data)
-	Jd = tonumber(data["Jp"])
-	Jp = tonumber(data["Jd"]) 
-	 m = tonumber(data["m"])
+	Jd = tonumber(data["Jp"]) / G
+	Jp = tonumber(data["Jd"]) / G
+	 m = tonumber(data["m"]) / G
 	 
  speed = tonumber(data["speed"])
      L = tonumber(data["L"])
@@ -82,7 +83,7 @@ func main() {
   etay = tonumber(data["etay"])
   etaz = tonumber(data["etaz"])	
 
-   unb = tonumber(data["unb"])
+   unb = tonumber(data["unb"]) / G
 
     dy = tonumber(data["dy"])
     dz = tonumber(data["dz"])    
