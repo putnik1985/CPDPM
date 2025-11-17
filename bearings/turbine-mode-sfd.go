@@ -56,7 +56,7 @@ func main() {
 	if (err != nil) {
 		fmt.Fprintf(os.Stderr,"turbine-mode: %v\n", err)
 	}
-	
+	defer com.Close()
 	input := bufio.NewScanner(com);
 	for (input.Scan()){
          line = input.Text()
@@ -87,9 +87,10 @@ func main() {
 
     dy = tonumber(data["dy"])
     dz = tonumber(data["dz"])    
+    	
 	
     ///fmt.Println(m, Jp, Jd, speed, L, b, ky, kz, dy, dz, etay, etaz, unb)
-    fmt.Printf("%12s%12s%12s\n","Time,sec","UY,mm","UZ,mm")
+    fmt.Printf("%12s%16s%16s%16s%16s%16s=%.2f%16s=%.2f\n","Time,sec","Abs(UY,mm)","Abs(UZ,mm)","Phase(UY,deg)", "Phase(UZ,deg)", "Freqz(Hz)",1./(2.*math.Pi) * math.Sqrt(kz*L*L/Jd), "Freqy(Hz)",1./(2.*math.Pi)*math.Sqrt(ky*L*L/Jd))
 
     var x0 [2]complex128
     var dx0 [2]complex128
@@ -99,13 +100,17 @@ func main() {
     var n int
 
     n = steps
-    fmt.Printf("%12.6f%12.6f%12.6f\n", t, L*real(x0[1]), -L*real(x0[0]))
+    r1, theta1 := cmplx.Polar(complex(L,0.)*x0[1])
+    r2, theta2 := cmplx.Polar(complex(-L,0.)*x0[0])
+    fmt.Printf("%12.6f%16.6f%16.6f%16.6f%16.2f\n", t, r1, r2, theta1 * 180. / math.Pi, theta2 * 180. / math.Pi)
     for i:=0; i<=n; i++ {
 	x, dx := df(t, dt, x0, dx0)
 	x0 = x
 	dx0 = dx
         t += dt
-        fmt.Printf("%12.6f%12.6f%12.6f\n", t, L*real(x0[1]), -L*real(x0[0]))
+        r1, theta1 = cmplx.Polar(complex(L,0.)*x0[1])
+        r2, theta2 = cmplx.Polar(complex(-L,0.)*x0[0])
+        fmt.Printf("%12.6f%16.6f%16.6f%16.6f%16.2f\n", t, r1, r2, theta1 * 180. / math.Pi, theta2 * 180. / math.Pi)
     }
     return
 }

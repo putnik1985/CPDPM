@@ -1,0 +1,12 @@
+speed=ARGV[1]
+set grid
+set xrange [0:0.5]
+set title sprintf("Rotor System \n Bearing Deflections @ speed = %.1f, rpm\n", speed)
+set xlabel "Time, sec"
+set multiplot layout 2,1
+set ylabel "Magnitude, mm"
+plot 'response.dat' using 1:3 title columnhead with lines,'response.dat' using 1:2 title columnhead with lines
+set ylabel "Phase, deg"
+unset title
+plot 'response.dat' using 1:5 title columnhead with lines,'response.dat' using 1:4 title columnhead with lines
+unset multiplot
