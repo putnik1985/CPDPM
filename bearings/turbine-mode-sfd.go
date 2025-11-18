@@ -23,6 +23,11 @@ var etay, etaz float64 // loss factor for y and z direction
 var unb float64 // unbalance on the turbine
 var dy, dz float64 // damping in y and z direction, will be damper
 var steps int = 1000
+var sfd_mu float64 // viscosity of the sfd
+var sfd_r float64 // sfd radius
+var sfd_c float64 // sfd clearance
+var sfd_l float64 // sfd length
+var sfd_k, sfd_d float64 // sfd stiffness and damping
 
 var G float64 = 9810. //mm/sec2 
 
@@ -88,7 +93,11 @@ func main() {
     dy = tonumber(data["dy"])
     dz = tonumber(data["dz"])    
     	
-	
+    sfd_mu = tonumber(data["sfd_mu"])
+     sfd_r = tonumber(data["sfd_r"])
+     sfd_c = tonumber(data["sfd_c"])
+     sfd_l = tonumber(data["sfd_l"])
+    ///fmt.Println(sfd_mu, sfd_r, sfd_c, sfd_l)	
     ///fmt.Println(m, Jp, Jd, speed, L, b, ky, kz, dy, dz, etay, etaz, unb)
     fmt.Printf("%12s%16s%16s%16s%16s%16s=%.2f%16s=%.2f\n","Time,sec","Abs(UY,mm)","Abs(UZ,mm)","Phase(UY,deg)", "Phase(UZ,deg)", "Freqz(Hz)",1./(2.*math.Pi) * math.Sqrt(kz*L*L/Jd), "Freqy(Hz)",1./(2.*math.Pi)*math.Sqrt(ky*L*L/Jd))
 
@@ -102,15 +111,37 @@ func main() {
     n = steps
     r1, theta1 := cmplx.Polar(complex(L,0.)*x0[1])
     r2, theta2 := cmplx.Polar(complex(-L,0.)*x0[0])
-    fmt.Printf("%12.6f%16.6f%16.6f%16.6f%16.2f\n", t, r1, r2, theta1 * 180. / math.Pi, theta2 * 180. / math.Pi)
+    fmt.Printf("%12.6f%16.6f%16.6f%16.6f%16.2f%12.2f%12.2f\n", t, r1, r2, theta1 * 180. / math.Pi, theta2 * 180. / math.Pi, sfd_k, sfd_d)
+
+    kz0 := kz
+    ky0 := ky
+    dz0 := dz
+    dy0 := dy
+
     for i:=0; i<=n; i++ {
+
+	 u := L * math.Max(cmplx.Abs(x0[0]), cmplx.Abs(x0[1])) 
+	 eps := u/sfd_c
+
+	 if (eps < 1.) {
+	     sfd_k, sfd_d = short_sfd(u)
+
+         } else {
+	    break 
+	 }
+
+        kz = kz0 + sfd_k
+	ky = ky0 + sfd_k
+        dz = dz0 + sfd_d
+        dy = dy0 + sfd_d
+
 	x, dx := df(t, dt, x0, dx0)
 	x0 = x
 	dx0 = dx
         t += dt
         r1, theta1 = cmplx.Polar(complex(L,0.)*x0[1])
         r2, theta2 = cmplx.Polar(complex(-L,0.)*x0[0])
-        fmt.Printf("%12.6f%16.6f%16.6f%16.6f%16.2f\n", t, r1, r2, theta1 * 180. / math.Pi, theta2 * 180. / math.Pi)
+        fmt.Printf("%12.6f%16.6f%16.6f%16.6f%16.2f%12.2f%12.2f\n", t, r1, r2, theta1 * 180. / math.Pi, theta2 * 180. / math.Pi, sfd_k, sfd_d)
     }
     return
 }
@@ -125,7 +156,8 @@ func f(t float64, x [2]complex128, dx [2]complex128) [2]complex128 {
 	 
 	 v1 := dx[0]
 	 v2 := dx[1]
-	 
+
+
 	 y[0] = cmplx.Exp(1i*complex(w*t,0.))*complex(unb*w*w*b/Jd, 0.) * 1i + complex(-1./Jd,0.) * ( complex(Jp*w,0.)*v2 + complex(dz*L*L,0.)*v1 + complex(kz*L*L,0.)*u1 + 1i*complex(etaz*kz*L*L,0.)*u1)
 	 y[1] =      cmplx.Exp(1i*complex(w*t,0.))*complex(unb*w*w*b/Jd, 0.) + complex(-1./Jd,0.) * (complex(-Jp*w,0.)*v1 + complex(dy*L*L,0.)*v2 + complex(ky*L*L,0.)*u2 + 1i*complex(etay*ky*L*L,0.)*u2)
 	 return y
@@ -170,4 +202,15 @@ func sum(vals ...[2]complex128) [2]complex128 {
 		total[1] += val[1]
 	}
 	return total
+}
+
+func short_sfd(u float64) (float64, float64) {
+	var k float64
+	var d float64
+
+        eps := u/sfd_c
+	w := speed * math.Pi / 30.
+	k = 2. * sfd_mu * sfd_r * math.Pow(sfd_l,3.) * eps * w / (math.Pow(sfd_c, 3.) * math.Pow(1. - eps*eps, 2.))
+	d = 1. * sfd_mu * sfd_r * math.Pow(sfd_l,3.) * math.Pi / (2. * math.Pow(sfd_c, 3.) * math.Pow(1. - eps*eps, 3./2.))
+	return k, d
 }

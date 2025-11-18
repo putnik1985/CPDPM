@@ -10,8 +10,8 @@ L,1200.,
 ky,200.,
 kz,200.,
 
-etay,0.01,
-etaz,0.01,
+etay,0.0,
+etaz,0.0,
 
 speed,1200.,
 
@@ -20,3 +20,11 @@ dz,0.04,
 
 ## unb = 180 gr.cm = 6 gr . 30 cm
 unb,1.8,
+
+## sfd inputs, length in mm, mu in kgs/(mm2/s)
+sfd_mu,1.5e-10,
+#####sfd_mu,0.,
+sfd_r,100.,
+sfd_c,0.05,
+sfd_l,20.,
+
