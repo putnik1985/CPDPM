@@ -115,8 +115,8 @@ func main() {
 
     kz0 := kz
     ky0 := ky
-    dz0 := dz
-    dy0 := dy
+    //dz0 := dz
+    //dy0 := dy
 
     for i:=0; i<=n; i++ {
 
@@ -127,13 +127,14 @@ func main() {
 	     sfd_k, sfd_d = short_sfd(u)
 
          } else {
+            ///////fmt.Println(sfd_k, sfd_d, ky, kz, dy, dz)
 	    break 
 	 }
 
         kz = kz0 + sfd_k
 	ky = ky0 + sfd_k
-        dz = dz0 + sfd_d
-        dy = dy0 + sfd_d
+        //dz = dz0 + sfd_d
+        //dy = dy0 + sfd_d
 
 	x, dx := df(t, dt, x0, dx0)
 	x0 = x
