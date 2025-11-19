@@ -22,7 +22,7 @@ var ky, kz float64 // stiffnesses in y and z direction
 var etay, etaz float64 // loss factor for y and z direction
 var unb float64 // unbalance on the turbine
 var dy, dz float64 // damping in y and z direction, will be damper
-var steps int = 1000
+var steps int = 10000
 var sfd_mu float64 // viscosity of the sfd
 var sfd_r float64 // sfd radius
 var sfd_c float64 // sfd clearance
@@ -105,7 +105,7 @@ func main() {
     var dx0 [2]complex128
 
     var t float64 = 0.
-    var dt float64 = 0.0005 // 2kHz sample rate
+    var dt float64 = 0.00005 // 20kHz sample rate
     var n int
 
     n = steps
@@ -115,8 +115,8 @@ func main() {
 
     kz0 := kz
     ky0 := ky
-    //dz0 := dz
-    //dy0 := dy
+    dz0 := dz
+    dy0 := dy
 
     for i:=0; i<=n; i++ {
 
@@ -133,8 +133,8 @@ func main() {
 
         kz = kz0 + sfd_k
 	ky = ky0 + sfd_k
-        //dz = dz0 + sfd_d
-        //dy = dy0 + sfd_d
+        dz = dz0 + sfd_d
+        dy = dy0 + sfd_d
 
 	x, dx := df(t, dt, x0, dx0)
 	x0 = x
