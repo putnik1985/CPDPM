@@ -22,12 +22,13 @@ var ky, kz float64 // stiffnesses in y and z direction
 var etay, etaz float64 // loss factor for y and z direction
 var unb float64 // unbalance on the turbine
 var dy, dz float64 // damping in y and z direction, will be damper
-var steps int = 10000
+var steps int = 1000000
 var sfd_mu float64 // viscosity of the sfd
 var sfd_r float64 // sfd radius
 var sfd_c float64 // sfd clearance
 var sfd_l float64 // sfd length
 var sfd_k, sfd_d float64 // sfd stiffness and damping
+var sfd_type string // sfd type
 
 var G float64 = 9810. //mm/sec2 
 
@@ -42,12 +43,17 @@ type ncomplex struct {
 	im float64
 }
 
+
 func main() {
 
 	if (len(os.Args) < 2) {
 		fmt.Println("usage: ./turbine-mode-sfd command=command-file steps=1000")
 		return
 	}
+
+        damper:=make(map[string](func (float64) (float64, float64))) 
+	damper["unsealed"] = short_sfd
+	 damper["sealed"] = long_sfd
 
 	data := make(map[string]string)
 	for _, value := range os.Args {
@@ -97,6 +103,9 @@ func main() {
      sfd_r = tonumber(data["sfd_r"])
      sfd_c = tonumber(data["sfd_c"])
      sfd_l = tonumber(data["sfd_l"])
+    sfd_type = data["sfd_type"]
+    //fmt.Println(sfd_type)
+    //return
     ///fmt.Println(sfd_mu, sfd_r, sfd_c, sfd_l)	
     ///fmt.Println(m, Jp, Jd, speed, L, b, ky, kz, dy, dz, etay, etaz, unb)
     fmt.Printf("%12s%16s%16s%16s%16s%16s=%.2f%16s=%.2f\n","Time,sec","Abs(UY,mm)","Abs(UZ,mm)","Phase(UY,deg)", "Phase(UZ,deg)", "Freqz(Hz)",1./(2.*math.Pi) * math.Sqrt(kz*L*L/Jd), "Freqy(Hz)",1./(2.*math.Pi)*math.Sqrt(ky*L*L/Jd))
@@ -105,7 +114,7 @@ func main() {
     var dx0 [2]complex128
 
     var t float64 = 0.
-    var dt float64 = 0.00005 // 20kHz sample rate
+    var dt float64 = 0.0000005 // 20kHz sample rate
     var n int
 
     n = steps
@@ -124,13 +133,12 @@ func main() {
 	 eps := u/sfd_c
 
 	 if (eps < 1.) {
-	     sfd_k, sfd_d = short_sfd(u)
+	     sfd_k, sfd_d = damper[sfd_type](u)
 
          } else {
             ///////fmt.Println(sfd_k, sfd_d, ky, kz, dy, dz)
 	    break 
 	 }
-
         kz = kz0 + sfd_k
 	ky = ky0 + sfd_k
         dz = dz0 + sfd_d
@@ -213,5 +221,16 @@ func short_sfd(u float64) (float64, float64) {
 	w := speed * math.Pi / 30.
 	k = 2. * sfd_mu * sfd_r * math.Pow(sfd_l,3.) * eps * w / (math.Pow(sfd_c, 3.) * math.Pow(1. - eps*eps, 2.))
 	d = 1. * sfd_mu * sfd_r * math.Pow(sfd_l,3.) * math.Pi / (2. * math.Pow(sfd_c, 3.) * math.Pow(1. - eps*eps, 3./2.))
+	return k, d
+}
+
+func long_sfd(u float64) (float64, float64) {
+	var k float64
+	var d float64
+
+        eps := u/sfd_c
+	w := speed * math.Pi / 30.
+	k = 24. * sfd_mu * math.Pow(sfd_r,3.) * math.Pow(sfd_l,1.) * eps * w / (math.Pow(sfd_c, 3.) * math.Pow(1. - eps*eps, 1.) * (2. + eps*eps))
+	d = 12. * sfd_mu * math.Pow(sfd_r,3.) * math.Pow(sfd_l,1.) * math.Pi/ (math.Pow(sfd_c, 3.) * math.Pow(1. - eps*eps, 0.5) * (2. + eps*eps))
 	return k, d
 }

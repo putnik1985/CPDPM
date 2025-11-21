@@ -22,6 +22,7 @@ dz,0.04,
 unb,1.8,
 
 ## sfd inputs, length in mm, mu in kgs/(mm2/s)
+sfd_type,sealed,
 sfd_mu,1.5e-10,
 #####sfd_mu,0.,
 sfd_r,100.,
