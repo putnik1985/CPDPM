@@ -1,0 +1,25 @@
+###mode number
+k = ARGV[1] 
+amp = ARGV[2]
+
+a(n) = pi / 2. * (2. * n - 1.)
+
+K2(x,n) = 1./(2.*a(n)**2)*(cosh(a(n)*x) - cos(a(n)*x))
+K3(x,n) = 1./(2.*a(n)**3)*(sinh(a(n)*x) - sin(a(n)*x))
+
+u(x,n) = K2(x,n) - a(n) * (cosh(a(n)) + cos(a(n)))/(sinh(a(n))+sin(a(n))) * K3(x,n)
+
+set xrange [0:1.]
+set yrange [-amp:amp]
+set grid
+
+set term gif animate delay 32
+set output(sprintf("mode#%d.gif", k))
+
+frames = 20
+
+set title sprintf("Cantelivered-Free Beam Mode Shape \n Mode#%d, alpha=%.4f", k, a(k))
+   do for [n=0:2*frames:1] {
+      plot cos(pi * n / frames) * u(x,k) with lines title "Deflection"
+   }
+unset output
