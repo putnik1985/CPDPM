@@ -4,6 +4,8 @@ amp = ARGV[2]
 
 a(n) = pi / 2. * (2. * n - 1.)
 
+K0(x,n) = 1./(2.)*(cosh(a(n)*x) + cos(a(n)*x))
+K1(x,n) = 1./(2.*a(n))*(sinh(a(n)*x) + sin(a(n)*x))
 K2(x,n) = 1./(2.*a(n)**2)*(cosh(a(n)*x) - cos(a(n)*x))
 K3(x,n) = 1./(2.*a(n)**3)*(sinh(a(n)*x) - sin(a(n)*x))
 
