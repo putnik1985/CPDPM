@@ -49,7 +49,7 @@ int main(int argc, char** argv){
               x0 += 0.001;
 	   }
 	   */
-	   int N = 3, K = N;
+	   int N = 2, K = N;
 	   printf("UkUn:\n");
        	   for(int k=1; k<=K; ++k){
 			   for(int n=1; n<=N; ++n){
