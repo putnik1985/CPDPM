@@ -1,0 +1,11 @@
+###mode number
+beta = ARGV[1] 
+a1(w) = sqrt(  beta**2 / 2 + sqrt(beta**2 / 4. + w**2))
+a2(w) = sqrt( -beta**2 / 2 + sqrt(beta**2 / 4. + w**2))
+
+f(w) = beta**4 + 2*w**2 + beta**2 * w * sin(a1(w)) * sinh(a2(w)) + 2*w**2 * cos(a1(w)) * cosh(a2(w))
+
+set xrange [0.:40.]
+####set yrange [-1.:1.]
+
+plot f(x) with lines title "zeros", 0. with lines title "axis"
