@@ -1,0 +1,43 @@
+file=stability-map-0-40.dat
+go run roots.go a=0. b=40. beta=0.1 > $file
+go run roots.go a=0. b=40. beta=0.4 >> $file
+go run roots.go a=0. b=40. beta=0.8 >> $file
+go run roots.go a=0. b=40. beta=1.2 >> $file
+go run roots.go a=0. b=40. beta=1.6 >> $file
+go run roots.go a=0. b=40. beta=2.1 >> $file
+go run roots.go a=0. b=40. beta=2.4 >> $file
+go run roots.go a=0. b=40. beta=2.8 >> $file
+go run roots.go a=0. b=40. beta=2.9 >> $file
+go run roots.go a=0. b=40. beta=3.2 >> $file
+go run roots.go a=0. b=40. beta=3.3 >> $file
+go run roots.go a=0. b=40. beta=3.4 >> $file
+go run roots.go a=0. b=40. beta=3.6 >> $file
+go run roots.go a=0. b=40. beta=3.8 >> $file
+go run roots.go a=0. b=40. beta=4.1 >> $file
+go run roots.go a=0. b=40. beta=4.4 >> $file
+go run roots.go a=0. b=40. beta=4.8 >> $file
+go run roots.go a=0. b=40. beta=5.2 >> $file
+go run roots.go a=0. b=40. beta=5.6 >> $file
+go run roots.go a=0. b=40. beta=6.0 >> $file
+
+file=stability-map-40-200.dat
+go run roots.go a=40. b=200. beta=0.1 > $file
+go run roots.go a=40. b=200. beta=0.4 >> $file
+go run roots.go a=40. b=200. beta=0.8 >> $file
+go run roots.go a=40. b=200. beta=1.2 >> $file
+go run roots.go a=40. b=200. beta=1.6 >> $file
+go run roots.go a=40. b=200. beta=2.1 >> $file
+go run roots.go a=40. b=200. beta=2.4 >> $file
+go run roots.go a=40. b=200. beta=2.8 >> $file
+go run roots.go a=40. b=200. beta=2.9 >> $file
+go run roots.go a=40. b=200. beta=3.2 >> $file
+go run roots.go a=40. b=200. beta=3.3 >> $file
+go run roots.go a=40. b=200. beta=3.4 >> $file
+go run roots.go a=40. b=200. beta=3.6 >> $file
+go run roots.go a=40. b=200. beta=3.8 >> $file
+go run roots.go a=40. b=200. beta=4.1 >> $file
+go run roots.go a=40. b=200. beta=4.4 >> $file
+go run roots.go a=40. b=200. beta=4.8 >> $file
+go run roots.go a=40. b=200. beta=5.2 >> $file
+go run roots.go a=40. b=200. beta=5.6 >> $file
+go run roots.go a=40. b=200. beta=6.0 >> $file
