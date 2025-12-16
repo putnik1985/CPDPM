@@ -1,8 +1,8 @@
 BEGIN{ 
 	type["cgap"] = 38; ## nastran nx element type from .pch file
 
-	if (ARGC < 2){
-		print "usage awk -f qs-edf-list-margins.awk file=inp.pch elements=list.txt";
+	if (ARGC < 4){
+		print "usage awk -f qs-edf-list-margins.awk file=inp.pch elements=list.txt rollers=rol cgaps=32";
 		exit;
 	}
 
@@ -14,7 +14,9 @@ BEGIN{
         }
 
 	file  = data["file"];
-
+    rollers = data["rollers"]
+	cgpelem = data["cgaps"]
+	
         edf_list = data["elements"]
         while(getline < edf_list > 0){
           edf[++nedf] = $1
@@ -52,7 +54,8 @@ BEGIN{
 					   if (max_z < fz[id]) max_z = fz[id]					   
 				   }
 
-                   printf("\n\n%12s%12.2f%12.2f%12.2f\n", "Maximum:", max_x, max_y, max_z)						  
+                   printf("\n\n%12s%12.2f%12.2f%12.2f\n", "   Maximum:", max_x, max_y, max_z)	
+                   printf("\n\n%12s%12.2f%12.2f%12.2f\n", "Per Roller:", max_x * cgpelem / rollers, max_y * cgpelem / rollers, max_z * cgpelem / rollers) 				   
 }
 
 function abs(x){

@@ -12,7 +12,7 @@ BEGIN{
           data[out[1]] = out[2]
       }
 
-      ######print "$$$$$$$$$$input file: " data["file"]
+      #######print "$$$$$$$$$$input file: " data["file"]
       file = data["file"]
 	  elements = data["elements"]
 	  while (getline < elements > 0){
@@ -20,8 +20,9 @@ BEGIN{
 	  }
 	  ##for(i=1;i<=ng;++i)
       ##    print group[i]
-		  
+	  ###print file	  
       while(getline < file > 0){
+	        #####print $0
             if ($0 ~ /^RBE2/) {
 			    element = $2
                 rbe2[element] = $3

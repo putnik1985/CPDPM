@@ -129,7 +129,8 @@ BEGIN{
 						 
 						 sigma = bending * ymax / Jd + fx / A
 						 shear = shear_force / A + torque * ymax / Jr 
-                         vm = sqrt(sigma * sigma + 3 * shear * shear)						 
+                         vm = sqrt(sigma * sigma + 3 * shear * shear)
+                         ##############################vm = bending * ymax / Jd						 
 					     if (vm > vm_max) vm_max = vm
                      	####printf("%16d,%16.1f,%16.1f,%16.1f,%16.1f,\n", i, max_moment[i], max_shear[i], max_axial[i], max_torque[i]);
                     }

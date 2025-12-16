@@ -8,7 +8,6 @@ BEGIN {
        disp = 1; rot = 1; freq = 1; Pi = 3.14159;
 	   }
 
-
 $0 ~ /MODAL EFFECTIVE MASS FRACTION/ {found++;}
 $0 ~ /EIGENVALUE/ {split($0, a, " "); frequency[freq++] = sqrt(a[3])/(2*Pi);}
 ######$0 ~ /MODAL EFFECTIVE MASS FRACTION/ && found == 1 {print $0; found = 2; }
