@@ -1,0 +1,5 @@
+units: lbf, in, lbf/g, sec 
+_component,490900.,19.5,
+_mass,0.0777,
+_component,4091.,0.231,
+_mass,0.00259,

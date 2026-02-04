@@ -21,9 +21,9 @@ int dimension;
 
 public:
 
-	Matrix(int dim = 2);
-	T& operator()(const int& i, const int& j);
-	const T& operator()(const int& i, const int& j) const;
+    Matrix(int dim = 2);
+    T& operator()(const int& i, const int& j);
+    const T& operator()(const int& i, const int& j) const;
     int size() const;
     void set_dimension(const int& n); 
     T& get(const int& i, const int& j);

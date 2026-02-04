@@ -25,9 +25,9 @@ int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes){
     Matrix<T> P = Q * inverse(sqrt(D)); 
     Matrix<T> A = transpose(P) * K * P;
 
-    free(a);
-    free(v);
-    free(d);
+    if ( a != NULL) free(a);
+    if ( v != NULL) free(v);
+    if ( d != NULL) free(d);
 
     a = A.c_matrix();
     v = (T*)calloc(n*n, sizeof(T));
@@ -55,7 +55,7 @@ int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes){
             cerr << "can not write to natural frequencies\n";
             return -1;
     }
-    os << "Natural Frequencies, Hz\n";
+    )os << "Natural Frequencies, Hz\n";
     for(int mode = 1; mode <= MAX_MODES; ++mode)
         os << frequencies(mode) << endl;
     os.close();
@@ -75,10 +75,8 @@ int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes){
     os << outputstr;
     for(int mode = 1; mode <= MAX_MODES; ++mode){
             char output1[MAXLINE];
-            char output2[MAXLINE];
-            sprintf(output1,"mode#%dY(%.1fHz)",mode,frequencies(mode));
-            sprintf(output2,"mode#%dZ(%.1fHz)",mode,frequencies(mode));
-            sprintf(outputstr, "%24s%24s", output1, output2); 
+            sprintf(output1,"mode#%dU(%.1fHz)",mode,frequencies(mode));
+            sprintf(outputstr, "%24s", output1); 
             os << outputstr;
     }
     sprintf(outputstr, "\n");
@@ -88,38 +86,31 @@ int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes){
         sprintf(outputstr, "%24.6f",nodes(i));
         os << outputstr;
         for(int mode = 1; mode <= MAX_MODES; ++mode){
-                sprintf(outputstr, "%24.6f%24.6f",modes(4*i-3,mode), modes(4*i-2,mode)); 
+                sprintf(outputstr, "%24.6f",modes(i,mode)); 
                 os << outputstr;
         }
         sprintf(outputstr,"\n");
         os << outputstr;
     }
 
-    free(a);
-    free(v);
-    free(d);
+    if (a != NULL) free(a);
+    if (v != NULL) free(v);
+    if (d != NULL) free(d);
     os.close();
-
-                os.open("gnuplot-natural-mode-shapes.dat",ios_base::out);
-                os << "set title \"Rotor System \\n Mode Shapes\"" << endl;
+                os.open("gnuplot-natural-mode-shapes.gpl",ios_base::out);
+                os << "set title \"Machine \\n Mode Shapes\"" << endl;
                 os << "set xlabel \"X\""<< endl;
                 os << "set ylabel \"Deflections\" " << endl;
                 sprintf(outputstr,"plot 'natural-mode-shapes.dat' using 1:2 title columnhead with lines,\\\n");
                 os << outputstr;
-                sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:3 title columnhead with lines,\\\n");
-                os << outputstr;
 
-                for(int i = 2; i < MAX_MODES; ++i){
-                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines,\\\n", 2*i);
-                    os << outputstr;
-                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines,\\\n", 2*i+1);
+                for(int i = 3; i < MAX_MODES; ++i){
+                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines,\\\n", i);
                     os << outputstr;
                 }
-                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines,\\\n", 2*MAX_MODES);
-                    os << outputstr;
-                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines\n", 2*MAX_MODES+1);
+                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines\n", MAX_MODES);
                     os << outputstr;
                 os.close();
-                system("gnuplot -persist -e \"call 'gnuplot-natural-mode-shapes.dat'\"");
+                system("gnuplot -persist -e \"call 'gnuplot-natural-mode-shapes.gpl'\"");
     return 0;
 }

@@ -1,6 +1,6 @@
-#include "linear_bearing.h"
+#include "component.h"
 
-linear_bearing::linear_bearing(double k, double d):
+component::component(double k, double d):
 k{k}, damp{d}
 {
            unsigned int dofs = 2; // vertical and latteral deflection for the grounded bearing
@@ -9,8 +9,8 @@ k{k}, damp{d}
            D = Matrix<double>(dofs); 
            H = Matrix<double>(dofs); 
         
-	   K(1,1) = k;
-	   K(2,2) = k;
-	   D(1,1) = damp;
-	   D(2,2) = damp;
+	   K(1,1) = k; K(1,2) = -k;
+	   K(2,2) = k; K(2,1) = -k;
+	   D(1,1) = damp; D(1,2) = -damp;
+	   D(2,2) = damp; D(2,1) = -damp;
 }
