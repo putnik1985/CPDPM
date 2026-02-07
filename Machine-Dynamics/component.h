@@ -2,8 +2,6 @@
 #define COMPONENT_H
 
 #include "structure.h"
-#include "gyro.h"
-
 
 class component: public structure {
  public:

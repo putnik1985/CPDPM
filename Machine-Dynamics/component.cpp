@@ -7,7 +7,6 @@ k{k}, damp{d}
 	   M = Matrix<double>(dofs);
 	   K = Matrix<double>(dofs);
            D = Matrix<double>(dofs); 
-           H = Matrix<double>(dofs); 
         
 	   K(1,1) = k; K(1,2) = -k;
 	   K(2,2) = k; K(2,1) = -k;

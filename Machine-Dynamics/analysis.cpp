@@ -55,8 +55,8 @@ int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes){
             cerr << "can not write to natural frequencies\n";
             return -1;
     }
-    )os << "Natural Frequencies, Hz\n";
-    for(int mode = 1; mode <= MAX_MODES; ++mode)
+    os << "Natural Frequencies, Hz\n";
+    for(int mode = 1; mode <= n; ++mode)
         os << frequencies(mode) << endl;
     os.close();
 
@@ -73,7 +73,7 @@ int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes){
     n = nodes.size();
     sprintf(outputstr, "%24s", "X,m"); 
     os << outputstr;
-    for(int mode = 1; mode <= MAX_MODES; ++mode){
+    for(int mode = 1; mode <= n; ++mode){
             char output1[MAXLINE];
             sprintf(output1,"mode#%dU(%.1fHz)",mode,frequencies(mode));
             sprintf(outputstr, "%24s", output1); 
@@ -85,7 +85,7 @@ int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes){
     for(int i=1; i<=n; ++i){
         sprintf(outputstr, "%24.6f",nodes(i));
         os << outputstr;
-        for(int mode = 1; mode <= MAX_MODES; ++mode){
+        for(int mode = 1; mode <= n; ++mode){
                 sprintf(outputstr, "%24.6f",modes(i,mode)); 
                 os << outputstr;
         }
@@ -104,11 +104,11 @@ int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes){
                 sprintf(outputstr,"plot 'natural-mode-shapes.dat' using 1:2 title columnhead with lines,\\\n");
                 os << outputstr;
 
-                for(int i = 3; i < MAX_MODES; ++i){
+                for(int i = 3; i < n + 1; ++i){
                     sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines,\\\n", i);
                     os << outputstr;
                 }
-                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines\n", MAX_MODES);
+                    sprintf(outputstr,"     'natural-mode-shapes.dat' using 1:%d title columnhead with lines\n", n + 1);
                     os << outputstr;
                 os.close();
                 system("gnuplot -persist -e \"call 'gnuplot-natural-mode-shapes.gpl'\"");

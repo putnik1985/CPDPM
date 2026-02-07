@@ -260,23 +260,23 @@ fcomplex* operator*(const fcomplex b, const Matrix<T>& A){
   fcomplex* out = (fcomplex*)calloc(n*n, sizeof(fcomplex));
   for(int i=0; i<n; ++i)
       for(int j=0; j<n; ++j)
-          out[n*i+j] = {b.re * A(i+1, j+1), b.i * A(i+1, j+1)};
+          out[n*i+j] = {b.r * A(i+1, j+1), b.i * A(i+1, j+1)};
   return out;
 }
 
 template<typename T>
 fcomplex operator*(const fcomplex a, const T b){
-  return {a.re * b, a.i * b};
+  return {a.r * b, a.i * b};
 }
 
 template<typename T>
 fcomplex operator*(const T b, const fcomplex a){
-  return {a.re * b, a.i * b};
+  return {a.r * b, a.i * b};
 }
 
 template<typename T>
 fcomplex operator+(const fcomplex a, const T b){
-  return {a.re + b, a.i };
+  return {a.r + b, a.i };
 }
 
 template<typename T>
