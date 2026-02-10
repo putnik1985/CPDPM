@@ -2,7 +2,7 @@ BEGIN{
 	type["ctetra"] = 39; ## nastran nx element type from .pch file
 
 	if (ARGC < 2){
-		print "usage awk -f random-spc-loads.awk file=inp.pch mass=604.4";
+		print "usage awk -f random-spc-loads.awk file=inp.pch mass=604.4 g=9.81";
 		exit;
 	}
 
@@ -16,10 +16,10 @@ BEGIN{
 	file  = data["file"];
      mass = data["mass"];
     pi = 3.14159;
-	G = 386.1;
+	G = data["g"];
 	
 	
-    printf("\n\n%12s%12s%12s%12s\n", "Grid", "Xrms, lbf", "Yrms, lbf", "Zrms, lbf")
+    printf("\n\n%12s,%12s,%12s,%12s,\n", "Grid", "Xrms", "Yrms", "Zrms")
 	
 	while (readline()){
 	       ###print $0
@@ -34,7 +34,7 @@ BEGIN{
 						  fx = $3
 						  fy = $4
 						  fz = $5
-						  printf("%12d%12.2f%12.2f%12.2f\n", $1, fx, fy, fz)
+						  printf("%12d,%12.2f,%12.2f,%12.2f,\n", $1, fx, fy, fz)
 						  Fx += fx
 						  Fy += fy
 						  Fz += fz
@@ -43,11 +43,11 @@ BEGIN{
 				   }
 		    }
 	}
-	 printf("\n\n%12s%12s%12s%12s\n", "Case", "Xrms, lbf", "Yrms, lbf", "Zrms, lbf")
-	 printf("%12s%12.2f%12.2f%12.2f\n", "Total:", Fx, Fy, Fz)
+	 printf("\n\n%12s,%12s,%12s,%12s,\n", "Case", "Xrms", "Yrms", "Zrms")
+	 printf("%12s,%12.2f,%12.2f,%12.2f,\n", "Total:", Fx, Fy, Fz)
 
-	 printf("\n\n%12s%12s%12s%12s\n", "Case", "X, G", "Y, G", "Z, G")
-	 printf("%12s%12.2f%12.2f%12.2f\n", "Total:", Fx/mass, Fy/mass, Fz/mass)
+	 printf("\n\n%12s,%12s,%12s,%12s,\n", "Case", "X, G", "Y, G", "Z, G")
+	 printf("%12s,%12.2f,%12.2f,%12.2f,\n", "Total:", Fx/(mass*G), Fy/(mass*G), Fz/(mass*G))
 	 
 						  
 }
