@@ -2,7 +2,7 @@ BEGIN{
 	type["ctetra"] = 39; ## nastran nx element type from .pch file
 
 	if (ARGC < 2){
-		print "usage awk -f random-spc-loads.awk file=inp.pch mass=604.4 g=9.81 transform=matrix-from-local-to-global.txt";
+		print "usage awk -f random-spc-loads.awk file=inp.pch mass=604.4 g=9.81 transform=matrix-from-local-to-global.txt peak=3.";
 		exit;
 	}
 
@@ -18,7 +18,8 @@ BEGIN{
     pi = 3.14159;
 	G = data["g"];
 	matrix_file = data["transform"]
-
+    peak = data["peak"]
+	
 	if (getline < matrix_file > 0){
 	    n = split($0, out, ",")
 		x[1] = out[1]
@@ -74,6 +75,8 @@ BEGIN{
 	 printf("\n\n%12s,%12s,%12s,%12s,\n", "Case", "X(G)", "Y(G)", "Z(G)")
 	 printf("%12s,%12.2f,%12.2f,%12.2f,\n", "Total:", Fx/(mass*G), Fy/(mass*G), Fz/(mass*G))
 	 
+	 printf("\n\n%12s,%12s,%12s,%12s,\n", "Peaking", "X(G)", "Y(G)", "Z(G)")
+	 printf("%12s,%12.2f,%12.2f,%12.2f,\n", "Total:", peak * Fx/(mass*G), peak * Fy/(mass*G), peak * Fz/(mass*G))
 						  
 }
 
