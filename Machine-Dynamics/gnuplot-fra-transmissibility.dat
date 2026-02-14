@@ -1,0 +1,7 @@
+set title "Machine System \n FRA(Transmissibility)"
+set logscale
+set grid
+set xlabel "Frequency, Hz"
+set ylabel "Q" 
+plot 'fra-transmissibility.dat' using 1:2 title columnhead with lines,\
+     'fra-transmissibility.dat' using 1:3 title columnhead with lines

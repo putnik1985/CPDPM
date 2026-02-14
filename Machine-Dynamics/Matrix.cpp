@@ -293,6 +293,47 @@ template<typename T>
 fcomplex* operator+(fcomplex* B, const Matrix<T>& A){
   return A + B;
 }
+
+template<typename T>
+fcomplex* operator*(fcomplex* B, const Matrix<T>& A){
+  int n = A.size();
+  fcomplex* out = (fcomplex*)calloc(n*n, sizeof(fcomplex));
+  for(int i=0; i<n; ++i)
+      for(int j=0; j<n ;++j){
+          out[n*i +j].r = 0.;
+          out[n*i +j].i = 0.;
+          for(int k=0; k<n; ++k){
+              out[n*i+j].r += B[n*i+k].r * A(k+1, j+1);
+              out[n*i+j].i += B[n*i+k].i * A(k+1, j+1);
+          }
+      }
+  return out;
+}
+
+template<typename T>
+fcomplex* operator-(fcomplex* B, const Matrix<T>& A){
+  int n = A.size();
+  fcomplex* out = (fcomplex*)calloc(n*n, sizeof(fcomplex));
+  for(int i=0; i<n; ++i)
+      for(int j=0; j<n; ++j){
+          out[i*n+j].r = B[n*i+j].r - A(i+1,j+1);
+          out[i*n+j].i = B[n*i+j].i;
+      }
+  return out;
+}
+
+template<typename T>
+fcomplex* operator*(fcomplex* B, const nvector<T>& v){
+  int n = v.size();
+  fcomplex* out = (fcomplex*)calloc(n*n, sizeof(fcomplex));
+  for(int i=0; i<n; ++i)
+      for(int k=0; k<n; ++k){
+          out[i].r += B[i*n+k].r * v(k+1);
+          out[i].i += B[i*n+k].i * v(k+1);
+      }
+  return out;
+}
+
 /******************************************************
 template<typename T>
 int natural_modes(Matrix<T> M, Matrix<T> K){

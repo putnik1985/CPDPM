@@ -65,6 +65,14 @@ fcomplex* operator+(const Matrix<T>& A, fcomplex* B);
 template<typename T>
 fcomplex* operator+(fcomplex* B, const Matrix<T>& A);
 
+template<typename T>
+fcomplex* operator*(fcomplex* B, const Matrix<T>& A);
+
+template<typename T>
+fcomplex* operator*(fcomplex* B, const nvector<T>& v);
+
+template<typename T>
+fcomplex* operator-(fcomplex* B, const Matrix<T>& A);
 
 template<typename T>
 ostream& operator<<(ostream& os, const Matrix<T>& M);
