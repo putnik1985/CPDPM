@@ -2,7 +2,7 @@ BEGIN{
 	type["cbush"] = 102; ## nastran nx element type from .pch file
 
 	if (ARGC < 4){
-		print "usage awk -f random-acceleration.awk file=inp.pch  point_id=15630394 G=9.81 transform=local-to-global.txt";
+		print "usage awk -f random-acceleration.awk file=inp.pch  point_id=15630394 G=9.81";
 		exit;
 	}
 
@@ -17,29 +17,6 @@ BEGIN{
 	 point_id  = data["point_id"];
      G = data["G"];
 
-	matrix_file = data["transform"]
-
-	if (getline < matrix_file > 0){
-	    n = split($0, out, ",")
-		x[1] = out[1]
-		x[2] = out[2]
-		x[3] = out[3]
-	}
-	
-	if (getline < matrix_file > 0){
-	    n = split($0, out, ",")
-		y[1] = out[1]
-		y[2] = out[2]
-		y[3] = out[3]
-	}
-
-	if (getline < matrix_file > 0){
-	    n = split($0, out, ",")
-		z[1] = out[1]
-		z[2] = out[2]
-		z[3] = out[3]
-	}
-	
 	printf("Output is in the Displacement Coordinate System\n")
 	printf("%12s,\n", point_id)
 	printf("%12s,%12s,%12s,%12s,\n","Frequency", "Ax", "Ay", "Az")
