@@ -22,11 +22,10 @@ BEGIN{
 
 	######print "Elements To Work With"
 	while(getline < elements > 0){
-	  group[++ngroup] = $1
-	  #####print group[ngroup]
+	  list[++nlist] = $1
+	  #####print $1
 	}
-	
-	
+
 	while (readline()){
 	       
 		   if ($0 ~ /\$ELEMENT STRESSES/) {
@@ -117,6 +116,14 @@ BEGIN{
 		    }
 			}
 	}
+	                        
+	                        for(k=1; k<=nlist; ++k){
+							    ##########print k
+							    ngroup = 0
+								element_file = list[k]
+								while (getline < element_file > 0){
+								       group[++ngroup] = $1
+								}
 	                                  vm_max = 0.;
 									  freq_max = 0.;
 									  
@@ -130,8 +137,9 @@ BEGIN{
 											   }
                                                #####printf("%d,%.2f,%s\n", num, frequency[num], stress[num])
                                       }
-									  printf("%d,%.2f,%s\n", id_max, freq_max, vm_max)
-
+									  output = element_file file ".stress" 
+									  printf("%d,%.2f,%s\n", id_max, freq_max, vm_max) > output
+                            } ## read each file
 }
 
 function abs(x){
