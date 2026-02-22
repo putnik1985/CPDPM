@@ -2,6 +2,24 @@
 #include "MatrixLib.cpp"
 #include "Operator.h"
 
+ostream& operator<<(ostream& os, const Numeric_lib::Matrix<double, 2>& m){
+ int n = m.dim1(); 
+         for(int i=0; i<n; ++i){
+             for(int j=0; j<n; ++j)
+                 printf("%12.4f", m(i,j));
+             os << '\n';
+         }
+ return os;
+}
+
+ostream& operator<<(ostream& os, const Numeric_lib::Matrix<double, 1>& m){
+ int n = m.dim1(); 
+         for(int i=0; i<n; ++i)
+                 printf("%12.4f", m(i));
+         os << '\n';
+ return os;
+}
+
 int main(int argc, char** argv){
 	int nx, ns;
 	double a, b, c, d;
@@ -29,6 +47,11 @@ int main(int argc, char** argv){
 	Numeric_lib::Matrix<double,2> C(ns,ns);
 	Numeric_lib::Matrix<double,1> y(ns);
 
+        cout << "g\n";
+        cout << g ;
+
+        cout << "K\n";
+        cout << K_;
 	double h = (b-a) / ns;
         for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
@@ -43,14 +66,26 @@ int main(int argc, char** argv){
 	for(int i=0; i<ns; ++i)
 		C(i,i) = (1. + 2. * p / (h*h));
 
+	for(int i=1; i<ns; ++i)
+		C(i,i-1) = (-alpha * p / (h*h));
+
+	for(int i=0; i<ns-1; ++i)
+		C(i,i+1) = (-alpha * p / (h*h));
+
 	C(1,1) = C(ns-1,ns-1) = 1. + p / (h*h);
 
-	Numeric_lib::Matrix<double,2> A = B + alpha * C;
+        cout << "C\n";
+        cout << C;
+	Numeric_lib::Matrix<double,2> A = B + C * alpha;
+        cout << "A\n";
+        cout << A;
+/*
 	Numeric_lib::Matrix<double,1> z = square_root(A,y);
 	cout << "Integral Equation Solution:" << endl;
 	for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
 		printf("%12.6f,%12.6f\n", s, z);
         }
+*/
 	return 0;
 }

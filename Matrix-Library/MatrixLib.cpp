@@ -798,6 +798,18 @@ template<class T, int D> Matrix<T,D> operator&(const Matrix<T,D>& m, const T& c)
 template<class T, int D> Matrix<T,D> operator|(const Matrix<T,D>& m, const T& c) { Matrix<T,D> r(m); return r|=c; }
 template<class T, int D> Matrix<T,D> operator^(const Matrix<T,D>& m, const T& c) { Matrix<T,D> r(m); return r^=c; }
 
+template<class T>
+Matrix<T,2> operator+(const Matrix<T,2>& m, const Matrix<T,2>& c){
+
+     if (m.size() != c.size()) error("sizes wrong for add");
+     Matrix<T,2> res(m.dim1(), m.dim2());
+     for(int i=0; i<m.dim1(); ++i)
+         for(int j=0; j<m.dim2(); ++j)
+             res(i,j) = m(i,j) + c(i,j);
+
+     return res;
+}
+
 //-----------------------------------------------------------------------------
 
 }

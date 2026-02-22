@@ -1,1 +1,0 @@
-g++ -o integral main.cpp -I../Matrix-Library/
