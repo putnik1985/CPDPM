@@ -12,29 +12,44 @@ Matrix<T,1> square_root(const Matrix<T,2>& A, const Matrix<T,1>& b)
 	Matrix<T,2> s(n,n);
 
 	s(0,0) = sqrt(A(0,0));
-	for(int j = 1; j < n; ++j)
+	for(int j = 0; j < n; ++j)
 		s(0,j) = A(0,j) / s(0,0);
+
 
 	for(int i = 1; i < n; ++i){
 		T sum = 0.;
+		
 		for(int k = 0; k < i; ++k)
 			sum += s(k,i) * s(k,i);
+		
 		s(i,i) = sqrt(A(i,i) - sum);
-	}
-
-	for(int i = 0; i < n; ++i)
-		for(int j = i+1; j < n; ++j){
+		
+	    for(int j = i+1; j < n; ++j){
 			T sum = 0.;
 			for(int k = 0; k < i; ++k)
 				sum += s(k,i) * s(k,j);
 
 			s(i,j) = (A(i,j) - sum)/s(i,i);
 		}
+	}
+
+
 
         for(int j = 0; j < n; ++j)
-		for(int i = j + 1; i < n; ++i)
-			s(i,j) = 0.;
+		    for(int i = j + 1; i < n; ++i)
+			    s(i,j) = 0.;
 
+/*********************************
+    cout << "S:\n";
+	cout << s;
+
+    cout << "Transpose S:\n";
+	cout << transpose(s);
+	
+    cout << "S'S:\n";
+	cout << transpose(s) * s;
+************************************/	
+	
 	Matrix<T,1> z(n);
 
 	for(int i = 0; i < n; ++i){

@@ -810,7 +810,66 @@ Matrix<T,2> operator+(const Matrix<T,2>& m, const Matrix<T,2>& c){
      return res;
 }
 
+
+template<class T>
+Matrix<T,1> operator*(const Matrix<T,2>& m, const Matrix<T,1>& c){
+
+     if (m.dim1() != c.dim1()) error("sizes wrong for add");
+     Matrix<T,1> res(m.dim1());
+     for(int i=0; i<m.dim1(); ++i)
+         for(int j=0; j<m.dim2(); ++j)
+             res(i) += m(i,j) * c(j);
+
+     return res;
+}
+
+template<class T>
+T vnorm(const Matrix<T,1>& c){
+	auto n = c.dim1();
+	T sum = 0.;
+	for(int i=0; i<n; ++i)
+		sum += c(i) * c(i);
+	
+	return sqrt(sum);
+}
+
+template<class T>
+Matrix<T,1> operator-(const Matrix<T,1>& m, const Matrix<T,1>& c){
+
+     if (m.size() != c.size()) error("sizes wrong for add");
+     Matrix<T,1> res(m.dim1());
+     for(int i=0; i<m.dim1(); ++i)
+         res(i) = m(i) - c(i);
+
+     return res;
+}
+
+template<class T>
+Matrix<T,2> transpose(const Matrix<T,2>& a){
+	auto n = a.dim1();
+	Matrix<T,2> res = a;
+	
+    for(int i=0; i<n; ++i)
+        for(int j=i+1; j<n; ++j)
+            swap(res(i,j), res(j,i));
+    
+    return res;	
+}
 //-----------------------------------------------------------------------------
+
+template<class T>
+Matrix<T,2> operator*(const Matrix<T,2>& a, const Matrix<T,2>& b){
+
+     if (a.dim1() != b.dim1()) error("sizes wrong for add");
+	 auto n = a.dim1();
+     Matrix<T,2> c(n,n);
+	 
+     for(int i=0; i<n; ++i)
+		 for(int j=0; j<n; ++j)
+			 for(int k=0; k<n; ++k)
+				 c(i,j) += a(i,k) * b(k,j);
+     return c;
+}
 
 }
 #endif

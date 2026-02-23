@@ -23,11 +23,11 @@ ostream& operator<<(ostream& os, const Numeric_lib::Matrix<double, 1>& m){
 
 int main(int argc, char** argv){
 	
-	int nx = 32., ns = 32;
+	int nx = 32, ns = 32;
 	double a = 0., b = M_PI, c = 0. , d = M_PI;
 	double p = 4.;
 	
-    double alpha = 0.00001; // initial value for alpha
+    double alpha = 1.; // initial value for alpha
 	
         for(int i=0; i< argc; ++i){
 		if (strcmp(argv[i], "-nx")==0) nx = atoi(argv[i+1]);
@@ -52,13 +52,9 @@ int main(int argc, char** argv){
 	Numeric_lib::Matrix<double,2> B(ns,ns);
 	Numeric_lib::Matrix<double,2> C(ns,ns);
 	Numeric_lib::Matrix<double,1> y(ns);
-/********************************************
-        cout << "g\n";
-        cout << g ;
+//********************************************
 
-        cout << "K\n";
-        cout << K_;
-************************************************/
+//************************************************/
 		
 	double h = (b-a) / ns;
         for(int i=0; i<ns; ++i){
@@ -81,12 +77,23 @@ int main(int argc, char** argv){
 		C(i,i+1) = (-alpha * p / (h*h));
 
 	C(0,0) = C(ns-1,ns-1) = 1. + p / (h*h);
-/***********************************************************	
+
+/******************************************
+        printf("h:\n");
+		printf("%12.4f\n",h);
+
+        cout << "g\n";
+        cout << g ;
+
+        cout << "K\n";
+        cout << K_;
+		
         cout << "B\n";
         cout << B;
+
         cout << "C\n";
         cout << C;
-************************************************/
+********************************************/
 		
 	Numeric_lib::Matrix<double,2> A = B + C * alpha;
 	
@@ -96,17 +103,35 @@ int main(int argc, char** argv){
         cout << "y\n";
         cout << y ;
 **********************************************************/
-		
+
+
+	//cout << "\nGauss\n" << A << "\n" << y;	
 	Numeric_lib::Matrix<double,1> z1 = gauss(A,y);
-	Numeric_lib::Matrix<double,1> z2 = square_root(A,y);
-	Numeric_lib::Matrix<double,1> z3 = hausholder(A,y);
 	
+	//cout << "\nSquare Root\n" << A << "\n" << y;
+	Numeric_lib::Matrix<double,1> z2 = square_root(A,y);
+
+	//cout << "\nHausholder\n" << A << "\n" << y;
+	Numeric_lib::Matrix<double,1> z3 = hausholder(A,y);	
 	//cout << "Integral Equation Solution:" << endl;
-	printf("%12s%12s%12s%12s%12s\n", "s", "Gauss", "Square", "Hausholder", "Exact");
+	printf("\n%12s%12s%12s%12s%12s\n", "s", "Gauss", "Square", "Hausholder", "Exact");
+
+
+
 	for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
 		printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), sin(s));
+		//printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), 1.);		
     }
+	    Numeric_lib::Matrix<double,1> yexact(z1.dim1());
+	    for(int i=0; i<z1.dim1(); ++i){
+			
+			double s = a + 0.5 * h + i * h;
+			//yexact(i) = 1.;
+			yexact(i) = sin(s);
+        }
+       
+		printf("\n%12s%12.6f%12.6f%12.6f%12.6f\n", "Residuals:", vnorm(A*z1-y), vnorm(A*z2-y), vnorm(A*z3-y), vnorm(A*yexact - y));
 
 	return 0;
 }

@@ -6,11 +6,13 @@
 template<class T>
 struct image{
 	T operator()(T x) {return 2. * x - M_PI;}
+	//T operator()(T x) {return M_PI;}
 };
 
 template<class T>
 struct kernel{
        double operator()(T x, T s){return x - s;}
+       //double operator()(T x, T s){return 1.;}	   
 };
 
 template<class F, class T>
