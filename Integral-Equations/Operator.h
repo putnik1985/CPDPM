@@ -1,15 +1,16 @@
 #ifndef OPERATOR_H
 #define OPERATOR_H
 #include "stl.h"
+#include "MatrixLib.cpp"
 
 template<class T>
 struct image{
-	T operator()(T x) {return cos(x);}
+	T operator()(T x) {return 2. * x - M_PI;}
 };
 
 template<class T>
 struct kernel{
-       double operator()(T x, T s){return x-s;}
+       double operator()(T x, T s){return x - s;}
 };
 
 template<class F, class T>
@@ -18,7 +19,7 @@ class integral_operator{
   integral_operator(F K1, T a1, T b1, T c1, T d1, int n1, int n2):K(K1), a(a1), b(b1), c(c1), d(d1), nx(n1), ns(n2) {};
   template<class U> Numeric_lib::Matrix<T,1> operator()(U u){
 	Numeric_lib::Matrix<T,1> g(ns);
-	T dx = (c-d)/nx;
+	T dx = (d-c)/nx;
 	T h  = (b-a)/ns;
 	for(int i=0; i<ns; ++i){
 	        T sum = 0.;
@@ -34,7 +35,7 @@ class integral_operator{
 
   Numeric_lib::Matrix<T,2> operator()(F K1){
                Numeric_lib::Matrix<T,2> K_(ns, ns);
-	       T dx = (c-d)/nx;
+	       T dx = (d-c)/nx;
 	       T h  = (b-a)/ns;
                for(int i=0; i<ns; ++i){
                    T s = a + 0.5 * h + i * h;
@@ -43,7 +44,7 @@ class integral_operator{
                        T sum = 0.;
                        for(int k=0; k<nx; ++k){
 			   T x = c + 0.5 * dx + k * dx;
-                           sum += K1(x,s) * K(x,t) * dx;
+                           sum += K(x,s) * K1(x,t) * dx;
                        }
                        K_(i,j) = sum;
                    }
