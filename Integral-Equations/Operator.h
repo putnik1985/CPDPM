@@ -2,24 +2,29 @@
 #define OPERATOR_H
 #include "stl.h"
 #include "MatrixLib.cpp"
+#include "Equation.h"
 
 template<class T>
 struct image{
-	T operator()(T x) {return 2. * x - M_PI;}
+	//T operator()(T x) {return 2. * x - M_PI;}
 	//T operator()(T x) {return M_PI;}
+	T operator()(T x) {return u(x);}
 };
 
 template<class T>
 struct kernel{
-       double operator()(T x, T s){return x - s;}
-       //double operator()(T x, T s){return 1.;}	   
+       //double operator()(T x, T s){return x - s;}
+       //double operator()(T x, T s){return 1.;}
+       T operator()(T x, T s){return K(x,s);}	   
 };
 
 template<class F, class T>
 class integral_operator{
   public:
   integral_operator(F K1, T a1, T b1, T c1, T d1, int n1, int n2):K(K1), a(a1), b(b1), c(c1), d(d1), nx(n1), ns(n2) {};
-  template<class U> Numeric_lib::Matrix<T,1> operator()(U u){
+
+  template<class U> 
+  Numeric_lib::Matrix<T,1> operator()(U u){
 	Numeric_lib::Matrix<T,1> g(ns);
 	T dx = (d-c)/nx;
 	T h  = (b-a)/ns;
@@ -54,6 +59,24 @@ class integral_operator{
                 return K_;
   }  
 
+   template<class U>
+   T residual(const Numeric_lib::Matrix<T,1>& z, U u){
+    T res = 0.;
+    T dx = (d-c)/nx;
+	T h  = (b-a)/ns;
+	    
+	     for(int i=0; i<nx; ++i){
+			 T x = c + 0.5 * dx + i * dx;
+			 T sum = 0.;
+			 for(int j=0; j<ns; ++j){
+				 T s = a + 0.5 * h + j * h;
+				 sum += K(x,s) * z(j) * h;
+			 }
+			 res+= (sum - u(x)) * (sum - u(x)) * dx; 
+		 }
+    return sqrt(res);
+  }
+  
   private:
   T a, b, c, d;
   F K;

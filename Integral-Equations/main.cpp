@@ -44,7 +44,7 @@ int main(int argc, char** argv){
 
 	image<double>  u;
 	kernel<double> K;
-        integral_operator<kernel<double>, double> iop(K, a, b, c, d, nx, ns); // define integral operator with the kernel k	
+    integral_operator<kernel<double>, double> iop(K, a, b, c, d, nx, ns); // define integral operator with the kernel k	
 	Numeric_lib::Matrix<double,1> g  = iop(u); // g(s) is an image of the u from the action of K must be double func(double)
 	Numeric_lib::Matrix<double,2> K_ = iop(K); // K_(s,t)
 
@@ -120,7 +120,7 @@ int main(int argc, char** argv){
 
 	for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
-		printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), sin(s));
+		printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), 2./M_PI);
 		//printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), 1.);		
     }
 	    Numeric_lib::Matrix<double,1> yexact(z1.dim1());
@@ -128,10 +128,11 @@ int main(int argc, char** argv){
 			
 			double s = a + 0.5 * h + i * h;
 			//yexact(i) = 1.;
-			yexact(i) = sin(s);
+			yexact(i) = 2./M_PI;
         }
        
-		printf("\n%12s%12.6f%12.6f%12.6f%12.6f\n", "Residuals:", vnorm(A*z1-y), vnorm(A*z2-y), vnorm(A*z3-y), vnorm(A*yexact - y));
-
+		printf("\n%12s%12.6f%12.6f%12.6f%12.6f\n", "Check:", vnorm(A*z1-y), vnorm(A*z2-y), vnorm(A*z3-y), vnorm(A*yexact - y));
+		printf("\n%12s%12.6g\n","alpha:", alpha);
+        printf("%12s%12.6g%12.6g%12.6g%12.6g\n", "Residual:", iop.residual(z1,u), iop.residual(z2,u), iop.residual(z3,u), iop.residual(yexact,u));
 	return 0;
 }
