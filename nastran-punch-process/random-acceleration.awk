@@ -34,7 +34,7 @@ BEGIN{
 				ay = $4 * scale;
 				az = $5 * scale;
 				if (freq ~ /^[0-9]/)
-				    printf("%12.1f,%12.8f,%12.8f,%12.8f,\n", freq, ax, ay, az)
+				    printf("%12.3f,%12.8f,%12.8f,%12.8f,\n", freq, ax, ay, az)
 				}
 			}#####if ($4 == point_id)
 			

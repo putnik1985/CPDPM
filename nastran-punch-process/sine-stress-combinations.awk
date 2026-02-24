@@ -65,15 +65,18 @@ BEGIN{
 			}
 		}
 	
-    output = comp ".MoS"
-	print output 
+ 
+	if (vm_max > 0) {
+        output = comp ".MoS"
+	    print output
+	    print "Input:" > output
+	    printf("Fy =%f, Fu =%f, FSy = %f, FSu = %f\n", Fy, Fu, FSy, FSu) >> output	
+        printf("\n\n%s,%s,%s,%s,%s,\n", "Element","Frequency", "VM", "MOS Yield", "MOS Ultimate") >> output
+	    yield = Fy * 1000000. / (FSy * vm_max) - 1
+	    ultimate = Fu * 1000000. / (FSu * vm_max) - 1
+        printf("%d,%.2f,%.2f,%.2f,%.2f\n", id_max, freq_max, vm_max / 1000000. , yield, ultimate) >> output 
+    }
 	
-	print "Input:" > output
-	printf("Fy =%f, Fu =%f, FSy = %f, FSu = %f\n", Fy, Fu, FSy, FSu) >> output	
-    printf("\n\n%s,%s,%s,%s,%s,\n", "Element","Frequency", "VM", "MOS Yield", "MOS Ultimate") >> output
-	yield = Fy * 1000000. / (FSy * vm_max) - 1
-	ultimate = Fu * 1000000. / (FSu * vm_max) - 1
-    printf("%d,%.2f,%.2f,%.2f,%.2f\n", id_max, freq_max, vm_max / 1000000. , yield, ultimate) >> output 	
 	}
 }
 
