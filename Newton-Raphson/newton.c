@@ -39,11 +39,11 @@ struct response newton(double x0, double (*f)(double), double (*J)(double)){
 }
 
 double f(double x) {
-	return sin(x);
+	return -4. + 14 * sin(2. * M_PI / 365. * x);
 }
 
 double J(double x){
-	return cos(x);
+	return 14. * cos(2. * M_PI / 365. * x) * 2. * M_PI / 365.;
 }
 
 double f1(double *x){

@@ -1,0 +1,2 @@
+gfortran -o integrate function.f90 integration.f90
+./integrate
