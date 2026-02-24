@@ -134,5 +134,6 @@ int main(int argc, char** argv){
 		printf("\n%12s%12.6f%12.6f%12.6f%12.6f\n", "Check:", vnorm(A*z1-y), vnorm(A*z2-y), vnorm(A*z3-y), vnorm(A*yexact - y));
 		printf("\n%12s%12.6g\n","alpha:", alpha);
         printf("%12s%12.6g%12.6g%12.6g%12.6g\n", "Residual:", iop.residual(z1,u), iop.residual(z2,u), iop.residual(z3,u), iop.residual(yexact,u));
+		
 	return 0;
 }

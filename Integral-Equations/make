@@ -1,2 +1,2 @@
 g++ -std=c++14 -I../Matrix-Library -o integral main.cpp
-./integral.exe
+./integral.exe -alpha 0.0001 -p 0.0

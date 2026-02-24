@@ -110,61 +110,112 @@ Matrix<T,1> gauss(const Matrix<T,2>& A1, const Matrix<T,1>& b1)
 template<class T>
 Matrix<T,1> hausholder(const Matrix<T,2>& A1, const Matrix<T,1>& b1)
 {
-		auto A = A1;
-		auto b = b1;
-        int n = A.dim1();
+		auto R = A1;
+        int n = R.dim1();
+		auto Q = QR(R);
 		
-        T w[n];
-	T e[n];
-	T S[n];
+/************************************		
+		//cout << A;
 
-	for(int i = 0; i < n; ++i){
-		e[i] = 0.;
-		S[i] = 0.;
-		w[i] = 0.;
-	}
-	for(int step = 0; step < n - 1; ++step){
-		e[step] = 1.;
-		for(int k = step; k < n; ++k)
-			S[k] = A(k,step);
-
-		T alpha = 0.;
-		for(int k = step; k < n; ++k)
-			alpha += S[k] * S[k];
-		alpha = sqrt(alpha);
-
-		T rho;
-		for(int k = step; k < n; ++k)
-			rho += (S[k] - alpha * e[k]) * (S[k] - alpha * e[k]);
-		rho = sqrt(rho);
-
-		for(int k = step; k < n; ++k)
-			w[k] = (S[k] - alpha * e[k])/rho;
-
-		for(int col = step; col < n; ++col){
-			T dot_product_a = 0.;
-			T dot_product_b= 0.;
-			for(int i = step; i < n; ++i){
-				dot_product_a += w[i] * A(i,col);
-				dot_product_b += w[i] * b(i);
-			}
-
-			for(int row = step; row < n; ++row){
-				A(row,col) -= 2. * dot_product_a* w[row];
-				b(row) -= 2. * dot_product_b * w[row];
-			}
-		}
-	}
+        int n = 3;
+		Matrix<T,2> R(n,n);
+		Matrix<T,2> Q(n,n);
+		
+		R(0,0) = 12.; R(0,1) = -51.; R(0,2) = 4.;
+		R(1,0) = 6.; R(1,1) = 167.; R(1,2) = -68.;
+		R(2,0) = -4.; R(2,1) = 24.; R(2,2) = -41.;
+		
+		Matrix<T,2> I(n,n);
+		for(int i=0; i<n; ++i)
+			I(i,i) = 1.;
+		
+	    Matrix<T,2> Q = I;
+		
+    // cout << endl;	
+    for(int i=0; i<n-1; ++i){
+		Matrix<T,1> x(n), e(n);
+		for(int j=i; j<n; ++j)
+			x(j) = R(j,i);
+		e(i) = 1.;
+		
+		T alpha = vnorm(x);
+		Matrix<T,1> u = x - e * alpha;
+		
+		u /= vnorm(u);
+		Q = Q * (I - (u * u) * 2.);
+		//cout << Q << endl;
+		R = (I - (u * u) * 2.) * R;
+		//cout << R << endl;
+	}	
+	
+	//cout << Q * R;
+*********************************************/
+    	
 
 	Matrix<T,1> x(n);
-
+	Matrix<T,1> b = transpose(Q) * b1;
+	
 	for(int k = n - 1; k >= 0; --k){
-		double s = 0.;
+		T s = 0.;
 		for(int j = k + 1; j < n; ++j)
-			s += A(k,j) * x(j);
-		x(k) = (b(k) - s) / A(k,k);
+			s += R(k,j) * x(j);
+		
+		x(k) = (b(k) - s) / R(k,k);
 	}
 	return x;
+}
+
+template<class T>
+Matrix<T,2> QR(Matrix<T,2>& A)
+{
+        int n = A.dim1();
+		Matrix<T,2> I(n,n);
+
+		for(int i=0; i<n; ++i)
+			I(i,i) = 1.;
+		
+	    Matrix<T,2> Q = I;
+		
+    for(int i=0; i<n-1; ++i){
+		Matrix<T,1> x(n);
+		Matrix<T,1> e(n);
+        
+		e(i) = 1.;
+		for(int j=i; j<n; ++j)
+			x(j) = A(j,i);
+
+		
+		
+		T alpha = vnorm(x);
+		Matrix<T,1> u = x - e * alpha;
+		
+		u /= vnorm(u);
+		Q = Q * (I - (u * u) * 2.);
+		//cout << Q << endl;
+		A = (I - (u * u) * 2.) * A;
+		//cout << R << endl;
+	}
+	return Q;
+}
+
+
+template<class T>
+Matrix<T,2> reflection_matrix(const Matrix<T,1>& x, int i)
+{
+        int n = x.dim1();
+		Matrix<T,2> I(n,n);
+
+        Matrix<T,1> e(n);
+		e(i) = 1.; //where to convert
+		
+		for(int i=0; i<n; ++i)
+			I(i,i) = 1.;
+		
+		T alpha = vnorm(x);
+		Matrix<T,1> u = x - e * alpha;	
+		u /= vnorm(u);
+		
+		return (I - (u * u) * 2.);
 }
 
 } //Numeric_lib

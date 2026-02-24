@@ -871,5 +871,31 @@ Matrix<T,2> operator*(const Matrix<T,2>& a, const Matrix<T,2>& b){
      return c;
 }
 
+
+template<class T>
+Matrix<T,2> operator*(const Matrix<T,1>& u, const Matrix<T,1>& v){
+
+	 auto n = u.dim1();
+	 auto m = v.dim1();
+     Matrix<T,2> c(n,m);
+	 
+     for(int i=0; i<n; ++i)
+		 for(int j=0; j<n; ++j)
+			 c(i,j) = u(i) * v(j);
+     return c;
+}
+
+template<class T>
+Matrix<T,2> operator-(const Matrix<T,2>& m, const Matrix<T,2>& c){
+
+     if (m.size() != c.size()) error("sizes wrong for add");
+     Matrix<T,2> res(m.dim1(), m.dim2());
+     for(int i=0; i<m.dim1(); ++i)
+         for(int j=0; j<m.dim2(); ++j)
+             res(i,j) = m(i,j) - c(i,j);
+
+     return res;
+}
+
 }
 #endif
