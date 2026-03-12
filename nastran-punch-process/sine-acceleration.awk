@@ -2,7 +2,7 @@ BEGIN{
 	type["cbush"] = 102; ## nastran nx element type from .pch file
 
 	if (ARGC < 4){
-		print "usage awk -f sine-acceleration.awk file=inp.pch  point_id=15630394 subcase=1 g=9.81";
+		print "usage awk -f sine-acceleration.awk file=inp.pch  point_id=15630394 subcase=1 G=9.81";
 		exit;
 	}
 
@@ -16,7 +16,7 @@ BEGIN{
 	 file  = data["file"];
 	 point_id  = data["point_id"];
 	 subcase = data["subcase"];
-     G = data["g"];
+     G = data["G"];
 	 
 	printf("%12s,%12s,%12s,%12s,\n","Frequency", "Ax", "Ay", "Az")
 	while (getline < file > 0){
