@@ -1,8 +1,8 @@
 units: f = 240. Hz, Q = 50., c = w/Q, m = 1 
 _mass,1024.,
-_component,227395.,30.16,
+_component,2273957.,30.16,
 _mass,1.,
-_component,227395.,30.16,
+_component,2273957.,30.16,
 _mass,1.,
 _analysis,natural_modes,
 ######_analysis,fra,max_freq,1000.,x0,1.,
