@@ -90,8 +90,11 @@ int main(int argc, char** argv){
                 double dw = w_max / 100.;
 
                        char outputstr[MAXLINE];
-                       ofstream os;
+                       ofstream os, ifos, iaos;
                        os.open("fra-transmissibility.dat",ios_base::out);
+                       ifos.open("fra-interface-force.dat",ios_base::out);
+                       iaos.open("fra-interface-accel.dat",ios_base::out);
+
                        if (!os) {
                                 cerr << "can not open fra-transmissibility.dat\n";
                                 return -1;
@@ -128,6 +131,8 @@ int main(int argc, char** argv){
                        w += dw;
                 }
                 os.close();
+                ifos.close();
+                iaos.close();
 
                 os.open("gnuplot-fra-transmissibility.dat",ios_base::out);
                 os << "set title \"Machine System \\n FRA(Transmissibility)\"" << endl;

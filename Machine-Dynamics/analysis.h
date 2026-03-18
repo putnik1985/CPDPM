@@ -5,7 +5,7 @@
 #include "Matrix.h"
 /////#include "Matrix.cpp"
 
-#define M_PI 3.14159
+/////////////////////////#define M_PI 3.14159
 template<typename T>
 int natural_modes(Matrix<T> M, Matrix<T> K, const nvector<T>& nodes);
 
