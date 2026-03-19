@@ -187,7 +187,9 @@ int main(int argc, char** argv){
                 ifos.close();
                 iaos.close();
 				apmos.close();
-
+				//----------------------------------------------------------------------------
+				// write transmisibility fra 
+				//----------------------------------------------------------------------------
                 os.open("gnuplot-fra-transmissibility.dat",ios_base::out);
                 os << "set title \"Machine System \\n FRA(Transmissibility)\"" << endl;
                 os << "set logscale" << endl;
@@ -205,6 +207,67 @@ int main(int argc, char** argv){
                 os.close();
 
                 system("gnuplot -persist -e \"call 'gnuplot-fra-transmissibility.dat'\"");
+				n = interfaces.size();
+				//----------------------------------------------------------------------------
+				// write interface loads fra 
+				//----------------------------------------------------------------------------
+                os.open("gnuplot-fra-interface-forces.dat",ios_base::out);
+                os << "set title \"Machine System \\n FRA(Interface Loads)\"" << endl;
+                os << "set logscale" << endl;
+                os << "set grid" << endl;
+                os << "set xlabel \"Frequency, Hz\""<< endl;
+                os << "set ylabel \"Force\" " << endl;
+                sprintf(outputstr,"plot 'fra-interface-forces.dat' using 1:2 title columnhead with lines,\\\n");
+                os << outputstr;
+                for(int i = 3; i < n; ++i){
+                    sprintf(outputstr,"     'fra-interface-forces.dat' using 1:%d title columnhead with lines,\\\n", i);
+                    os << outputstr;
+                }
+                    sprintf(outputstr,"     'fra-interface-forces.dat' using 1:%d title columnhead with lines\n", n);
+                    os << outputstr;
+                os.close();
+                system("gnuplot -persist -e \"call 'gnuplot-fra-interface-forces.dat'\"");
+
+				//----------------------------------------------------------------------------
+				// write accelerations fra 
+				//----------------------------------------------------------------------------
+                os.open("gnuplot-fra-interface-accels.dat",ios_base::out);
+                os << "set title \"Machine System \\n FRA(Interface Accelerations)\"" << endl;
+                os << "set logscale" << endl;
+                os << "set grid" << endl;
+                os << "set xlabel \"Frequency, Hz\""<< endl;
+                os << "set ylabel \"Acceleration\" " << endl;
+                sprintf(outputstr,"plot 'fra-interface-accelsfra-interface-accels.dat' using 1:2 title columnhead with lines,\\\n");
+                os << outputstr;
+                for(int i = 3; i < n; ++i){
+                    sprintf(outputstr,"     'fra-interface-accels.dat' using 1:%d title columnhead with lines,\\\n", i);
+                    os << outputstr;
+                }
+                sprintf(outputstr,"     'fra-interface-accels.dat' using 1:%d title columnhead with lines\n", n);
+                os << outputstr;
+                os.close();
+                system("gnuplot -persist -e \"call 'gnuplot-fra-interface-accels.dat'\"");
+
+				//----------------------------------------------------------------------------
+				// write aparent mass fra 
+				//----------------------------------------------------------------------------
+                os.open("gnuplot-fra-apparent-mass.dat",ios_base::out);
+                os << "set title \"Machine System \\n FRA(Interface Aparent Mass)\"" << endl;
+                os << "set logscale" << endl;
+                os << "set grid" << endl;
+                os << "set xlabel \"Frequency, Hz\""<< endl;
+                os << "set ylabel \"Aparent Mass\" " << endl;
+                sprintf(outputstr,"plot 'fra-apparent-mass.dat' using 1:2 title columnhead with lines,\\\n");
+                os << outputstr;
+                for(int i = 3; i < n; ++i){
+                    sprintf(outputstr,"     'fra-apparent-mass.dat' using 1:%d title columnhead with lines,\\\n", i);
+                    os << outputstr;
+                }
+                sprintf(outputstr,"     'fra-apparent-mass.dat' using 1:%d title columnhead with lines\n", n);
+                os << outputstr;
+                os.close();
+                system("gnuplot -persist -e \"call 'gnuplot-fra-apparent-mass.dat'\"");
+
                 cout << "Frequency Response Analysis Completed\n";
             }
         }
