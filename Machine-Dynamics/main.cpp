@@ -17,7 +17,7 @@ extern "C"{
 int main(int argc, char** argv){
     string line;
     string filename;
-
+    vector<component> interfaces;
 
     for( int i = 0; i < argc; ++i)
      if (strcmp(argv[i], "-f") == 0) filename = argv[i+1]; // need to check if it exists will crash otherwise
@@ -47,6 +47,7 @@ int main(int argc, char** argv){
              double k = stod(csv.getfield(1)); 
              double c = stod(csv.getfield(2)); 
              component comp(k,c);
+			 interfaces.push_back(comp);
              machine2.append(comp);
         }
 
@@ -90,17 +91,22 @@ int main(int argc, char** argv){
                 double dw = w_max / 100.;
 
                        char outputstr[MAXLINE];
-                       ofstream os, ifos, iaos;
+                       ofstream os, ifos, iaos, apmos;
                        os.open("fra-transmissibility.dat",ios_base::out);
-                       ifos.open("fra-interface-force.dat",ios_base::out);
-                       iaos.open("fra-interface-accel.dat",ios_base::out);
-
+                       ifos.open("fra-interface-forces.dat",ios_base::out);
+                       iaos.open("fra-interface-accels.dat",ios_base::out);
+                       apmos.open("fra-apparent-mass.dat",ios_base::out);
+						
                        if (!os) {
                                 cerr << "can not open fra-transmissibility.dat\n";
                                 return -1;
                        }
                        sprintf(outputstr,"%12s","Frequency,Hz");
                        os << outputstr;
+					   ifos << outputstr;
+					   iaos << outputstr;
+					   apmos << outputstr;
+					   
                        for(int i = 2; i <= n; ++i){
                            char output[MAXLINE];
                            sprintf(output,"point#%d",i);
@@ -109,6 +115,20 @@ int main(int argc, char** argv){
                        }
                        sprintf(outputstr, "\n");
                        os << outputstr;
+
+                       for(int i = 1; i <= interfaces.size(); ++i){
+                           char output[MAXLINE];
+                           sprintf(output,"comp#%d",i);
+                           sprintf(outputstr, "%12s", output);
+                           ifos << outputstr;
+						   ifaos << outputstr;
+						   apmos << outputstr;
+                       }
+                       sprintf(outputstr, "\n");
+                       ifos << outputstr;
+					   ifaos << outputstr;
+					   apmos << outputstr;
+					   
 
                 while (w < w_max){
                        fcomplex* A = (-w * w * machine2.M + imag * w * machine2.D + machine2.K) * Eu - Ef; 
@@ -120,7 +140,8 @@ int main(int argc, char** argv){
                        fcomplex* b = ( w * w * machine2.M + imag * (-w) * machine2.D + (-1.) *  machine2.K) * X0;
                        fcomplex* x = cgauss(n, A, b);
                        double freq = w / (2 * M_PI);
-                       sprintf(outputstr,"%12.2f",freq);
+                       
+					   sprintf(outputstr,"%12.2f",freq);
                        os << outputstr;
                        for(int i = 2; i <= n; ++i){
                            sprintf(outputstr, "%12.4f",cabs(x[i-1])/x0);
@@ -128,11 +149,44 @@ int main(int argc, char** argv){
                        }
                        sprintf(outputstr, "\n");
                        os << outputstr;
+					   
+					   sprintf(outputstr,"%12.2f",freq);
+                       ifos << outputstr;
+					   iaos << outputstr;
+					   apmos << outputstr;
+					   
+                       for(int i = 0; i < interfaces.size(); ++i){
+						   
+						   double k = interfaces[i].get_k();
+						   double c = interfaces[i].get_d();
+						   fcomplex dx = x[i] - x[i + 1];
+						   
+						   fcomplex force = (k + imag * w * c) * dx; //interface load calculation
+						   
+                           sprintf(outputstr, "%12.4f",cabs(force));
+                           ifos << outputstr;
+						  
+						   fcomplex acceleration = -w * w * dx; //interface acceleration calculation
+                           sprintf(outputstr, "%12.4f",cabs(acceleration));
+                           iaos << outputstr;
+						  
+						   fcomplex mass = force/acceleration; //aparent mass calculation
+                           sprintf(outputstr, "%12.4f",cabs(mass));
+                           apmos << outputstr;
+
+                       }
+                       sprintf(outputstr, "\n");
+                       os << outputstr;
+					   ifos << outputstr;
+					   iaos << outputstr;
+					   apmos << outputstr;
+
                        w += dw;
                 }
                 os.close();
                 ifos.close();
                 iaos.close();
+				apmos.close();
 
                 os.open("gnuplot-fra-transmissibility.dat",ios_base::out);
                 os << "set title \"Machine System \\n FRA(Transmissibility)\"" << endl;
