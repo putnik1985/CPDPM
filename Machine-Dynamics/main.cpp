@@ -238,7 +238,7 @@ int main(int argc, char** argv){
                 os << "set grid" << endl;
                 os << "set xlabel \"Frequency, Hz\""<< endl;
                 os << "set ylabel \"Acceleration\" " << endl;
-                sprintf(outputstr,"plot 'fra-interface-accelsfra-interface-accels.dat' using 1:2 title columnhead with lines,\\\n");
+                sprintf(outputstr,"plot 'fra-interface-accels.dat' using 1:2 title columnhead with lines,\\\n");
                 os << outputstr;
                 for(int i = 3; i < interfaces.size(); ++i){
                     sprintf(outputstr,"     'fra-interface-accels.dat' using 1:%d title columnhead with lines,\\\n", i);
