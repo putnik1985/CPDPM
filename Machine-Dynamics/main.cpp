@@ -146,8 +146,6 @@ int main(int argc, char** argv){
                            sprintf(outputstr, "%12.4f",cabs(x[i-1])/x0);
                            os << outputstr;
                        }
-                       sprintf(outputstr, "\n");
-                       os << outputstr;
 					   
 					   sprintf(outputstr,"%12.2f",freq);
                        ifos << outputstr;
@@ -161,7 +159,7 @@ int main(int argc, char** argv){
 						   fcomplex dx = csub(x[i],x[i + 1]);
 			 			   fcomplex force = cmul(k + imag * w * c, dx); //interface load calculation
 						   
-                           sprintf(outputstr, "%12.4f",cabs(force));
+                           sprintf(outputstr, "%24.4f",cabs(force));
                            ifos << outputstr;
 						  
 						   fcomplex acceleration = -w * w * dx; //interface acceleration calculation
@@ -173,15 +171,16 @@ int main(int argc, char** argv){
                            apmos << outputstr;
 
                        }
+					   
                        sprintf(outputstr, "\n");
-                       os << outputstr;
-					   ifos << outputstr;
-					   iaos << outputstr;
+                          os << outputstr;
+					    ifos << outputstr;
+					    iaos << outputstr;
 					   apmos << outputstr;
 
                        w += dw;
 ///////////////////////////////////////////////////////////
-		       return -1;			   
+///////////////////////////////////		       return -1;			   
 ///////////////////////////////////////////////////////////
                 }
                 os.close();
@@ -209,7 +208,7 @@ int main(int argc, char** argv){
 
                 system("gnuplot -persist -e \"call 'gnuplot-fra-transmissibility.dat'\"");
 
-				n = interfaces.size();
+				
 				//----------------------------------------------------------------------------
 				// write interface loads fra 
 				//----------------------------------------------------------------------------
@@ -221,7 +220,7 @@ int main(int argc, char** argv){
                 os << "set ylabel \"Force\" " << endl;
                 sprintf(outputstr,"plot 'fra-interface-forces.dat' using 1:2 title columnhead with lines,\\\n");
                 os << outputstr;
-                for(int i = 3; i < n; ++i){
+                for(int i = 3; i < interfaces.size(); ++i){
                     sprintf(outputstr,"     'fra-interface-forces.dat' using 1:%d title columnhead with lines,\\\n", i);
                     os << outputstr;
                 }
@@ -241,7 +240,7 @@ int main(int argc, char** argv){
                 os << "set ylabel \"Acceleration\" " << endl;
                 sprintf(outputstr,"plot 'fra-interface-accelsfra-interface-accels.dat' using 1:2 title columnhead with lines,\\\n");
                 os << outputstr;
-                for(int i = 3; i < n; ++i){
+                for(int i = 3; i < interfaces.size(); ++i){
                     sprintf(outputstr,"     'fra-interface-accels.dat' using 1:%d title columnhead with lines,\\\n", i);
                     os << outputstr;
                 }
@@ -261,7 +260,7 @@ int main(int argc, char** argv){
                 os << "set ylabel \"Aparent Mass\" " << endl;
                 sprintf(outputstr,"plot 'fra-apparent-mass.dat' using 1:2 title columnhead with lines,\\\n");
                 os << outputstr;
-                for(int i = 3; i < n; ++i){
+                for(int i = 3; i < interfaces.size(); ++i){
                     sprintf(outputstr,"     'fra-apparent-mass.dat' using 1:%d title columnhead with lines,\\\n", i);
                     os << outputstr;
                 }
