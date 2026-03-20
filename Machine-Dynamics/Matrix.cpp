@@ -275,9 +275,15 @@ fcomplex operator*(const T b, const fcomplex a){
 }
 
 template<typename T>
-fcomplex operator+(const fcomplex a, const T b){
-  return {a.r + b, a.i };
+fcomplex operator+(const T b, const fcomplex a){
+  return {a.r + b, a.i};
 }
+ 
+template<typename T>
+fcomplex operator+(const fcomplex a, const T b){
+  return {a.r + b, a.i};
+}
+
 
 template<typename T>
 fcomplex* operator+(const Matrix<T>& A, fcomplex* B){

@@ -1,0 +1,7 @@
+set title "Machine System \n FRA(Interface Aparent Mass)"
+set logscale
+set grid
+set xlabel "Frequency, Hz"
+set ylabel "Aparent Mass" 
+plot 'fra-apparent-mass.dat' using 1:2 title columnhead with lines,\
+     'fra-apparent-mass.dat' using 1:2 title columnhead with lines

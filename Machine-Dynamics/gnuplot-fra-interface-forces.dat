@@ -1,0 +1,7 @@
+set title "Machine System \n FRA(Interface Loads)"
+set logscale
+set grid
+set xlabel "Frequency, Hz"
+set ylabel "Force" 
+plot 'fra-interface-forces.dat' using 1:2 title columnhead with lines,\
+     'fra-interface-forces.dat' using 1:2 title columnhead with lines

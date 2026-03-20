@@ -121,14 +121,13 @@ int main(int argc, char** argv){
                            sprintf(output,"comp#%d",i);
                            sprintf(outputstr, "%12s", output);
                            ifos << outputstr;
-						   ifaos << outputstr;
-						   apmos << outputstr;
+			   iaos << outputstr;
+			   apmos << outputstr;
                        }
                        sprintf(outputstr, "\n");
                        ifos << outputstr;
-					   ifaos << outputstr;
-					   apmos << outputstr;
-					   
+		       iaos << outputstr;
+		       apmos << outputstr;
 
                 while (w < w_max){
                        fcomplex* A = (-w * w * machine2.M + imag * w * machine2.D + machine2.K) * Eu - Ef; 
@@ -159,9 +158,8 @@ int main(int argc, char** argv){
 						   
 						   double k = interfaces[i].get_k();
 						   double c = interfaces[i].get_d();
-						   fcomplex dx = x[i] - x[i + 1];
-						   
-						   fcomplex force = (k + imag * w * c) * dx; //interface load calculation
+						   fcomplex dx = csub(x[i],x[i + 1]);
+			 			   fcomplex force = cmul(k + imag * w * c, dx); //interface load calculation
 						   
                            sprintf(outputstr, "%12.4f",cabs(force));
                            ifos << outputstr;
@@ -170,7 +168,7 @@ int main(int argc, char** argv){
                            sprintf(outputstr, "%12.4f",cabs(acceleration));
                            iaos << outputstr;
 						  
-						   fcomplex mass = force/acceleration; //aparent mass calculation
+						   fcomplex mass = cdiv(force,acceleration); //aparent mass calculation
                            sprintf(outputstr, "%12.4f",cabs(mass));
                            apmos << outputstr;
 
@@ -182,6 +180,9 @@ int main(int argc, char** argv){
 					   apmos << outputstr;
 
                        w += dw;
+///////////////////////////////////////////////////////////
+		       return -1;			   
+///////////////////////////////////////////////////////////
                 }
                 os.close();
                 ifos.close();
@@ -207,6 +208,7 @@ int main(int argc, char** argv){
                 os.close();
 
                 system("gnuplot -persist -e \"call 'gnuplot-fra-transmissibility.dat'\"");
+
 				n = interfaces.size();
 				//----------------------------------------------------------------------------
 				// write interface loads fra 
