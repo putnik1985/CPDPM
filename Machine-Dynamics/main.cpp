@@ -91,12 +91,13 @@ int main(int argc, char** argv){
                 double dw = w_max / 100.;
 
                        char outputstr[MAXLINE];
-                       ofstream os, ifos, iaos, apmos;
+                       ofstream os, ifos, iaos, apmos, aos;
                        os.open("fra-transmissibility.dat",ios_base::out);
                        ifos.open("fra-interface-forces.dat",ios_base::out);
                        iaos.open("fra-interface-accels.dat",ios_base::out);
                        apmos.open("fra-apparent-mass.dat",ios_base::out);
-						
+					   aos.open("fra-accels.dat",ios_base::out);
+					   
                        if (!os) {
                                 cerr << "can not open fra-transmissibility.dat\n";
                                 return -1;
@@ -124,6 +125,7 @@ int main(int argc, char** argv){
 			   iaos << outputstr;
 			   apmos << outputstr;
                        }
+					   
                        sprintf(outputstr, "\n");
                        ifos << outputstr;
 		       iaos << outputstr;
@@ -187,6 +189,7 @@ int main(int argc, char** argv){
                 ifos.close();
                 iaos.close();
 				apmos.close();
+				aos.close();
 				//----------------------------------------------------------------------------
 				// write transmisibility fra 
 				//----------------------------------------------------------------------------
