@@ -18,7 +18,8 @@ int main(int argc, char** argv){
     string line;
     string filename;
     vector<component> interfaces;
-
+    vector<lumped_mass> masses;
+	
     for( int i = 0; i < argc; ++i){
      if (strcmp(argv[i], "-f") == 0) filename = argv[i+1]; // need to check if it exists will crash otherwise
     }
@@ -36,6 +37,7 @@ int main(int argc, char** argv){
 
     Csv csv(ifs);
     while (csv.getline(line) != 0) {
+		
 /*****************************************************
         cout << "line = '" << line << "'\n";
         for (int i = 0; i < csv.getnfield(); i++)
@@ -55,6 +57,7 @@ int main(int argc, char** argv){
              double m = stod(csv.getfield(1)); 
              lumped_mass lmass(m);
              machine2.append(lmass);
+			 masses.push_back(lmass);
              global_nodes.push_back(x0+=1.);
         }
         if (csv.getfield(0).compare("_analysis") == 0 ){
@@ -87,7 +90,7 @@ int main(int argc, char** argv){
                 
                 //cout << Eu << Ef;
                 //return -1;
-                double w = 0.0;
+                double w = 0.000001;
                 double dw = w_max / 100.;
 
                        char outputstr[MAXLINE];
@@ -150,6 +153,8 @@ int main(int argc, char** argv){
                        X0(1) = x0; //dof of excitation
                        fcomplex* b = ( w * w * machine2.M + imag * (-w) * machine2.D + (-1.) *  machine2.K) * X0;
                        fcomplex* x = cgauss(n, A, b);
+					   // vector of unknowns (force, disp, disp,...), x[0] - force, x[1], x[..] - disp, as disp at initial point is defined
+					   // so for the unknown for the predefined grid can be taken force at this point
                        double freq = w / (2 * M_PI);
                        
 					   sprintf(outputstr,"%12.2f",freq);
@@ -162,7 +167,11 @@ int main(int argc, char** argv){
 
 					   sprintf(outputstr,"%12.2f",freq);
                        aos << outputstr;
-                       for(int i = 1; i <= n; ++i){   
+					       double base_disp = cabs(x[0] / (masses[0] * w * w))
+                           sprintf(outputstr, "%24.4f", base_disp);
+                           aos << outputstr;	
+						   
+                       for(int i = 2; i <= n; ++i){   
                            sprintf(outputstr, "%24.4f",cabs(x[i-1]));
                            aos << outputstr;
                        }
