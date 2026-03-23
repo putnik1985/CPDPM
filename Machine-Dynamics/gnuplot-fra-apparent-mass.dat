@@ -4,4 +4,4 @@ set grid
 set xlabel "Frequency, Hz"
 set ylabel "Aparent Mass" 
 plot 'fra-apparent-mass.dat' using 1:2 title columnhead with lines,\
-     'fra-apparent-mass.dat' using 1:2 title columnhead with lines
+     'fra-apparent-mass.dat' using 1:3 title columnhead with lines

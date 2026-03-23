@@ -148,7 +148,7 @@ int main(int argc, char** argv){
                        for(int i=1; i<=n; ++i)
                            X0(i) = 0.;
 
-                       X0(1) = x0; //dof of excitation
+                       X0(1) = x0 / (-w*w); //dof of excitation
                        fcomplex* b = ( w * w * machine2.M + imag * (-w) * machine2.D + (-1.) *  machine2.K) * X0;
                        fcomplex* x = cgauss(n, A, b);
                        double freq = w / (2 * M_PI);
@@ -220,7 +220,7 @@ int main(int argc, char** argv){
                 os << "set logscale" << endl;
                 os << "set grid" << endl;
                 os << "set xlabel \"Frequency, Hz\""<< endl;
-                os << "set ylabel \"Q\" " << endl;
+                os << "set ylabel \"Acceleration\" " << endl;
                 sprintf(outputstr,"plot 'fra-accels.dat' using 1:2 title columnhead with lines,\\\n");
                 os << outputstr;
                 for(int i = 3; i < n + 1; ++i){

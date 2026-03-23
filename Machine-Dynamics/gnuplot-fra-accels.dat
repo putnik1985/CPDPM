@@ -1,0 +1,8 @@
+set title "Machine System \n FRA(Accelerations)"
+set logscale
+set grid
+set xlabel "Frequency, Hz"
+set ylabel "Acceleration" 
+plot 'fra-accels.dat' using 1:2 title columnhead with lines,\
+     'fra-accels.dat' using 1:3 title columnhead with lines,\
+     'fra-accels.dat' using 1:4 title columnhead with lines
