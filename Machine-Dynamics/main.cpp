@@ -127,7 +127,6 @@ int main(int argc, char** argv){
                        sprintf(outputstr, "\n");
                        aos << outputstr;
 
-
                        for(int i = 1; i <= interfaces.size(); ++i){
                            char output[MAXLINE];
                            sprintf(output,"comp#%d",i);
@@ -148,7 +147,7 @@ int main(int argc, char** argv){
                        for(int i=1; i<=n; ++i)
                            X0(i) = 0.;
 
-                       X0(1) = x0 / (-w*w); //dof of excitation
+                       X0(1) = x0; //dof of excitation
                        fcomplex* b = ( w * w * machine2.M + imag * (-w) * machine2.D + (-1.) *  machine2.K) * X0;
                        fcomplex* x = cgauss(n, A, b);
                        double freq = w / (2 * M_PI);
@@ -164,7 +163,7 @@ int main(int argc, char** argv){
 					   sprintf(outputstr,"%12.2f",freq);
                        aos << outputstr;
                        for(int i = 1; i <= n; ++i){   
-                           sprintf(outputstr, "%12.4f",cabs(w * w * x[i-1]));
+                           sprintf(outputstr, "%24.4f",cabs(x[i-1]));
                            aos << outputstr;
                        }
 
@@ -185,11 +184,11 @@ int main(int argc, char** argv){
                            ifos << outputstr;
 						  
 						   fcomplex acceleration = -w * w * dx; //interface acceleration calculation
-                           sprintf(outputstr, "%12.4f",cabs(acceleration));
+                           sprintf(outputstr, "%24.4f",cabs(acceleration));
                            iaos << outputstr;
 						  
 						   fcomplex mass = cdiv(force,acceleration); //aparent mass calculation
-                           sprintf(outputstr, "%12.4f",cabs(mass));
+                           sprintf(outputstr, "%24.4f",cabs(mass));
                            apmos << outputstr;
 
                        }
