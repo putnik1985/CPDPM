@@ -19,9 +19,9 @@ int main(int argc, char** argv){
     string filename;
     vector<component> interfaces;
 
-    for( int i = 0; i < argc; ++i)
+    for( int i = 0; i < argc; ++i){
      if (strcmp(argv[i], "-f") == 0) filename = argv[i+1]; // need to check if it exists will crash otherwise
-
+    }
     
     ifstream ifs(filename.c_str());
     if (!ifs){
@@ -107,6 +107,7 @@ int main(int argc, char** argv){
 					   ifos << outputstr;
 					   iaos << outputstr;
 					   apmos << outputstr;
+					   aos << outputstr;
 					   
                        for(int i = 2; i <= n; ++i){
                            char output[MAXLINE];
@@ -116,6 +117,16 @@ int main(int argc, char** argv){
                        }
                        sprintf(outputstr, "\n");
                        os << outputstr;
+
+                       for(int i = 1; i <= n; ++i){
+                           char output[MAXLINE];
+                           sprintf(output,"point#%d",i);
+                           sprintf(outputstr, "%12s", output);
+                           aos << outputstr;
+                       }
+                       sprintf(outputstr, "\n");
+                       aos << outputstr;
+
 
                        for(int i = 1; i <= interfaces.size(); ++i){
                            char output[MAXLINE];
@@ -148,6 +159,15 @@ int main(int argc, char** argv){
                            sprintf(outputstr, "%12.4f",cabs(x[i-1])/x0);
                            os << outputstr;
                        }
+
+
+					   sprintf(outputstr,"%12.2f",freq);
+                       aos << outputstr;
+                       for(int i = 1; i <= n; ++i){   
+                           sprintf(outputstr, "%12.4f",cabs(w * w * x[i-1]));
+                           aos << outputstr;
+                       }
+
 					   
 					   sprintf(outputstr,"%12.2f",freq);
                        ifos << outputstr;
@@ -176,6 +196,7 @@ int main(int argc, char** argv){
 					   
                        sprintf(outputstr, "\n");
                           os << outputstr;
+                         aos << outputstr;						  
 					    ifos << outputstr;
 					    iaos << outputstr;
 					   apmos << outputstr;
@@ -190,6 +211,28 @@ int main(int argc, char** argv){
                 iaos.close();
 				apmos.close();
 				aos.close();
+
+				//----------------------------------------------------------------------------
+				// write acceleration fra 
+				//----------------------------------------------------------------------------
+                os.open("gnuplot-fra-accels.dat",ios_base::out);
+                os << "set title \"Machine System \\n FRA(Accelerations)\"" << endl;
+                os << "set logscale" << endl;
+                os << "set grid" << endl;
+                os << "set xlabel \"Frequency, Hz\""<< endl;
+                os << "set ylabel \"Q\" " << endl;
+                sprintf(outputstr,"plot 'fra-accels.dat' using 1:2 title columnhead with lines,\\\n");
+                os << outputstr;
+                for(int i = 3; i < n + 1; ++i){
+                    sprintf(outputstr,"     'fra-accels.dat' using 1:%d title columnhead with lines,\\\n", i);
+                    os << outputstr;
+                }
+                    sprintf(outputstr,"     'fra-accels.dat' using 1:%d title columnhead with lines\n", n + 1);
+                    os << outputstr;
+                os.close();
+
+                system("gnuplot -persist -e \"call 'gnuplot-fra-accels.dat'\"");
+				
 				//----------------------------------------------------------------------------
 				// write transmisibility fra 
 				//----------------------------------------------------------------------------
