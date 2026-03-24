@@ -90,7 +90,7 @@ int main(int argc, char** argv){
                 
                 //cout << Eu << Ef;
                 //return -1;
-                double w = 0.000001;
+                double w = 0.;
                 double dw = w_max / 100.;
 
                        char outputstr[MAXLINE];
@@ -150,13 +150,19 @@ int main(int argc, char** argv){
                        for(int i=1; i<=n; ++i)
                            X0(i) = 0.;
 
-                       X0(1) = x0; //dof of excitation
+                       //X0(1) = x0 / (-w*w); //dof of excitation, x0 is in the acceleration
+                       //                     //convert to displacement
+
+                       X0(1) = x0;           //dof of excitation, x0 is in the disp
+                                            //convert to displacement
+
                        fcomplex* b = ( w * w * machine2.M + imag * (-w) * machine2.D + (-1.) *  machine2.K) * X0;
                        fcomplex* x = cgauss(n, A, b);
 					   // vector of unknowns (force, disp, disp,...), x[0] - force, x[1], x[..] - disp, as disp at initial point is defined
 					   // so for the unknown for the predefined grid can be taken force at this point
                        double freq = w / (2 * M_PI);
-                       x[0] = x[0] / (-masses[0] * w * w); // convert force to displacement
+                       auto mass = masses[0].get_m();
+                       x[0] = x[0] / (-mass * w * w); // convert force to displacement
 					   
 					   
 					   sprintf(outputstr,"%12.2f",freq);
@@ -167,9 +173,10 @@ int main(int argc, char** argv){
                        }
 
 
-			   
+					   sprintf(outputstr,"%12.2f",freq);
+                       aos << outputstr;
                        for(int i = 0; i < n; ++i){   
-                           sprintf(outputstr, "%24.4f",cabs(x[i]));
+                           sprintf(outputstr, "%24.4f",cabs(w * w * x[i]));
                            aos << outputstr;
                        }
 
@@ -184,6 +191,8 @@ int main(int argc, char** argv){
 						   double k = interfaces[i].get_k();
 						   double c = interfaces[i].get_d();
 						   fcomplex dx = csub(x[i],x[i + 1]);
+                                                   ///cout << freq << " " << x[i].r << " " << x[i].i << endl;
+                                                   ////cout << x[i+1].r << " " << x[i+1].i << endl;
 			 			   fcomplex force = cmul(k + imag * w * c, dx); //interface load calculation
 						   
                            sprintf(outputstr, "%24.4f",cabs(force));

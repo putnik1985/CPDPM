@@ -265,6 +265,11 @@ fcomplex* operator*(const fcomplex b, const Matrix<T>& A){
 }
 
 template<typename T>
+fcomplex operator/(const fcomplex a, const T b){
+  return {a.r / b, a.i / b};
+}
+
+template<typename T>
 fcomplex operator*(const fcomplex a, const T b){
   return {a.r * b, a.i * b};
 }
@@ -366,3 +371,5 @@ int natural_modes(Matrix<T> M, Matrix<T> K){
     return 0;
 }
 ********************************************************/
+
+
