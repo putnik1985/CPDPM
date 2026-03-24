@@ -156,7 +156,9 @@ int main(int argc, char** argv){
 					   // vector of unknowns (force, disp, disp,...), x[0] - force, x[1], x[..] - disp, as disp at initial point is defined
 					   // so for the unknown for the predefined grid can be taken force at this point
                        double freq = w / (2 * M_PI);
-                       
+                       x[0] = x[0] / (-masses[0] * w * w); // convert force to displacement
+					   
+					   
 					   sprintf(outputstr,"%12.2f",freq);
                        os << outputstr;
                        for(int i = 2; i <= n; ++i){
@@ -165,14 +167,9 @@ int main(int argc, char** argv){
                        }
 
 
-					   sprintf(outputstr,"%12.2f",freq);
-                       aos << outputstr;
-					       double base_disp = cabs(x[0] / (masses[0] * w * w))
-                           sprintf(outputstr, "%24.4f", base_disp);
-                           aos << outputstr;	
-						   
-                       for(int i = 2; i <= n; ++i){   
-                           sprintf(outputstr, "%24.4f",cabs(x[i-1]));
+			   
+                       for(int i = 0; i < n; ++i){   
+                           sprintf(outputstr, "%24.4f",cabs(x[i]));
                            aos << outputstr;
                        }
 
@@ -259,7 +256,6 @@ int main(int argc, char** argv){
                     sprintf(outputstr,"     'fra-transmissibility.dat' using 1:%d title columnhead with lines\n", n);
                     os << outputstr;
                 os.close();
-
                 system("gnuplot -persist -e \"call 'gnuplot-fra-transmissibility.dat'\"");
 
 				
