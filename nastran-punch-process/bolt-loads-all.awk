@@ -2,8 +2,8 @@ BEGIN{
 	type["cbush"] = 102; ## nastran nx element type from .pch file
 	type["cbar"] = 34; ## nastran nx element type from .pch file
 	
-	if (ARGC < 4){
-		print "usage awk -f bolt-loads.awk file=inp.pch label=cbar bolts_id=bolts.txt";
+	if (ARGC < 2){
+		print "usage awk -f bolt-loads.awk file=inp.pch";
 		exit;
 	}
 
@@ -18,20 +18,23 @@ BEGIN{
 	label  = data["label"];
 	boltsf = data["bolts_id"]
 
-    ###print file, label, eid
+    ####print file, label, eid
 	type_number = type[label];
 	###print type_number;
 	####exit;
-	
-	printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq", "Elem", "MZZ-A", "MYY-A", "MZZ-B", "MYY-B", "Shear-Y", "Shear-Z", "Axial", "Torque")
+	sta = 1
+	###################printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","Subcase#", "Freq", "Elem", "MZZ-A", "MYY-A", "MZZ-B", "MYY-B", "Shear-Y", "Shear-Z", "Axial", "Torque")
 	count = 0
 	while (getline < file > 0){
+	    ###print $0
 		if ($0 ~ /SUBCASE ID/){
 			case_number = $4;
-			
+			###print case_number
 			if (getline < file >0){
-				if ($0 ~ /ELEMENT TYPE/ && $4 == type[label]){
+			    ###print $0
+				if ($0 ~ /ELEMENT TYPE/ && $4 == type["cbar"]){
 				    ++count
+					#####print $0
 					if (getline < file > 0){
 						eid = $1
 					}
@@ -76,11 +79,11 @@ BEGIN{
 					    max_torque[count] = abs(torque);
 					}
 					
-                    str = sprintf("%12d%12d%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n",case_number, 0, eid, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
-					####print str
-					id = count "," eid
+                    str = sprintf("%12d,%12d,%12d,%12d,%12d,%12d,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,", 1, eid, case_number, type["cbar"], freq, sta, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
+					print str
+					##id = count "," eid
 					##print id
-					bolts[id] = str
+					##bolts[id] = str
 					if (getline < file > 0){
 						eid = $1
 					} else {
@@ -95,24 +98,6 @@ BEGIN{
 		}
 
 	}
-                        bolts_number = 0 
-				        while(getline < boltsf > 0){
-	                      bolt_idf[++bolts_number] = $1
-	                    }
-
-	                
-					##############print "bolts: ", bolts_number
-					for(i = 1; i <= count; ++i){
-				          for(j=1; j<=bolts_number; ++j){
-						      eid = i "," bolt_idf[j]
-     	                      printf("%s", bolts[eid])
-						  }
-	                    
-                    }		
-
-                    printf("\n%16s%16s%16s%16s%16s\n","Subcase#", "Moment, lbf.in", "Shear, lbf", "Axial, lbf", "Torque, lbf.in");	
-                    for(i=1; i<=count; ++i)
-                     	printf("%16d%16.1f%16.1f%16.1f%16.1f\n", i, max_moment[i], max_shear[i], max_axial[i], max_torque[i]);				
 }
 
 function abs(x){

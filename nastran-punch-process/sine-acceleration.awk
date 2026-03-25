@@ -25,17 +25,23 @@ BEGIN{
 			readline();
 			if (subcase != $4) continue;
 			
-			readline();
-			freq = $3
+			
             scale = 1./G;
+			readline();
+			if (point_id == $4) {
 			    while (getline < file > 0 && $0 !~ /\$TITLE/){
-				if (point_id != $1) continue;
+				freq = $1
 				ax = $3 * scale;
 				ay = $4 * scale;
 				az = $5 * scale;
-			    printf("%12.1f,%12.8f,%12.8f,%12.8f,\n", freq, ax, ay, az)
+				if (freq ~ /[0-9]/){
+			        printf("%12.1f,%12.8f,%12.8f,%12.8f,\n", freq, ax, ay, az)
+                }
+				
 				}
+			}
 		}###if ($0 ~ /\$ACCELERATION/)
+
 
 	}####while (getline < file > 0)
 }
