@@ -76,7 +76,7 @@ BEGIN{
 					    max_torque[count] = abs(torque);
 					}
 					
-                    str = sprintf("%12d%12d%12d%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f%12.1f\n",case_number, 0, eid, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
+                    str = sprintf("%12d%12d%12d%12.4f%12.4f%12.4f%12.4f%12.4f%12.4f%12.4f%12.4f\n",case_number, 0, eid, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
 					####print str
 					id = count "," eid
 					##print id

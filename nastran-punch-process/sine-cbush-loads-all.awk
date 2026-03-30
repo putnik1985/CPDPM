@@ -1,11 +1,11 @@
-BEGIN{ 
-	type["cbush"] = 102; ## nastran nx element type from .pch file
+BEGIN{
 
-	if (ARGC < 2){
-		print "usage awk -f qs-loads.awk file=inp.pch";
-		exit;
-	}
+      if (ARGC < 2){
+	       print "usage: awk -f sine-cbush-loads.awk file=input.pch";
+	       exit;
+       }
 
+        type["cbush"] = 102;
 	for(i=1; i <= ARGC; i++){
 	     input = ARGV[i];
 	     split(input,a,"=");
@@ -13,24 +13,22 @@ BEGIN{
 	     data[a[1]] = a[2];
         }
 
-	 file  = data["file"];
-	label  = data["label"];
-	  eid  = data["id"];
-	   pi  = 3.14159
-	   
-        ######print file, label, eid
-	type_number = type[label];
-	sta = 1
-	####print type_number;
-	####printf("%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,\n","Subcase#", "Fx", "Fy", "Fz", "Rx", "Ry", "Rz", "FResultant", "MResultant" )
+	     file  = data["file"];
+     	  eid  = data["cbush"];
+        label  = "cbush";
+    	type_number = type[label];
+    	record = 0;
+		
 	while (getline < file > 0){
-	    
 		if ($0 ~ /SUBCASE ID/){
-			case_number = $4;
+		    subcase_num = $4;
+				
 			if (getline < file >0){
 				if ($0 ~ /ELEMENT TYPE/ && $4 == type["cbush"]){
-				###########print case_number
-				    ####print $0
+				    readline()
+					freq = $3
+					##print freq
+					##exit
 				    while (getline < file > 0 && $0 !~ /\$TITLE/){
 				      ++count
 					  ###########print count
@@ -43,20 +41,20 @@ BEGIN{
 					  my = $3
 					  mz = $4
 					  printf("%12d,%12d,%12d,%12d,%12d,%12d,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,\n", 1, eid, case_number, type["cbush"], freq, sta,  my, mz, my, mz, fy, fz, fx, mx)
+                      readline()
+					  readline()
 				    }
-				}
-					      
-						  					  
+				}			  					  
 		    }
-		}
+		} ####if ($0 ~ /SUBCASE ID/)
 	}
 }
 
-function abs(x){
-  if (x > 0) 
-      return x
-  else 
-      return -x;
+function max(a,b){
+	if (a > b)
+            return a;
+	else 
+	    return b;
 }
 
 function readline(){

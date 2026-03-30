@@ -78,8 +78,9 @@ BEGIN{
 					if (max_torque[count] < abs(torque)) {
 					    max_torque[count] = abs(torque);
 					}
+					####mza +=, mya, mzb, myb, shear_y, shear_z, axial, torque
 					
-                    str = sprintf("%12d,%12d,%12d,%12d,%12d,%12d,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,%12.1f,", 1, eid, case_number, type["cbar"], freq, sta, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
+                    str = sprintf("%12d,%12d,%12d,%12d,%12d,%12d,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,", 1, eid, case_number, type["cbar"], freq, sta, mza, mya, mzb, myb, shear_y, shear_z, axial, torque)
 					print str
 					##id = count "," eid
 					##print id
