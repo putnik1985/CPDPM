@@ -25,6 +25,10 @@ BEGIN{
 	####printf("%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,%12s,\n","Subcase#", "Fx", "Fy", "Fz", "Rx", "Ry", "Rz", "FResultant", "MResultant" )
 	while (getline < file > 0){
 	    
+    if ($0 ~ /\$ELEMENT FORCES/){
+        readline()
+		readline()
+		
 		if ($0 ~ /SUBCASE ID/){
 			case_number = $4;
 			if (getline < file >0){
@@ -37,19 +41,20 @@ BEGIN{
 				      eid = $1
                       fx = $2
 					  fy = $3
-					  fz = $4
+					  fz = adapt($4)
 					  readline()
 					  mx = $2
 					  my = $3
-					  mz = $4
+					  mz = adapt($4)
 					  printf("%12d,%12d,%12d,%12d,%12d,%12d,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,%12.4f,\n", 1, eid, case_number, type["cbush"], freq, sta,  my, mz, my, mz, fy, fz, fx, mx)
 				    }
 				}
 					      
 						  					  
 		    }
-		}
-	}
+		} ## subcase id
+	  } ## element forces
+	} ## while getline
 }
 
 function abs(x){
@@ -66,4 +71,12 @@ function readline(){
        printf("can not read file:%s\n", file);
 	   exit;
 	   }
+}
+
+function adapt(vm){
+	if (NF < 5){ 
+		s = vm; 
+	    vm = substr(s, 1, length(s) - 8)
+	}
+    return vm
 }

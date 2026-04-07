@@ -27,6 +27,11 @@ BEGIN{
 	count = 0
 	while (getline < file > 0){
 	    ###print $0
+
+    if ($0 ~ /\$ELEMENT FORCES/){
+        readline()
+		readline()
+		
 		if ($0 ~ /SUBCASE ID/){
 			case_number = $4;
 			###print case_number
@@ -42,13 +47,13 @@ BEGIN{
 					while (eid !~ /TITLE/){
 					
 					    mza = $2
-						mya = -$3
-						mzb = $4
+						mya = $3
+						mzb = adapt($4)
 
 					if (getline < file > 0){
 						myb = -$2
 						shear_y = $3
-						shear_z = $4
+						shear_z = adapt($4)
 					}
 
 					if (getline < file > 0){
@@ -96,12 +101,29 @@ BEGIN{
 				}
 			}
 
-		}
-
-	}
+		} ## subcase id
+	  } ## element forces
+	} ## getline
 }
 
 function abs(x){
  return (x>0) ? x : -x;
 }
 
+function adapt(vm){
+	if (NF < 5){ 
+		s = vm; 
+	    vm = substr(s, 1, length(s) - 8)
+	}
+    return vm
+}	
+
+
+function readline(){
+   err = getline < file;
+   if (err < 0){
+       print "can not read file: " file;
+	   exit;
+   } else 
+       return err;
+}
