@@ -23,7 +23,7 @@ BEGIN{
 	######print "Elements To Work With"
 	while(getline < elements > 0){
 	  list[++nlist] = $1
-	  #####print $1
+	  ##print $1
 	}
 
 	while (readline()){
@@ -43,6 +43,7 @@ BEGIN{
 			       while(readline() && $0 !~ /TITLE/){
 
 				         id = $1
+						 ####print id
                          if (id !~ /^[0-9]/)
                              continue
 							 
@@ -128,8 +129,10 @@ BEGIN{
 							    ##########print k
 							    ngroup = 0
 								element_file = list[k]
+								###print element_file
 								while (getline < element_file > 0){
 								       group[++ngroup] = $1
+									   ##print $1
 								}
 	                                  vm_max = 0.;
 									  freq_max = 0.;
@@ -137,14 +140,18 @@ BEGIN{
 	                                  for(i=1; i<=ngroup; ++i){
                                                id = group[i]
                                                num = sprintf("%d",id)
-											   if (stress[num] > vm_max){
+											   ####print num, stress[num],vm_max
+											   str = sprintf("%g",stress[num])
+											   ###print id, stress[num], vm_max, stress[num]-vm_max
+											   delta = stress[num]-vm_max
+											   if (delta > 0.){
 											       vm_max = stress[num]
 												   freq_max = frequency[num]
 												   id_max = num
 											   }
-                                               #####printf("%d,%.2f,%s\n", num, frequency[num], stress[num])
+                                               ##printf("%d,%.2f,%s\n", num, frequency[num], stress[num])
                                       }
-									  output = element_file file ".stress" 
+									  output = element_file "-" file ".stress" 
 									  printf("%d,%d,%s\n", id_max, freq_max, vm_max) > output
                             } ## read each file
 }
