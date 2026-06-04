@@ -23,8 +23,8 @@ ostream& operator<<(ostream& os, const Numeric_lib::Matrix<double, 1>& m){
 
 int main(int argc, char** argv){
 	
-	int nx = 32, ns = 32;
-	double a = 0., b = M_PI, c = 0. , d = M_PI;
+	int nx = 41, ns = 41;
+	double a = 0., b = 1., c = -2. , d = 2.;
 	double p = 4.;
 	
     double alpha = 1.; // initial value for alpha
@@ -42,26 +42,29 @@ int main(int argc, char** argv){
 	}
 	//printf("nx=%d, ns=%d, a=%.4f, b=%.4f, c=%.4f, d=%.4f\n", nx, ns, a, b, c, d);
 
-	image<double>  u;
+	image<double> u;
+	u.a = a;
+	u.b = b;
+	u.ns = ns;
+
 	kernel<double> K;
-    integral_operator<kernel<double>, double> iop(K, a, b, c, d, nx, ns); // define integral operator with the kernel k	
+        integral_operator<kernel<double>, double> iop(K, a, b, c, d, nx, ns); // define integral operator with the kernel k	
+
 	Numeric_lib::Matrix<double,1> g  = iop(u); // g(s) is an image of the u from the action of K must be double func(double)
 	Numeric_lib::Matrix<double,2> K_ = iop(K); // K_(s,t)
 
-        
 	Numeric_lib::Matrix<double,2> B(ns,ns);
 	Numeric_lib::Matrix<double,2> C(ns,ns);
 	Numeric_lib::Matrix<double,1> y(ns);
+
 //********************************************
 
-//************************************************/
-		
 	double h = (b-a) / ns;
         for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
 		for (int j=0; j<ns; ++j){
 			 double t = a + 0.5 * h + j * h;
-			 B(i,j) = K_(i,j) * h;
+			 B(i,j) = K_(s,t) * h;
 			 C(i,j) = 0.;
 		}
 		y(i) = g(i);
@@ -71,12 +74,12 @@ int main(int argc, char** argv){
 		C(i,i) = (1. + 2. * p / (h*h));
 
 	for(int i=1; i<ns; ++i)
-		C(i,i-1) = (-alpha * p / (h*h));
+		C(i,i-1) = (-p / (h*h));
 
 	for(int i=0; i<ns-1; ++i)
-		C(i,i+1) = (-alpha * p / (h*h));
+		C(i,i+1) = (-p / (h*h));
 
-	C(0,0) = C(ns-1,ns-1) = 1. + p / (h*h);
+	C(0,0) = C(ns-1,ns-1) = (1. + p / (h*h));
 
 /******************************************
         printf("h:\n");
@@ -120,19 +123,18 @@ int main(int argc, char** argv){
 
 	for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
-		printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), 2./M_PI);
-		//printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), 1.);		
-    }
+		printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), z(s));
+        }
 	    Numeric_lib::Matrix<double,1> yexact(z1.dim1());
 	    for(int i=0; i<z1.dim1(); ++i){
 			
 			double s = a + 0.5 * h + i * h;
 			//yexact(i) = 1.;
-			yexact(i) = 2./M_PI;
+			yexact(i) = z(s);
         }
        
-		printf("\n%12s%12.6f%12.6f%12.6f%12.6f\n", "Check:", vnorm(A*z1-y), vnorm(A*z2-y), vnorm(A*z3-y), vnorm(A*yexact - y));
-		printf("\n%12s%12.6g\n","alpha:", alpha);
+	printf("\n%12s%12.6f%12.6f%12.6f%12.6f\n", "Check:", vnorm(A*z1-y), vnorm(A*z2-y), vnorm(A*z3-y), vnorm(A*yexact - y));
+	printf("\n%12s%12.6g\n","alpha:", alpha);
         printf("%12s%12.6g%12.6g%12.6g%12.6g\n", "Residual:", iop.residual(z1,u), iop.residual(z2,u), iop.residual(z3,u), iop.residual(yexact,u));
 		
 	return 0;

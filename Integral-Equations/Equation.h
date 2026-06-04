@@ -5,12 +5,13 @@
 /******************************
  Integral[a,b] {K(x,s)*z(s)} ds = u(x)
 *******************************/
-template<class T> T u(T x){
-                    return 2. * x - M_PI;
-}
 
 template<class T> T K(T x, T s){
-                    return x - s;
+                    return 1./(1. + 100. * (x-s) * (x-s));
+}
+
+template<class T> T z(T s){
+                    return (exp(-(s-0.3)*(s-0.3)/0.03) + exp(-(s-0.7)*(s-0.7)/0.03))/0.9550408-0.052130913;
 }
 
 #endif

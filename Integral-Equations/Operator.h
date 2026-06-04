@@ -5,10 +5,24 @@
 #include "Equation.h"
 
 template<class T>
+struct kernel;
+
+template<class T>
 struct image{
 	//T operator()(T x) {return 2. * x - M_PI;}
 	//T operator()(T x) {return M_PI;}
-	T operator()(T x) {return u(x);}
+	T operator()(T x){
+	                   T h = (b-a)/ns;
+	                   T sum = 0.;
+	                   for(int i=0; i<ns; ++i){
+		               T s = a + 0.5 * h + i * h;
+			       // cout << z(s) << endl;
+	                       sum += K(x,s) * z(s) * h;
+		           }
+	  return sum;
+	}
+	T a, b;
+	int ns;
 };
 
 template<class T>
