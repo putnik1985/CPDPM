@@ -9,6 +9,7 @@ import (
 
        "github.com/CPDPM/functions"
        "github.com/CPDPM/numlib"
+
        _ "gonum.org/v1/gonum/graph/simple"
        )
 
@@ -29,18 +30,12 @@ func main() {
      }
      //fmt.Println(data["e_2l"])
      e_2l, _ := strconv.ParseFloat(data["e_2l"],64)
-     fmt.Println(e_2l)
-/////////////////////////////////////////////////
-     root := numlib.sect(e, -1., 1.)
-     fmt.Println(root)
-     return
-/////////////////////////////////////////////////
      for angle := 5; angle <= 90; angle += 5 {
          //fmt.Println(math.Pi * float64(angle) / 180.)
          rad := float64(angle) * math.Pi / 180.
          // solve equation
             k := math.Sin(rad)
-	    var psiL float64
+	    var psiL float64 
          psiL = functions.BF(psiL, k)
          beta := functions.F(psiL)
          f_2L := (k/beta) * (1. - math.Cos(psiL))

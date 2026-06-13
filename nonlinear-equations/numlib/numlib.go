@@ -7,7 +7,7 @@ func test(x float64) float64 {
      return x;
 }
 
-func sect(f func(float64) float64, a float64, b float64) float64 {
+func Sect(f func(float64) float64, a float64, b float64) float64 {
       var x0, x1 float64
       var error float64
       error = 1.e-8
