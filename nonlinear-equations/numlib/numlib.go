@@ -3,9 +3,6 @@ package numlib
 import "math"
 import "fmt"
 
-func test(x float64) float64 {
-     return x;
-}
 
 func Sect(f func(float64) float64, a float64, b float64) float64 {
       var x0, x1 float64
