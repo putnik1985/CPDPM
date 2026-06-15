@@ -23,11 +23,14 @@ ostream& operator<<(ostream& os, const Numeric_lib::Matrix<double, 1>& m){
 
 int main(int argc, char** argv){
 	
-	int nx = 41, ns = 41;
-	double a = 0., b = 1., c = -2. , d = 2.;
-	double p = 4.;
+    int nx = 41, ns = 41;
+    double a = 0., b = 1., c = -2. , d = 2.;
+    double p = 4.;
 	
-    double alpha = 1.; // initial value for alpha
+    double alpha0 = 0.001; // initial value for alpha
+    double dalpha = 0.0001;
+    double alpha = 1.;
+    double alpha2 = -1.;
 	
         for(int i=0; i< argc; ++i){
 		if (strcmp(argv[i], "-nx")==0) nx = atoi(argv[i+1]);
@@ -97,8 +100,18 @@ int main(int argc, char** argv){
         cout << "C\n";
         cout << C;
 ********************************************/
-		
-	Numeric_lib::Matrix<double,2> A = B + C * alpha;
+   
+       Numeric_lib::Matrix<double,1> yexact(ns);
+	    for(int i=0; i<ns; ++i){
+		double s = a + 0.5 * h + i * h;
+		yexact(i) = z(s);
+            }
+
+        double delta = 1.;
+        Numeric_lib::Matrix<double,1> zdelta(ns);
+        double alfa = alpha0;
+        while ( alfa < alpha) {
+	Numeric_lib::Matrix<double,2> A = B + C * alfa;
 	
 /*********************************************************
         cout << "A\n";
@@ -125,17 +138,26 @@ int main(int argc, char** argv){
 		double s = a + 0.5 * h + i * h;
 		printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), z(s));
         }
-	    Numeric_lib::Matrix<double,1> yexact(z1.dim1());
-	    for(int i=0; i<z1.dim1(); ++i){
-			
-			double s = a + 0.5 * h + i * h;
-			//yexact(i) = 1.;
-			yexact(i) = z(s);
-        }
+
        
 	printf("\n%12s%12.6f%12.6f%12.6f%12.6f\n", "Check:", vnorm(A*z1-y), vnorm(A*z2-y), vnorm(A*z3-y), vnorm(A*yexact - y));
-	printf("\n%12s%12.6g\n","alpha:", alpha);
+	printf("\n%12s%12.6g\n","alpha:", alfa);
         printf("%12s%12.6g%12.6g%12.6g%12.6g\n", "Residual:", iop.residual(z1,u), iop.residual(z2,u), iop.residual(z3,u), iop.residual(yexact,u));
-		
+          if ( delta > iop.residual(z2,u) ){
+               delta = iop.residual(z2,u);
+               zdelta = z2;
+               alpha2 = alfa;
+          }		
+          alfa += dalpha;
+        } // alfa cycle
+        
+        printf("\n\n---------------------S U M M A R Y------------------------------------\n\n");
+        printf("delta: %.6f\n", delta);
+        printf("alpha: %.6f\n", alpha2);
+	printf("\n%12s%12s%12s\n", "s", "Square", "Exact");
+	for(int i=0; i<ns; ++i){
+		double s = a + 0.5 * h + i * h;
+		printf("%12.6f%12.6f%12.6f\n", s, zdelta(i), z(s));
+        }
 	return 0;
 }
