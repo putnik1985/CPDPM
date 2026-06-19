@@ -39,7 +39,7 @@ func main() {
 	 eq.K = 0.
 	 
 	 fmt.Printf("%12s%12s%12s%12s(e/2l=%3.2f)%12s\n","k", "psiL(deg)", "beta", "P/P_e", e_2l, "f/2L")
-     for angle := 5; angle <= 90; angle += 5 {
+     for angle := 5; angle <= 75; angle += 5 {
          //fmt.Println(math.Pi * float64(angle) / 180.)
          rad := float64(angle) * math.Pi / 180.
          // solve equation

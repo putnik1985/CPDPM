@@ -1,3 +1,7 @@
+set title "Bar Stability \n Nonlinear Equation (Feodosiev, Problem#137)"
+set grid
+set xlabel "f/2l"
+set ylabel "P/Pe"
 
 plot 'sol_0_00.dat' using 5:4 title columnhead with lines,\
      'sol_0_02.dat' using 5:4 title columnhead with lines,\
