@@ -1,0 +1,4 @@
+
+plot 'sol_0_00.dat' using 5:4 title columnhead with lines,\
+     'sol_0_02.dat' using 5:4 title columnhead with lines,\
+     'sol_0_04.dat' using 5:4 title columnhead with lines
