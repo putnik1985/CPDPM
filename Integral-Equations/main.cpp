@@ -23,11 +23,11 @@ ostream& operator<<(ostream& os, const Numeric_lib::Matrix<double, 1>& m){
 
 int main(int argc, char** argv){
 	
-    int nx = 41, ns = 41;
+    int nx = 6, ns = 6;
     double a = 0., b = 1., c = -2. , d = 2.;
     double p = 4.;
 	
-    double alpha0 = 0.001; // initial value for alpha
+    double alpha0 = 0.00001; // initial value for alpha
     double dalpha = 0.0001;
     double alpha = 1.;
     double alpha2 = -1.;
@@ -50,6 +50,13 @@ int main(int argc, char** argv){
 	u.b = b;
 	u.ns = ns;
 
+        printf("Solution Image:\n");
+        auto hx = (d-c)/nx;
+        for(int i=0; i<nx; ++i){
+	    double x = c + 0.5 * hx + i * hx;
+            printf("%4.2f%8.4f\n", x, u(x)); 
+        }
+        printf("\n");
 	kernel<double> K;
         integral_operator<kernel<double>, double> iop(K, a, b, c, d, nx, ns); // define integral operator with the kernel k	
 
@@ -84,7 +91,7 @@ int main(int argc, char** argv){
 
 	C(0,0) = C(ns-1,ns-1) = (1. + p / (h*h));
 
-/******************************************
+//////******************************************
         printf("h:\n");
 		printf("%12.4f\n",h);
 
@@ -99,7 +106,7 @@ int main(int argc, char** argv){
 
         cout << "C\n";
         cout << C;
-********************************************/
+/////********************************************/
    
        Numeric_lib::Matrix<double,1> yexact(ns);
 	    for(int i=0; i<ns; ++i){
@@ -110,16 +117,15 @@ int main(int argc, char** argv){
         double delta = 1.;
         Numeric_lib::Matrix<double,1> zdelta(ns);
         double alfa = alpha0;
-        while ( alfa < alpha) {
+        while (alfa < alpha) {
 	Numeric_lib::Matrix<double,2> A = B + C * alfa;
 	
-/*********************************************************
+////*********************************************************
         cout << "A\n";
         cout << A;
         cout << "y\n";
         cout << y ;
-**********************************************************/
-
+////**********************************************************/
 
 	//cout << "\nGauss\n" << A << "\n" << y;	
 	Numeric_lib::Matrix<double,1> z1 = gauss(A,y);
@@ -132,13 +138,10 @@ int main(int argc, char** argv){
 	//cout << "Integral Equation Solution:" << endl;
 	printf("\n%12s%12s%12s%12s%12s\n", "s", "Gauss", "Square", "Hausholder", "Exact");
 
-
-
 	for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
 		printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), z(s));
         }
-
        
 	printf("\n%12s%12.6f%12.6f%12.6f%12.6f\n", "Check:", vnorm(A*z1-y), vnorm(A*z2-y), vnorm(A*z3-y), vnorm(A*yexact - y));
 	printf("\n%12s%12.6g\n","alpha:", alfa);
@@ -148,7 +151,7 @@ int main(int argc, char** argv){
                zdelta = z2;
                alpha2 = alfa;
           }		
-          alfa += dalpha;
+          alfa *= 10.;
         } // alfa cycle
         
         printf("\n\n---------------------S U M M A R Y------------------------------------\n\n");
