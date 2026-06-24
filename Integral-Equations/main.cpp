@@ -23,11 +23,11 @@ ostream& operator<<(ostream& os, const Numeric_lib::Matrix<double, 1>& m){
 
 int main(int argc, char** argv){
 	
-    int nx = 6, ns = 6;
+    int nx = 41, ns = 41;
     double a = 0., b = 1., c = -2. , d = 2.;
     double p = 4.;
 	
-    double alpha0 = 0.00001; // initial value for alpha
+    double alpha0 = 1.E-16; // initial value for alpha
     double dalpha = 0.0001;
     double alpha = 1.;
     double alpha2 = -1.;
@@ -49,7 +49,7 @@ int main(int argc, char** argv){
 	u.a = a;
 	u.b = b;
 	u.ns = ns;
-
+/******************************************************************************
         printf("Solution Image:\n");
         auto hx = (d-c)/nx;
         for(int i=0; i<nx; ++i){
@@ -57,6 +57,8 @@ int main(int argc, char** argv){
             printf("%4.2f%8.4f\n", x, u(x)); 
         }
         printf("\n");
+******************************************************************************/
+
 	kernel<double> K;
         integral_operator<kernel<double>, double> iop(K, a, b, c, d, nx, ns); // define integral operator with the kernel k	
 
@@ -69,15 +71,21 @@ int main(int argc, char** argv){
 
 //********************************************
 
+
 	double h = (b-a) / ns;
+	Numeric_lib::Matrix<double,1> g_exact(ns);
+	Numeric_lib::Matrix<double,2> K_exact(ns,ns);
+
         for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
 		for (int j=0; j<ns; ++j){
 			 double t = a + 0.5 * h + j * h;
-			 B(i,j) = K_(s,t) * h;
+			 //K_exact(i,j) = exp(-(s+t)) * (exp(2.*d) - exp(2.*c))/2.;
+			 B(i,j) = K_(i,j) * h;
 			 C(i,j) = 0.;
 		}
 		y(i) = g(i);
+		//g_exact(i) = exp(-s) * (b-a) * (exp(2.*d)-exp(2.*c))/2.;
 	}
 
 	for(int i=0; i<ns; ++i)
@@ -91,22 +99,28 @@ int main(int argc, char** argv){
 
 	C(0,0) = C(ns-1,ns-1) = (1. + p / (h*h));
 
-//////******************************************
+/******************************************
         printf("h:\n");
 		printf("%12.4f\n",h);
 
         cout << "g\n";
         cout << g ;
 
+        cout << "g_exact\n";
+        cout << g_exact ;
+
         cout << "K\n";
         cout << K_;
 		
+        cout << "K_exact\n";
+        cout << K_exact;
+
         cout << "B\n";
         cout << B;
 
         cout << "C\n";
         cout << C;
-/////********************************************/
+********************************************/
    
        Numeric_lib::Matrix<double,1> yexact(ns);
 	    for(int i=0; i<ns; ++i){
@@ -120,12 +134,12 @@ int main(int argc, char** argv){
         while (alfa < alpha) {
 	Numeric_lib::Matrix<double,2> A = B + C * alfa;
 	
-////*********************************************************
+/*********************************************************
         cout << "A\n";
         cout << A;
         cout << "y\n";
         cout << y ;
-////**********************************************************/
+**********************************************************/
 
 	//cout << "\nGauss\n" << A << "\n" << y;	
 	Numeric_lib::Matrix<double,1> z1 = gauss(A,y);
@@ -135,9 +149,9 @@ int main(int argc, char** argv){
 
 	//cout << "\nHausholder\n" << A << "\n" << y;
 	Numeric_lib::Matrix<double,1> z3 = hausholder(A,y);	
+/*********************************************************************************************************
 	//cout << "Integral Equation Solution:" << endl;
 	printf("\n%12s%12s%12s%12s%12s\n", "s", "Gauss", "Square", "Hausholder", "Exact");
-
 	for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
 		printf("%12.6f%12.6f%12.6f%12.6f%12.6f\n", s, z1(i), z2(i), z3(i), z(s));
@@ -146,6 +160,7 @@ int main(int argc, char** argv){
 	printf("\n%12s%12.6f%12.6f%12.6f%12.6f\n", "Check:", vnorm(A*z1-y), vnorm(A*z2-y), vnorm(A*z3-y), vnorm(A*yexact - y));
 	printf("\n%12s%12.6g\n","alpha:", alfa);
         printf("%12s%12.6g%12.6g%12.6g%12.6g\n", "Residual:", iop.residual(z1,u), iop.residual(z2,u), iop.residual(z3,u), iop.residual(yexact,u));
+********************************************************************************************************/
           if ( delta > iop.residual(z2,u) ){
                delta = iop.residual(z2,u);
                zdelta = z2;
@@ -155,8 +170,8 @@ int main(int argc, char** argv){
         } // alfa cycle
         
         printf("\n\n---------------------S U M M A R Y------------------------------------\n\n");
-        printf("delta: %.6f\n", delta);
-        printf("alpha: %.6f\n", alpha2);
+        printf("delta: %.6g\n", delta);
+        printf("alpha: %.6g\n", alpha2);
 	printf("\n%12s%12s%12s\n", "s", "Square", "Exact");
 	for(int i=0; i<ns; ++i){
 		double s = a + 0.5 * h + i * h;
