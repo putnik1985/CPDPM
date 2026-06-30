@@ -5,8 +5,8 @@ BEGIN{
     type["cquad4"] = 33
     type["ctria3"] = 74
 	
-	if (ARGC < 7){
-		print "usage awk -f sine-stress-combinations.awk stress=list_of_all_stresses components=list_of_components_results Fy=44. Fu=44. FSy=1.25 FSu=2.0";
+	if (ARGC < 8){
+		print "usage awk -f sine-stress-combinations.awk stress=list_of_all_stresses components=list_of_components_results Fy=44. Fu=44. FSy=1.25 FSu=2.0 out=out";
 		exit;
 	}
 
@@ -16,7 +16,7 @@ BEGIN{
 	     ####print a[1], a[2]
 	     data[a[1]] = a[2];
         }
-
+    dir = data["out"]
 	stress  = data["stress"];
 	Fy  = data["Fy"];
 	Fu  = data["Fu"];
@@ -25,7 +25,7 @@ BEGIN{
 	FSu  = data["FSu"];
 
 	components = data["components"]
-	######print "Elements To Work With"
+	##print "Read Components File: " components
 	while(getline < components > 0){
 	  n = split($0, out, ".")
 	  component[++ncomponent] = out[1]
@@ -36,32 +36,40 @@ BEGIN{
 	#    print component[k]
 	
 	n = split(stress, out, "/")
-    (n==1) ? folder = "." : folder = out[1]
-	##print folder
+    ##########(n==1) ? folder = "." : folder = out[1]
+	folder = out[1]
+	for(i=2;i<=n-1;++i)
+	    folder = folder "/" out[i]
+	
+	###print folder
 	##exit
-	print stress
-	print getline < stress
+	####print getline < stress
+	####print getline < stress
 	##exit
+
+	###print "Read Stress File: " stress
     while (getline < stress > 0){
       n = split($0, out, ".")
-      print $0, out[1]
+      #####print $0, out[1]
 	  all_components[out[1]] = all_components[out[1]] folder "/" $0 ","
-	  #####print all_components[out[1]]
+	  ###print all_components[out[1]]
     }	  
-    exit
+
+    ###exit
 
 	for(k=1;k<=ncomponent;++k){
 	    comp = component[k]
+		###print comp
 		n = split(all_components[comp], files, ",")
 
 		vm_max = 0.;
         freq_max = 0.;
         id_max = 0;		
 		for(i=1; i<n; ++i){
-		    ##print files[i]
+		    ###print files[i]
 			while (getline < files[i] > 0){
 			       split($0, values, ",")
-				   
+				   ####print $0
 				   if (values[3] > vm_max){
 				       vm_max = values[3]
 					   freq_max = values[2]
@@ -72,8 +80,8 @@ BEGIN{
 	
  
 	if (vm_max > 0) {
-        output = comp ".MoS"
-	    print output
+        output = dir "/" comp ".MoS"
+	    ####print output
 	    print "Input:" > output
 	    printf("Fy =%f, Fu =%f, FSy = %f, FSu = %f\n", Fy, Fu, FSy, FSu) >> output	
         printf("\n\n%s,%s,%s,%s,%s,\n", "Element","Frequency", "VM", "MOS Yield", "MOS Ultimate") >> output
