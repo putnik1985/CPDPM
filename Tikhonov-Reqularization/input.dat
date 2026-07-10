@@ -1,0 +1,11 @@
+dimension:
+2
+
+matrix:
+-2.0 2.0
+ 3.0 1.0
+
+
+vector b:
+2.
+5.
