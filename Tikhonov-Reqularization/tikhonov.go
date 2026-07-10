@@ -1,13 +1,14 @@
 package main
 
-import "gonum.org/v1/gonum/mat"
 import "fmt"
+import "gonum.org/v1/gonum/mat"
+import "log"
 
 func main(){
-	a := mat.Dense(2, 2, []float64 {
-		1., -1.,
-		1.,  1.,
-	})
+        ///var input []float64={1., -1., 1., 1.,}
+
+	a := mat.NewDense(2, 2, []float64 { 1., -1.,
+                                            1., 1.})
         fmt.Printf("A = %v\n\n", mat.Formatted(a, mat.Prefix("     ")))
 	var eig mat.Eigen
 	ok := eig.Factorize(a, mat.EigenLeft)
