@@ -7,7 +7,6 @@ import  "bufio"
 import "strings"
 import _ "strconv"
 import "os"
-import "io"
 
 func main(){
         ///var input []float64={1., -1., 1., 1.,}
@@ -34,22 +33,24 @@ func main(){
 
 	file := data["file"]
 	fmt.Printf("Input file: %s\n", file)
-	handler, err := os.Open(file)
-	defer handler.Close()
-	if (err != nil){
-		message := fmt.Sprintf("can not read file: %s", file)
-		panic(message)
-	}
-	string_vector := read(handler, "vector")
-	string_n := read(handler, "dimension")
-	string_matrix := read(handler, "matrix")
+	string_vector := read(file, "vector")
+	string_n := read(file, "dimension")
+	string_matrix := read(file, "matrix")
 
 	fmt.Println(string_n, string_matrix, string_vector)
 
 }
 
-func read(handler io.Reader, key string) []string {
+func read(filename string, key string) []string {
         var output []string
+
+	handler, err := os.Open(filename)
+	defer handler.Close()
+	if (err != nil){
+		message := fmt.Sprintf("can not read file: %s", filename)
+		panic(message)
+	}
+
 	scanner := bufio.NewScanner(handler)
 	var found bool = false
 	fmt.Println("looking for: ", key)
