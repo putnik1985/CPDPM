@@ -56,6 +56,10 @@ func main(){
         } 
 
 	fmt.Println(matrix)
+
+	A := mat.NewDense(int(n[0]),int(n[1]),matrix)
+        fmt.Printf("A = %v\n\n", mat.Formatted(A, mat.Prefix("     ")))
+
 }
 
 func read(filename string, key string) []string {
@@ -99,7 +103,7 @@ func convert_slice_to_numbers(strings []string) ([]float64, error) {
 
      var output []float64
          for _, value := range strings {
-             ////////////fmt.Println(value)
+             //fmt.Println(value)
              number, err := strconv.ParseFloat(value,64)
              if (err != nil) {
                  panic("can not convert into numbers:")
