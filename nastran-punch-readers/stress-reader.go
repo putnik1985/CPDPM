@@ -12,7 +12,7 @@ func main() {
         etypes["ctetra"] = 39
         var fields []string
         var NF int
-        var subcase int
+        ////var subcase int
 
         data := make(map[string]string)
 	for _, value := range os.Args {
@@ -39,7 +39,7 @@ func main() {
 		chline := line[:len(line)-8]
 		///fmt.Printf("%s\n",chline)
 		if (strings.Contains(chline, "$ELEMENT STRESSES")) {
-			fmt.Println(chline)
+			///fmt.Println(chline)
                         scanner.Scan()
 			line, fields = readline(scanner)
 			/************************
@@ -50,7 +50,7 @@ func main() {
 			*****************************/
 
 			NF = len(fields)
-			subcase, _ = strconv.Atoi(fields[NF-1])
+			////subcase, _ = strconv.Atoi(fields[NF-1])
 			/************************************************************
                         scanner.Scan()
 			line = scanner.Text()
@@ -64,7 +64,7 @@ func main() {
 			read_type, _ := strconv.Atoi(fields[NF-1])
 			begin := fields[0]
 			if (read_type == etypes["ctetra"]) {
-				fmt.Println("Subcase: ",subcase)
+				///fmt.Println("Subcase: ",subcase)
 			        for scanner.Scan() && begin != "$TITLE" {
 			            /*****************************************************************
 			            line = scanner.Text()
@@ -74,13 +74,49 @@ func main() {
 				    line, fields = splitline(scanner)
 				    begin = fields[0]
 				    if (strings.ContainsAny(begin,"0123456789")) {
-				        fmt.Println(begin)
+				        ///fmt.Println(begin)
+					EID, _ := strconv.ParseInt(begin, 10, 64)
+
+					line, fields = readline(scanner)
+					///fmt.Println(line)
+					 X, _ := strconv.ParseFloat(fields[2], 64)
+					XY, _ := strconv.ParseFloat(fields[3], 64)
+                                        
+					line, fields = readline(scanner)
+					//fmt.Println(line)
+					 A, _ := strconv.ParseFloat(fields[1], 64)
+
+					line, fields = readline(scanner)
+					//fmt.Println(line)
+					 P, _ := strconv.ParseFloat(fields[2], 64)
+					 VM, _ := strconv.ParseFloat(fields[3], 64)
+
+					line, fields = readline(scanner)
+					//fmt.Println(line)
+					 Y, _ := strconv.ParseFloat(fields[1], 64)
+					YZ, _ := strconv.ParseFloat(fields[2], 64)
+					 B, _ := strconv.ParseFloat(fields[3], 64)
+
+					line, fields = readline(scanner)
+					//fmt.Println(line)
+
+					line, fields = readline(scanner)
+					//fmt.Println(line)
+					 Z, _ := strconv.ParseFloat(fields[1], 64)
+					ZX, _ := strconv.ParseFloat(fields[2], 64)
+					 C, _ := strconv.ParseFloat(fields[3], 64)
+
+					line, fields = readline(scanner)
+					///fmt.Println(line)
+	                                fmt.Printf("%16d%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e\n", EID, X, Y, Z, XY, YZ, ZX, A, B, C, P, VM)
+
 			            }
 				}
 			}
 		}
 	}
 }
+
 
 func readline(scanner *bufio.Scanner) (string, []string) {
 	var line string
@@ -104,3 +140,4 @@ func splitline(scanner *bufio.Scanner) (string, []string) {
 	fields = strings.Fields(chline)
 	return line, fields
 }
+
