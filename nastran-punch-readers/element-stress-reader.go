@@ -10,6 +10,11 @@ import "strconv"
 func main() {
 	etypes := make(map[string]int)
         etypes["ctetra"] = 39
+        etypes["chexa"] = 67 
+        etypes["cpenta"] = 68 
+        etypes["cquad4"] = 33 
+        etypes["ctria"] = 74 
+        etypes["cquadr"] = 228 
         var fields []string
         var NF int
         ////var subcase int
@@ -63,7 +68,47 @@ func main() {
 			NF = len(fields)
 			read_type, _ := strconv.Atoi(fields[NF-1])
 			begin := fields[0]
-			if (read_type == etypes["ctetra"]) {
+			if (read_type == etypes["cquad4"] || read_type == etypes["cquadr"] || read_type == etypes["ctria"]){
+				///fmt.Println("Subcase: ",subcase)
+			        for scanner.Scan() && begin != "$TITLE" {
+				    line, fields = splitline(scanner)
+				    begin = fields[0]
+				    if (strings.ContainsAny(begin,"0123456789")) {
+					EID, _ := strconv.ParseInt(begin, 10, 64)
+					X, _ := strconv.ParseFloat(fields[2], 64)
+					Y, _ := strconv.ParseFloat(fields[3], 64)
+					line, fields = readline(scanner)
+					XY, _ := strconv.ParseFloat(fields[1], 64)
+					A, _ := strconv.ParseFloat(fields[3], 64)
+					line, fields = readline(scanner)
+					B, _ := strconv.ParseFloat(fields[1], 64)
+					VM, _ :=strconv.ParseFloat(fields[2], 64)
+					Z := 0.
+					YZ := 0.
+					ZX := 0.
+					C := 0.
+					P := 0.
+	                                fmt.Printf("%16d%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e\n", EID, X, Y, Z, XY, YZ, ZX, A, B, C, P, VM)
+					line, fields = readline(scanner)
+					X, _ = strconv.ParseFloat(fields[1], 64)
+					Y, _ = strconv.ParseFloat(fields[2], 64)
+					XY, _ = strconv.ParseFloat(fields[3], 64)
+					line, fields = readline(scanner)
+					A, _ = strconv.ParseFloat(fields[2], 64)
+					B, _ = strconv.ParseFloat(fields[3], 64)
+					line, fields = readline(scanner)
+					VM, _ =strconv.ParseFloat(fields[1], 64)
+					Z = 0.
+					YZ = 0.
+					ZX = 0.
+					C = 0.
+					P = 0.
+	                                fmt.Printf("%16d%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e%16.4e\n", EID, X, Y, Z, XY, YZ, ZX, A, B, C, P, VM)
+			            }
+				}
+			} //if CQUAD
+
+			if (read_type == etypes["ctetra"] || read_type == etypes["chexa"] || read_type == etypes["cpenta"]) {
 				///fmt.Println("Subcase: ",subcase)
 			        for scanner.Scan() && begin != "$TITLE" {
 			            /*****************************************************************
@@ -112,7 +157,7 @@ func main() {
 
 			            }
 				}
-			}
+			} // if CTETRA CHEXA
 		}
 	}
 }
