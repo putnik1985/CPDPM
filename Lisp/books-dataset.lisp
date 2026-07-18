@@ -58,3 +58,10 @@
              ((fictionp (first books))
               (+ 1 (count-fiction-books (rest books))))
              (t (count-fiction-books (rest books))))) 
+
+;;search book by title
+(defun find-book-by-title-words (words books)
+       (cond ((endp books) nil)
+             ((subsetp words (book-title (first books))) 
+              (cons (first books) (find-book-by-title-words words (rest books))))
+             (t (find-book-by-title-words words (rest books)))))
