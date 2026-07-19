@@ -1,0 +1,6 @@
+(defun read-file (filename)
+ (with-open-file (patient-stream filename :direction :input)
+  (do ( (patient (read patient-stream nil)
+                 (read patient-stream nil)))
+        ((not patient))
+        (print patient) )))
