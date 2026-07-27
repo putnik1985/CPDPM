@@ -7,6 +7,7 @@ program modes
    integer length
    character(len=MAX_WORD) filename
    character(len=MAX_WORD) line
+   character(len=12) condition
 
    print*, "Please input filename"
    read*, filename
@@ -18,11 +19,20 @@ program modes
    do i=1,MAX_RECORDS
       read(12,'(A)',end=100) line
       L = length(line)
-      !!!!L = LEN(line) defines actual length during the definition
       n = n + 1
       m = index(line, ',')
       if (m .gt. 0) then
+          condition = line(m+1:)
           write(*,'(A)') line(:m-1)
+          write(*,'(A)') condition
+          call remove_leading_spaces(condition)
+          call remove_trailing_spaces(condition)
+          if (condition .eq. "supported") then
+                  write(*,*) "Found supported"
+          else if (condition .eq. "clamped") then
+                  write(*,*) "Found clamped"
+          endif
+          write(*,'(A,I16)') condition, length(condition)
       else 
           write(*,'(A)') line(:L)
       endif
