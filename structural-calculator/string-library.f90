@@ -16,3 +16,12 @@ subroutine remove_trailing_spaces(line)
         character(*) line
         line = trim(line)
 end 
+
+real function string_to_real(str)
+        character(*) str
+        real number
+
+        read(str,'(F12.4)') number
+        string_to_real = number
+        return
+end function string_to_real
