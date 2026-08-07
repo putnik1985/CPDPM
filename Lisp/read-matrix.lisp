@@ -1,0 +1,10 @@
+(defun read-matrix (file arr)
+       (setf n 0)
+       (with-open-file (input-stream file :direction :input)
+        (do ((element (read input-stream nil)
+                      (read input-stream nil)))
+            ((not element))
+            (print element) 
+            (setf (aref arr n) element)
+            (setf n (+ n 1)))))             
+       
