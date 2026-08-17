@@ -1,5 +1,5 @@
-x=0.0,clamped
-x=2.1,clamped
+x=0.0,supported
+x=2.1,supported
 y=0.,supported
 y=4.0,supported
 E=2.E+11
