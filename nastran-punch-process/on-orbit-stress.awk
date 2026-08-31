@@ -61,12 +61,13 @@ BEGIN{
                                 ####print sxy								
 						    } 
 
-						 
-						 if (vm > stress[id]) {
+						 ####print case_number, id, stress[id], vm
+						 delta = vm - stress[id]
+						 if (delta > 0.) {
 						          stress[id] = vm
 								  frequency[id] = case_number
 						 }
-						 ####print case_number, id, vm
+						 ####print case_number, id, stress[id], vm
 						 
 				   }
 				   
@@ -146,7 +147,7 @@ BEGIN{
 	                                  for(i=1; i<=ngroup; ++i){
                                                id = group[i]
                                                num = sprintf("%d",id)
-											   ####print num, stress[num],vm_max
+											   ##print num, stress[num],vm_max
 											   str = sprintf("%g",stress[num])
 											   ###print id, stress[num], vm_max, stress[num]-vm_max
 											   delta = stress[num]-vm_max
