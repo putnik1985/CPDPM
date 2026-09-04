@@ -28,7 +28,7 @@ BEGIN{
 	       if ($1 ~ /^[0-9]/) {
 		       ###print $0
 			   id = $1
-			   vm = $NF
+			   vm = max($NF, $(NF-1))
 			   delta = vm - stress[id]
 				if (delta > 0.) {
 					stress[id] = vm
