@@ -70,7 +70,7 @@ BEGIN{
 			   }
 		   }
 	}
-	printf("\n\n%12d%12d%12.4f\n", elem_max, load_case_max, vm_max)						  
+	printf("%d,%d,%.4f\n", elem_max, load_case_max, vm_max)						  
 }
 
 function abs(x){
