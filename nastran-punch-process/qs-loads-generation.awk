@@ -43,14 +43,14 @@ BEGIN{
          }			 
 	 } ## while (getline ...)
 
-     print "Case Control Section"
+     print "$$$$Case Control Section" > "case-control.dat"
      for(i=1; i<= loadcase; ++i){
-	     print "subcase " i
-		 print "load = " i
+	     print "subcase " i >> "case-control.dat"
+		 print "load = " i >> "case-control.dat"
 	 }
 	 
-	 print ""
-     print "Bulk Data"
+	 ##print ""
+     ##print "Bulk Data"
 	 for(i=1; i<=loadcase; ++i){
 	     sub(",g,","," accel ",",gload[i]);
          print gload[i];
