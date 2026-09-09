@@ -5,8 +5,8 @@ BEGIN{
     type["cquad4"] = 33
     type["ctria3"] = 74
 	
-	if (ARGC < 3){
-		print "usage awk -f qs-element-stress.awk file=inp.pch elements=elements.dat";
+	if (ARGC < 4){
+		print "usage awk -f qs-element-stress.awk file=inp.pch elements=elements.dat out=dir";
 		exit;
 	}
 
@@ -19,7 +19,8 @@ BEGIN{
 
 	file  = data["file"];
 	elements = data["elements"] ##list of files where the elements for each component
-
+    dir = data["out"]
+	
 	######print "Elements To Work With"
 	while(getline < elements > 0){
 	  list[++nlist] = $1
@@ -137,7 +138,7 @@ BEGIN{
 											   }
                                                #####printf("%d,%.2f,%s\n", num, frequency[num], stress[num])
                                       }
-									  output = element_file file ".stress" 
+									  output = dir "/" element_file file ".stress" 
 									  printf("%d,%.2f,%s\n", id_max, freq_max, vm_max) > output
                             } ## read each file
 }
