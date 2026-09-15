@@ -28,7 +28,14 @@ BEGIN{
 	       if ($1 ~ /^[0-9]/) {
 		       ###print $0
 			   id = $1
-			   vm = max($NF, $(NF-1))
+			   vm1 = max($NF, $(NF-1))
+			   vm2 = 0.
+			   if ($3 ~ /CQUAD/) {
+			       readline()
+				   vm2 = max($NF, $(NF-1))
+			   }
+			   vm = max(vm1, vm2)
+			   
 			   delta = vm - stress[id]
 				if (delta > 0.) {
 					stress[id] = vm
