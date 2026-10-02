@@ -1,12 +1,13 @@
 BEGIN{ 
+
 	type["ctetra"] = 39; ## nastran nx element type from .pch file
 	type["cquadr"] = 228; ## nastran nx element type for from .pch file
     type["chexa"] = 67; ## nastran nx element type from .pch file CHEXA8
     type["cquad4"] = 33
     type["ctria3"] = 74
-	
-	if (ARGC < 4){
-		print "usage awk -f qs-element-stress.awk file=inp.pch elements=elements.dat out=dir";
+
+	if (ARGC < 3){
+		print "usage awk -f qs-stress-margins.awk file=inp.pch elements=elements.dat out=dir";
 		exit;
 	}
 
@@ -28,7 +29,7 @@ BEGIN{
       ####print list[nlist]
 	  #####print $1
 	}
-       
+	
 	while (readline()){
 	       
 		   if ($0 ~ /\$ELEMENT STRESSES/) {
@@ -43,7 +44,7 @@ BEGIN{
 	           vm_max = 0.
 			   
 			   if ($4 == type["ctetra"]){
-			       readline();
+			       readline()
 				   freq = $3
 			       while(readline() && $0 !~ /TITLE/){
 
@@ -54,18 +55,23 @@ BEGIN{
 						 readline();
 						 readline();
 						 readline();
-						 readline();
-						 readline();
+
 						 
-                         vm = $3
-						 if (vm > stress[id]) {
+                         vm = $4
+						    if (NF < 5) { 
+						        s = vm; 
+								vm = substr(s, 1, length(s) - 8)
+                                ####print sxy								
+						    } 
+
+						 delta = vm - stress[id]
+						 if (delta > 0.) {
 						          stress[id] = vm
-								  frequency[id] = freq
+								  frequency[id] = case_number
 						 }
-						 ##print freq, id, vm
+						 ####print case_number, id, stress[id], vm
 						 
-				   }
-				   
+				   }				   
 			   }
 			   
 			   if ($4 == type["cquadr"] || $4 == type["cquad4"] || $4 == type["ctria3"]){
@@ -88,38 +94,44 @@ BEGIN{
 							 frequency[id] = freq
 						 }
 						 ##print freq, id, vm_top, vm_bottom
-					 
 				   }
 										  
-			   }
+			   } ##cquad
 			   
 			   if ($4 == type["chexa"]){
-                           ## read stresses in the middle of the element
 			       readline()
 				   freq = $3
-				   while(readline() && $0 !~ /TITLE/){
-                            id = $1
+
+			       while(readline() && $0 !~ /TITLE/){
+				         id = $1
+						 
                             if (id !~ /^[0-9]/)
                             continue
-                            readline()
-							readline()
-							readline()
-							readline()
-							readline()
-                            vm = $3
-						    if (vm > stress[id]) {
-						          stress[id] = vm
-								  frequency[id] = freq
-						    }
+							
+						 readline()
+						 readline()
+						 readline()
+						 vm = $4
 
-							##print freq, id, vm
-                    }
-                }
+						    if (NF < 5) { 
+						        s = vm; 
+								vm = substr(s, 1, length(s) - 8)
+                                ####print sxy								
+						    }
+							
+						 if (vm > stress[id]){
+						     stress[id] = vm
+							 frequency[id] = freq
+						 }
+						 ##print freq, id, vm_top, vm_bottom
+				   }				   
+
+               } ##chexa
 
 		    }
 			}
 	}
-	                        
+
 	                        for(k=1; k<=nlist; ++k){
 							    ##########print k
 							    ngroup = 0
@@ -147,7 +159,8 @@ BEGIN{
                                       }
 									  output = dir "/" fout ".stress" 
 									  printf("%d,%.2f,%s\n", id_max, freq_max, vm_max) > output
-                            } ## read each file
+                            } ## read each file						  
+						  
 }
 
 function abs(x){
@@ -171,4 +184,4 @@ function max(a, b){
      return a
  else 
      return b
-}	 
+}	
