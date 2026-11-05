@@ -26,4 +26,6 @@ func main() {
 	fmt.Printf("%18s%18s%18s%18s%18s%18s%18s\n", "D", "P", "Stress", "Yield Shear", "Ultimate Shear", "MoS Yield", "Mos Ultimate")
 	fmt.Printf("%18s%18s%18s%18s%18s%10sFSy=%4.2f%10sFSu=%4.2f\n", "", "", "", "", "", "", FSy, "", FSu)
 	fmt.Printf("%18.6f%18.1f%18.2f%18.1f%18.1f%18.2f%18.2f\n\n", d, P, stress, Ys, Us, Ys/(FSy * stress) - 1., Us/(FSu * stress) - 1.)
+	 var str string
+         fmt.Scanf("%s",str)
 }
